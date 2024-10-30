@@ -7,7 +7,9 @@ import TextField from '@mui/material/TextField';
 import Search from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
+import type {} from '@mui/x-data-grid/themeAugmentation';
+
 // ==============================|| Procedure PAGE ||============================== //
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
@@ -116,18 +118,31 @@ const Procedure = () => {
                         // <Search sx={{ color: 'action.active', mr: 0, my: 0.5 }} />
                     }}
                 />
-                <DataGrid
-                    columns={columns}
-                    rows={rows}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 5
-                            }
-                        }
+                <Box
+                    m="8px 0 0 0"
+                    width="100%"
+                    height="80vh"
+                    sx={{
+                        '& .MuiDataGrid-root': {
+                            border: 'none'
+                        },
+                        '& .MuiDataGrid-cell': {
+                            borderBottom: 'none'
+                        },
+                        '& .name-column--cell': {},
+                        '& .MuiDataGrid-columnHeaders': {
+                            borderBottom: 'none'
+                        },
+                        '& .MuiDataGrid-virtualScroller': {},
+                        '& .MuiDataGrid-footerContainer': {
+                            borderTop: 'none'
+                        },
+                        '& .MuiCheckbox-root': {},
+                        '& .MuiDataGrid-toolbarContainer .MuiButton-text': {}
                     }}
-                    disableRowSelectionOnClick
-                />
+                >
+                    <DataGrid rows={rows} columns={columns} components={{ Toolbar: GridToolbar }} />
+                </Box>
             </MainCard>
         </>
     );
