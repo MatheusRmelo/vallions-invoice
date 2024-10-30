@@ -30,7 +30,7 @@ const MainRoutes = {
         {
             path: '/faturamento/procedimento',
             element: <Procedure />
-        },
+        }
     ]
 };
 
