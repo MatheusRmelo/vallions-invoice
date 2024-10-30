@@ -3,7 +3,7 @@ import React, { Ref, ExoticComponent, ReactElement } from 'react';
 // material-ui
 import Collapse from '@mui/material/Collapse';
 import Fade from '@mui/material/Fade';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import Grow from '@mui/material/Grow';
 import Slide from '@mui/material/Slide';
 import Zoom from '@mui/material/Zoom';

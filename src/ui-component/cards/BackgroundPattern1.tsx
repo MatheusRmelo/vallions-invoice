@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import CardMedia from '@mui/material/CardMedia';
 
 // assets

@@ -1,7 +1,7 @@
 // material-ui
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';

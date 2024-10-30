@@ -3,7 +3,7 @@ import { matchPath, useLocation } from 'react-router-dom';
 
 // material-ui
 import { alpha, styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
@@ -228,13 +228,13 @@ const NavCollapse = ({ menu, level, parentId }: NavCollapseProps) => {
                             ...(drawerOpen &&
                                 level === 1 &&
                                 mode !== ThemeMode.DARK && {
-                                    '&:hover': { bgcolor: 'secondary.light' },
-                                    '&.Mui-selected': {
-                                        bgcolor: 'secondary.light',
-                                        color: iconSelectedColor,
-                                        '&:hover': { color: iconSelectedColor, bgcolor: '.secondary.light' }
-                                    }
-                                }),
+                                '&:hover': { bgcolor: 'secondary.light' },
+                                '&.Mui-selected': {
+                                    bgcolor: 'secondary.light',
+                                    color: iconSelectedColor,
+                                    '&:hover': { color: iconSelectedColor, bgcolor: '.secondary.light' }
+                                }
+                            }),
                             ...((!drawerOpen || level !== 1) && {
                                 py: level === 1 ? 0 : 1,
                                 '&:hover': { bgcolor: 'transparent' },
@@ -252,26 +252,26 @@ const NavCollapse = ({ menu, level, parentId }: NavCollapseProps) => {
                                     color: isSelected ? iconSelectedColor : 'text.primary',
                                     ...(!drawerOpen &&
                                         level === 1 && {
-                                            borderRadius: `${borderRadius}px`,
-                                            width: 46,
-                                            height: 46,
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
+                                        borderRadius: `${borderRadius}px`,
+                                        width: 46,
+                                        height: 46,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        '&:hover': {
+                                            bgcolor:
+                                                mode === ThemeMode.DARK ? alpha(theme.palette.secondary.main, 0.25) : 'secondary.light'
+                                        },
+                                        ...(isSelected && {
+                                            bgcolor:
+                                                mode === ThemeMode.DARK ? alpha(theme.palette.secondary.main, 0.25) : 'secondary.light',
                                             '&:hover': {
                                                 bgcolor:
-                                                    mode === ThemeMode.DARK ? alpha(theme.palette.secondary.main, 0.25) : 'secondary.light'
-                                            },
-                                            ...(isSelected && {
-                                                bgcolor:
-                                                    mode === ThemeMode.DARK ? alpha(theme.palette.secondary.main, 0.25) : 'secondary.light',
-                                                '&:hover': {
-                                                    bgcolor:
-                                                        mode === ThemeMode.DARK
-                                                            ? alpha(theme.palette.secondary.main, 0.3)
-                                                            : 'secondary.light'
-                                                }
-                                            })
+                                                    mode === ThemeMode.DARK
+                                                        ? alpha(theme.palette.secondary.main, 0.3)
+                                                        : 'secondary.light'
+                                            }
                                         })
+                                    })
                                 }}
                             >
                                 {menuIcon}

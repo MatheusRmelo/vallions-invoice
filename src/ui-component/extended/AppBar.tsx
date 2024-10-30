@@ -4,7 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Drawer from '@mui/material/Drawer';

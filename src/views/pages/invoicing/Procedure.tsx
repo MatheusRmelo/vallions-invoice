@@ -5,10 +5,10 @@
 import MainCard from 'ui-component/cards/MainCard';
 import TextField from '@mui/material/TextField';
 import Search from '@mui/icons-material/Search';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
-import type {} from '@mui/x-data-grid/themeAugmentation';
+import type { } from '@mui/x-data-grid/themeAugmentation';
 
 // ==============================|| Procedure PAGE ||============================== //
 

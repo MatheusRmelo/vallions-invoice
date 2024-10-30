@@ -1,6 +1,6 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 
 const MegaMenuBanner = () => {
     const theme = useTheme();

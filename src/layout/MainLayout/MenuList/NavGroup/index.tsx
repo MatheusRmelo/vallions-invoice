@@ -3,7 +3,7 @@ import { matchPath, useLocation } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';

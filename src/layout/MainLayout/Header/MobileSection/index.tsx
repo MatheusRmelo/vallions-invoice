@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 // material-ui
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Paper from '@mui/material/Paper';

@@ -1,7 +1,7 @@
 import { useEffect, useState, ReactElement } from 'react';
 
 // material-ui
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';

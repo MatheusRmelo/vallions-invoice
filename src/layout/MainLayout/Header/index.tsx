@@ -1,7 +1,7 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 // project imports

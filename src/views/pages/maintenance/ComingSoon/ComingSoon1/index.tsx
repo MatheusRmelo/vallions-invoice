@@ -4,7 +4,7 @@ import React from 'react';
 import { useTheme, styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import ButtonBase from '@mui/material/ButtonBase';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';

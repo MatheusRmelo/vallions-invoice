@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 
 // material-ui
 import { Theme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';

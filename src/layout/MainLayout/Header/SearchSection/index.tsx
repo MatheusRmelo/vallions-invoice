@@ -3,7 +3,7 @@ import { ReactNode, Ref, forwardRef, useState } from 'react';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Avatar, { AvatarProps } from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';

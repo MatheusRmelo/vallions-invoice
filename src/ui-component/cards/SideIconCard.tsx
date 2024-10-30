@@ -1,5 +1,5 @@
 // material-ui
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';

@@ -1,5 +1,5 @@
 // material-ui
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 
 // project import
 import MainCard, { MainCardProps } from 'ui-component/cards/MainCard';
