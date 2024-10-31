@@ -11,6 +11,7 @@ import { Box } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
+import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
 import Dialog from '@mui/material/Dialog';
@@ -18,6 +19,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+
 // ==============================|| Procedure PAGE ||============================== //
 
 const columns: GridColDef<(typeof rows)[number]>[] = [
@@ -106,6 +112,16 @@ const rows = [
 
 const Procedure = () => {
     const [open, setOpen] = React.useState(false);
+    const [institute, setInstitute] = React.useState('');
+    const [modality, setModality] = React.useState('');
+    const handleChange = (event: SelectChangeEvent) => {
+        setInstitute(event.target.value as string);
+    };
+
+    const handleChangeModality = (event: SelectChangeEvent) => {
+        setModality(event.target.value as string);
+    };
+
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -179,6 +195,9 @@ const Procedure = () => {
                         const email = formJson.email;
                         console.log(email);
                         handleClose();
+                    },
+                    sx: {
+                        zIndex: 1200 // Ajuste o z-index do Dialog
                     }
                 }}
             >
@@ -190,7 +209,7 @@ const Procedure = () => {
                         procedimento.
                     </DialogContentText>
                     <Box display="flex" justifyContent="space-between" gap={2}>
-                        <Box width="50vh">
+                        <Box width="180%">
                             <TextField
                                 autoFocus
                                 required
@@ -200,27 +219,68 @@ const Procedure = () => {
                                 fullWidth
                             />
                         </Box>
-                        <TextField required label="Código CBHPM" name="code" variant="outlined" />
+                        <TextField required label="Código CBHPM" name="code" variant="outlined" fullWidth />
                     </Box>
                     <Box height={10} />
-                    <Box display="flex" justifyContent="space-between" gap={2}>
-                        <Box width="50vh">
-                            <TextField
-                                autoFocus
-                                required
-                                label="Descrição do Procedimento"
-                                name="description"
-                                variant="outlined"
-                                fullWidth
-                            />
+                    <Box display="flex" justifyContent="space-between">
+                        <Box width="60vh">
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label" style={{ color: 'black' }}>
+                                    Instituto
+                                </InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    defaultValue="Teste1"
+                                    value={institute}
+                                    label="Instituição"
+                                    onChange={handleChange}
+                                    fullWidth
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    <MenuItem value={'Teste1'}>Teste1</MenuItem>
+                                    <MenuItem value={'teste2'}>Teste2</MenuItem>
+                                    <MenuItem value={'teste3'}>Teste3</MenuItem>
+                                </Select>
+                            </FormControl>
                         </Box>
-                        <TextField required label="Código CBHPM" name="code" variant="outlined" />
+                        <Box width="52vh">
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label" style={{ color: 'black' }}>
+                                    Instituto
+                                </InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    defaultValue="Teste1"
+                                    value={modality}
+                                    label="Modalidade"
+                                    onChange={handleChangeModality}
+                                    fullWidth
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    <MenuItem value={'Teste1'}>Teste1</MenuItem>
+                                    <MenuItem value={'teste2'}>Teste2</MenuItem>
+                                    <MenuItem value={'teste3'}>Teste3</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
                     </Box>
+                    <Box height={50} />
                 </DialogContent>
                 <DialogActions>
-                    <Fab size="small" color="primary" aria-label="add" type="submit">
-                        <AddIcon />
-                    </Fab>
+                    <Button variant="outlined" onClick={handleClose} color="primary">
+                        Fechar
+                    </Button>
+                    <Box width={10} />
+                    <Button variant="contained" type="submit" color="primary">
+                        Salvar
+                    </Button>
+                    <Box width={10} />
                 </DialogActions>
             </Dialog>
         </>
