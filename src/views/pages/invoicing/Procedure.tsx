@@ -112,14 +112,14 @@ const rows = [
 
 const Procedure = () => {
     const [open, setOpen] = React.useState(false);
-    const [institute, setInstitute] = React.useState('');
-    const [modality, setModality] = React.useState('');
+    const [institute, setInstitute] = React.useState<string[]>([]);
+    const [modality, setModality] = React.useState<string[]>([]);
     const handleChange = (event: SelectChangeEvent) => {
-        setInstitute(event.target.value as string);
+        setInstitute(typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value);
     };
 
     const handleChangeModality = (event: SelectChangeEvent) => {
-        setModality(event.target.value as string);
+        setModality(typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value);
     };
 
     const handleClickOpen = () => {
@@ -129,6 +129,9 @@ const Procedure = () => {
     const handleClose = () => {
         setOpen(false);
     };
+
+    const mockInstitutes = ['Teste1', 'Teste2', 'Teste3'];
+    const mockModalities = ['Teste1', 'Teste2', 'Teste3'];
     return (
         <>
             <MainCard title="Cadastro de Procedimentos">
@@ -225,47 +228,45 @@ const Procedure = () => {
                     <Box display="flex" justifyContent="space-between">
                         <Box width="60vh">
                             <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-label" style={{ color: 'black' }}>
+                                <InputLabel id="demo-multiple-name-label" style={{ color: 'black' }}>
                                     Instituto
                                 </InputLabel>
                                 <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    defaultValue="Teste1"
+                                    labelId="demo-multiple-name-label"
+                                    id="demo-multiple-name"
+                                    multiple
+                                    // defaultValue="Teste1"
                                     value={institute}
                                     label="Instituição"
                                     onChange={handleChange}
                                     fullWidth
                                 >
-                                    <MenuItem value="">
-                                        <em>None</em>
-                                    </MenuItem>
-                                    <MenuItem value={'Teste1'}>Teste1</MenuItem>
-                                    <MenuItem value={'teste2'}>Teste2</MenuItem>
-                                    <MenuItem value={'teste3'}>Teste3</MenuItem>
+                                    {mockInstitutes.map((mockInstitute) => (
+                                        <MenuItem key={mockInstitute} value={mockInstitute}>
+                                            {mockInstitute}
+                                        </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                         </Box>
                         <Box width="52vh">
                             <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-label" style={{ color: 'black' }}>
-                                    Instituto
+                                <InputLabel id="demo-multiple-name-label" style={{ color: 'black' }}>
+                                    Modalidade
                                 </InputLabel>
                                 <Select
-                                    labelId="demo-simple-select-label"
+                                    labelId="demo-multiple-name-label"
                                     id="demo-simple-select"
-                                    defaultValue="Teste1"
+                                    multiple
                                     value={modality}
-                                    label="Modalidade"
                                     onChange={handleChangeModality}
                                     fullWidth
                                 >
-                                    <MenuItem value="">
-                                        <em>None</em>
-                                    </MenuItem>
-                                    <MenuItem value={'Teste1'}>Teste1</MenuItem>
-                                    <MenuItem value={'teste2'}>Teste2</MenuItem>
-                                    <MenuItem value={'teste3'}>Teste3</MenuItem>
+                                    {mockModalities.map((mockModality) => (
+                                        <MenuItem key={mockModality} value={mockModality}>
+                                            {mockModality}
+                                        </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                         </Box>
