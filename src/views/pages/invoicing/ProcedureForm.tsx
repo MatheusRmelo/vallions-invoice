@@ -19,10 +19,10 @@ const mockModalities = ['Teste1', 'Teste2', 'Teste3'];
 
 // Validation schema using zod
 const procedureSchema = z.object({
-    description: z.string().nonempty('Descrição é obrigatória'),
-    code: z.string().nonempty('Código CBHPM é obrigatório'),
-    institute: z.string().nonempty('Instituto é obrigatório'),
-    modality: z.string().nonempty('Modalidade é obrigatória')
+    description: z.string().min(1, 'Descrição é obrigatória'),
+    code: z.string().min(1, 'Código CBHPM é obrigatório'),
+    institute: z.array(z.string()).nonempty('Pelo menos uma instituição é obrigatória'),
+    modality: z.array(z.string()).nonempty('Pelo menos uma modalidade é obrigatória')
 });
 
 type ProcedureFormProps = {
