@@ -21,17 +21,17 @@ const pages: NavItemType = {
     children: [
         {
             id: 'invoicing',
-            title: "Faturamento",
+            title: 'Faturamento',
             type: 'collapse',
             icon: icons.IconCurrencyDollar,
             children: [
                 {
                     id: 'procedure',
-                    title: "Faturamento",
+                    title: 'Procedimento',
                     type: 'item',
                     url: '/faturamento/procedimento',
                     target: false
-                },
+                }
             ]
         },
         {

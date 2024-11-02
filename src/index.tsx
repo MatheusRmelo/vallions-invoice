@@ -32,6 +32,9 @@ import '@fontsource/poppins/500.css';
 import '@fontsource/poppins/600.css';
 import '@fontsource/poppins/700.css';
 
+///Toastfy import
+import { ToastContainer } from 'react-toastify';
+
 // ==============================|| REACT DOM RENDER ||============================== //
 
 const container = document.getElementById('root');
@@ -41,6 +44,7 @@ root.render(
         <ConfigProvider>
             <App />
         </ConfigProvider>
+        <ToastContainer autoClose={3000} hideProgressBar={false} closeOnClick rtl={false} draggable />
     </Provider>
 );
 

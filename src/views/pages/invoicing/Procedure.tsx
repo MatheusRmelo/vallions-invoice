@@ -113,7 +113,7 @@ const Procedure = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    <DataGrid rows={rows} columns={columns} />
+                    <DataGrid disableRowSelectionOnClick rows={rows} columns={columns} />
                 </Box>
             </MainCard>
 
