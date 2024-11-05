@@ -1,15 +1,15 @@
 import * as React from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import TextField from '@mui/material/TextField';
-import Search from '@mui/icons-material/Search';
+// import TextField from '@mui/material/TextField';
+// import Search from '@mui/icons-material/Search';
 import Edit from '@mui/icons-material/Edit';
 import { Box } from '@mui/material';
-import InputAdornment from '@mui/material/InputAdornment';
+// import InputAdornment from '@mui/material/InputAdornment';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
-
+import CustomTextField from 'ui-component/inputs/customTextField';
 import ProcedureForm from './ProcedureForm';
 // Mock data
 
@@ -83,20 +83,7 @@ const Procedure = () => {
         <>
             <MainCard title="Cadastro de Procedimentos">
                 <Box display="flex" justifyContent="space-between">
-                    <TextField
-                        id="input-with-icon-textfield"
-                        variant="outlined"
-                        label="Search"
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Box display="flex" alignItems="center">
-                                        <Search sx={{ color: 'action.active', mr: 1 }} />
-                                    </Box>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
+                    <CustomTextField label="Search" />
                     <Fab size="small" color="primary" aria-label="add" onClick={handleClickOpen}>
                         <AddIcon />
                     </Fab>
@@ -116,7 +103,6 @@ const Procedure = () => {
                     <DataGrid disableRowSelectionOnClick rows={rows} columns={columns} />
                 </Box>
             </MainCard>
-
             <ProcedureForm open={open} handleClose={handleClose} />
         </>
     );
