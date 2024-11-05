@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, TextField, InputAdornment } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import { styled } from '@mui/system';
 
@@ -23,7 +23,8 @@ const CustomTextField = styled(TextField, {
 })<CustomTextFieldProps>(({ theme, hasValue }) => ({
     '& .MuiInputBase-root': {
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        color: 'white'
     },
     '& .custom-label': {
         position: 'absolute',
@@ -37,12 +38,14 @@ const CustomTextField = styled(TextField, {
         transform: 'translateY(-1.8em) scale(0.75) translateX(-4.0em)',
         color: theme.palette.primary.main,
         padding: '0 6px',
-        backgroundColor: 'white',
+        backgroundColor: 'transparent',
         zIndex: 9999
     },
     '& .MuiInputBase-input': {
         backgroundColor: 'white'
     },
+    /// Color white all field
+
     '& .MuiOutlinedInput-root': {
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
             border: 'none'
@@ -68,11 +71,18 @@ const CustomTextField = styled(TextField, {
  */
 const SearchField: React.FC<SearchFieldProps> = ({
     label = 'Search',
-    prefixIcon = <Search color="action" />,
+    prefixIcon = <Search color="action" fontSize="small" />,
     value: propValue,
     onChange
 }) => {
+    const hashValueClick: string = Math.random().toString(36).substring(7);
+
     const [value, setValue] = useState<string>(propValue || '');
+    ///Click icon focus field
+    const clickIcon = () => {
+        console.log('clickIcon: ', hashValueClick);
+        document.getElementById(hashValueClick)?.focus();
+    };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValue(event.target.value);
@@ -82,25 +92,29 @@ const SearchField: React.FC<SearchFieldProps> = ({
     };
 
     return (
-        <Box position="relative" width="100%">
-            <CustomTextField
-                variant="outlined"
-                value={value}
-                onChange={handleChange}
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            {prefixIcon}
-                            {!value && (
-                                <Box className="custom-label" display="flex" alignItems="center">
-                                    {label}
-                                </Box>
-                            )}
-                        </InputAdornment>
-                    )
+        <Box display="flex" alignItems="center" position="relative">
+            <Box
+                onClick={clickIcon}
+                sx={{
+                    zIndex: 1000,
+                    position: 'absolute',
+                    top: '55%',
+                    transform: 'translateY(-50%)',
+                    marginRight: '8px'
                 }}
-                hasValue={Boolean(value)}
-            />
+            >
+                {prefixIcon}
+            </Box>
+            <Box sx={{ marginLeft: '16px' }}>
+                <CustomTextField
+                    id={hashValueClick}
+                    variant="outlined"
+                    value={value}
+                    onChange={handleChange}
+                    label={label}
+                    hasValue={Boolean(value)}
+                />
+            </Box>
         </Box>
     );
 };

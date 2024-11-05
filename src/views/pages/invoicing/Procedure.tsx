@@ -9,7 +9,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
-import CustomTextField from 'ui-component/inputs/customTextField';
+import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
 // Mock data
 
