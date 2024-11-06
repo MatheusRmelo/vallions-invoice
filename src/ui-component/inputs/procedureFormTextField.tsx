@@ -28,8 +28,10 @@ const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, va
                         borderColor: 'rgba(198, 40, 40, 1)'
                     },
                     backgroundColor: value ? 'white' : 'inherit',
-                    color: value ? 'black' : 'inherit'
+                    color: value ? 'black' : 'inherit',
+                    borderRadius: '60px'
                 },
+
                 '& .MuiInputLabel-root': {
                     '&.Mui-focused': {
                         color: 'rgba(198, 40, 40, 1)'
