@@ -31,6 +31,13 @@ const pages: NavItemType = {
                     type: 'item',
                     url: '/faturamento/procedimento',
                     target: false
+                },
+                {
+                    id: 'tableOfValues',
+                    title: 'Tabela de Valores',
+                    type: 'item',
+                    url: '/faturamento/tabela-de-valores',
+                    target: false
                 }
             ]
         },

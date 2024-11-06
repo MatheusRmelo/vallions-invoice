@@ -4,8 +4,8 @@ import { lazy } from 'react';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
-import Procedure from 'views/pages/invoicing/Procedure';
-
+import Procedure from 'views/pages/invoicing/procedure/Procedure';
+import TableOfValues from 'views/pages/invoicing/tableOfValue/TableOfValue';
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
@@ -31,6 +31,10 @@ const MainRoutes = {
             path: '/faturamento/procedimento',
             element: <Procedure />
         },
+        {
+            path: '/faturamento/tabela-de-valores',
+            element: <TableOfValues />
+        }
     ]
 };
 
