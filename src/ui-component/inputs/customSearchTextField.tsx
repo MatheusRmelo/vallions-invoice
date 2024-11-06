@@ -105,7 +105,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
             >
                 {prefixIcon}
             </Box>
-            <Box sx={{ marginLeft: '16px' }}>
+            <Box sx={{ marginLeft: '20px' }}>
                 <CustomTextField
                     id={hashValueClick}
                     variant="outlined"

@@ -1,17 +1,14 @@
 import * as React from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-// import TextField from '@mui/material/TextField';
-// import Search from '@mui/icons-material/Search';
+import Search from '@mui/icons-material/Search';
 import Edit from '@mui/icons-material/Edit';
 import { Box } from '@mui/material';
-// import InputAdornment from '@mui/material/InputAdornment';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
-// Mock data
 
 // Columns for DataGrid
 const columns: GridColDef[] = [
@@ -83,7 +80,7 @@ const Procedure = () => {
         <>
             <MainCard title="Cadastro de Procedimentos">
                 <Box display="flex" justifyContent="space-between">
-                    <CustomTextField label="Search" />
+                    <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
                     <Fab size="small" color="primary" aria-label="add" onClick={handleClickOpen}>
                         <AddIcon />
                     </Fab>
@@ -103,6 +100,7 @@ const Procedure = () => {
                     <DataGrid disableRowSelectionOnClick rows={rows} columns={columns} />
                 </Box>
             </MainCard>
+
             <ProcedureForm open={open} handleClose={handleClose} />
         </>
     );
