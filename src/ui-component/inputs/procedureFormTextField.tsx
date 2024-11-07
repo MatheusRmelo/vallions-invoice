@@ -24,12 +24,15 @@ const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, va
             helperText={helperText}
             sx={{
                 '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                        borderRadius: '12px',
+                        backgroundColor: 'white'
+                    },
                     '&.Mui-focused fieldset': {
                         borderColor: 'rgba(198, 40, 40, 1)'
                     },
                     backgroundColor: value ? 'white' : 'inherit',
-                    color: value ? 'black' : 'inherit',
-                    borderRadius: '60px'
+                    color: value ? 'black' : 'inherit'
                 },
 
                 '& .MuiInputLabel-root': {

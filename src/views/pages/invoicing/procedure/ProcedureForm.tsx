@@ -15,6 +15,7 @@ import { z } from 'zod';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import ProcedureFormTextField from 'ui-component/inputs/procedureFormTextField';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 // Mock data
 const mockInstitutes = ['Teste1', 'Teste2', 'Teste3'];
 const mockModalities = ['Teste1', 'Teste2', 'Teste3'];
@@ -193,6 +194,11 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                                 error={Boolean(errors.institute)}
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderRadius: '12px',
+                                            backgroundColor: 'white'
+                                        },
+
                                         '&.Mui-focused fieldset': {
                                             borderColor: 'rgba(198, 40, 40, 1)'
                                         }
@@ -215,6 +221,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                                         setInstitute(e.target.value as string[]);
                                     }}
                                     fullWidth
+                                    IconComponent={ArrowDropDownIcon}
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             '&.Mui-focused fieldset': {
@@ -225,6 +232,9 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                                             '&.Mui-focused': {
                                                 color: 'rgba(198, 40, 40, 1)'
                                             }
+                                        },
+                                        '& .MuiSelect-icon': {
+                                            zIndex: 9999
                                         }
                                     }}
                                 >
@@ -244,6 +254,10 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                                 error={Boolean(errors.modality)}
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderRadius: '12px',
+                                            backgroundColor: 'white'
+                                        },
                                         '&.Mui-focused fieldset': {
                                             borderColor: 'rgba(198, 40, 40, 1)'
                                         }
@@ -268,6 +282,10 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                                     fullWidth
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
+                                            '& fieldset': {
+                                                borderRadius: '12px',
+                                                backgroundColor: 'white'
+                                            },
                                             '&.Mui-focused fieldset': {
                                                 borderColor: 'rgba(198, 40, 40, 1)'
                                             }
@@ -276,6 +294,9 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                                             '&.Mui-focused': {
                                                 color: 'rgba(198, 40, 40, 1)'
                                             }
+                                        },
+                                        '& .MuiSelect-icon': {
+                                            zIndex: 9999
                                         }
                                     }}
                                 >
