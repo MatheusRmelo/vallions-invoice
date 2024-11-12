@@ -1,13 +1,14 @@
+import React from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 import { Box } from '@mui/material';
-import TextField from '@mui/material/TextField';
+import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import Search from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
 import { DataGrid } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
+import TableOfValueForm from './TableOfValueForm';
 // Columns for DataGrid
 const columns = [
     { field: 'id', headerName: 'ID', width: 250 },
@@ -36,25 +37,22 @@ const mockRows = [
 ];
 
 const TableOfValues = () => {
+    const [open, setOpen] = React.useState(false);
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
     return (
         <>
             <MainCard title="Cadastro de Procedimentos">
                 <Box display="flex" justifyContent="space-between">
-                    <TextField
-                        id="input-with-icon-textfield"
-                        variant="outlined"
-                        label="Search"
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Box display="flex" alignItems="center">
-                                        <Search sx={{ color: 'action.active', mr: 1 }} />
-                                    </Box>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
-                    <Fab size="small" color="primary" aria-label="add">
+                    <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
+
+                    <Fab size="small" color="primary" aria-label="add" onClick={handleOpen}>
                         <AddIcon />
                     </Fab>
                 </Box>
@@ -72,6 +70,8 @@ const TableOfValues = () => {
                 >
                     <DataGrid disableRowSelectionOnClick rows={mockRows} columns={columns} />
                 </Box>
+
+                <TableOfValueForm open={open} handleClose={handleClose} />
             </MainCard>
         </>
     );

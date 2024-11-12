@@ -121,6 +121,78 @@ const Snackbar = () => {
                     </Alert>
                 </MuiSnackbar>
             )}
+            {/* sucess snackbar */}
+            {variant === 'sucess' && (
+                <MuiSnackbar
+                    TransitionComponent={animation[transition]}
+                    anchorOrigin={anchorOrigin}
+                    open={open}
+                    autoHideDuration={1500}
+                    onClose={handleClose}
+                >
+                    <Alert
+                        variant="filled"
+                        // color=
+                        action={
+                            <>
+                                {actionButton !== false && (
+                                    <Button size="small" onClick={handleClose} sx={{ color: 'background.paper' }}>
+                                        UNDO
+                                    </Button>
+                                )}
+                                {close !== false && (
+                                    <IconButton sx={{ color: 'background.paper' }} size="small" aria-label="close" onClick={handleClose}>
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                )}
+                            </>
+                        }
+                        sx={{
+                            bgcolor: 'rgba(185, 246, 202, 1)',
+                            color: 'rgba(0, 200, 83, 1)'
+                        }}
+                    >
+                        {message}
+                    </Alert>
+                </MuiSnackbar>
+            )}
+            {/* error snackbar */}
+
+            {variant === 'error' && (
+                <MuiSnackbar
+                    TransitionComponent={animation[transition]}
+                    anchorOrigin={anchorOrigin}
+                    open={open}
+                    autoHideDuration={1500}
+                    onClose={handleClose}
+                >
+                    <Alert
+                        variant="filled"
+                        // color="error"
+                        action={
+                            <>
+                                {actionButton !== false && (
+                                    <Button size="small" onClick={handleClose} sx={{ color: 'background.paper' }}>
+                                        UNDO
+                                    </Button>
+                                )}
+                                {close !== false && (
+                                    <IconButton sx={{ color: 'background.paper' }} size="small" aria-label="close" onClick={handleClose}>
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                )}
+                            </>
+                        }
+                        sx={{
+                            bgcolor: 'rgba(251, 233, 231, 1)',
+                            color: 'rgba(216, 67, 21, 1)'
+                        }}
+                    >
+                        {message}
+                    </Alert>
+                </MuiSnackbar>
+            )}
+            {/* warning snackbar */}
         </>
     );
 };

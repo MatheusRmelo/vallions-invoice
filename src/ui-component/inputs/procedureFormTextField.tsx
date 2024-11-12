@@ -21,7 +21,8 @@ const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, va
             value={value}
             onChange={onChange}
             error={error}
-            helperText={helperText}
+            /// Removido pela incerteza se é necessário
+            // helperText={helperText}
             sx={{
                 '& .MuiOutlinedInput-root': {
                     '& fieldset': {
