@@ -196,8 +196,8 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
 const formControlStyles = {
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
-            borderRadius: '12px',
-            backgroundColor: 'white'
+            borderRadius: '12px'
+            // backgroundColor: 'white'
         },
         '&.Mui-focused fieldset': {
             borderColor: 'rgba(198, 40, 40, 1)'

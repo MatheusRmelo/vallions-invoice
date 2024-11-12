@@ -11,7 +11,6 @@ interface ProcedureFormFieldProps {
 }
 
 const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, value, onChange, error, helperText, ...props }) => {
-    console.log(value);
     return (
         <TextField
             label={label}
@@ -26,8 +25,8 @@ const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, va
             sx={{
                 '& .MuiOutlinedInput-root': {
                     '& fieldset': {
-                        borderRadius: '12px',
-                        backgroundColor: 'white'
+                        borderRadius: '12px'
+                        // backgroundColor: 'white'
                     },
                     '&.Mui-focused fieldset': {
                         borderColor: 'rgba(198, 40, 40, 1)'
@@ -35,7 +34,9 @@ const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, va
                     backgroundColor: value ? 'white' : 'inherit',
                     color: value ? 'black' : 'inherit'
                 },
-
+                '& .MuiInputBase-input': {
+                    color: 'black' // Define explicitamente a cor do texto
+                },
                 '& .MuiInputLabel-root': {
                     '&.Mui-focused': {
                         color: 'rgba(198, 40, 40, 1)'
