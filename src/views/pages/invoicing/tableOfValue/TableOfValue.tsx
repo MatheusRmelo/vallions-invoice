@@ -11,10 +11,10 @@ import Switch from '@mui/material/Switch';
 import TableOfValueForm from './TableOfValueForm';
 // Columns for DataGrid
 const columns = [
-    { field: 'id', headerName: 'ID', width: 250 },
-    { field: 'Descrição Tabela de Valores', headerName: 'Descrição do Procedimento', width: 300 },
-    { field: 'Editar', headerName: 'Editar', width: 170, renderCell: () => <Edit color="primary" /> },
-    { field: 'Inativo/Ativo', headerName: 'Inativo/Ativo', width: 170, renderCell: () => <Switch /> }
+    { field: 'id', headerName: 'ID', flex: 2 },
+    { field: 'Descrição Tabela de Valores', headerName: 'Descrição do Procedimento', flex: 3 },
+    { field: 'Editar', headerName: 'Editar', flex: 1, renderCell: () => <Edit color="primary" /> },
+    { field: 'Inativo/Ativo', headerName: 'Inativo/Ativo', flex: 1, renderCell: () => <Switch /> }
 ];
 
 const mockRows = [
@@ -63,8 +63,8 @@ const TableOfValues = () => {
                     height="80vh"
                     sx={{
                         '& .MuiDataGrid-root': { border: 'none' },
-                        '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '10px' },
-                        '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '12px' },
+                        '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '1.2vh' },
+                        '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '1.5vh' },
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
