@@ -9,7 +9,7 @@ import Add from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
 import Edit from '@mui/icons-material/Edit';
 import Delete from '@mui/icons-material/Delete';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridCellParams } from '@mui/x-data-grid';
 type TableOfValueFormProps = {
     open: boolean;
     handleClose: () => void;
@@ -50,13 +50,15 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose }
         <Dialog
             open={open}
             onClose={handleClose}
-            maxWidth="md"
+            maxWidth={false}
             fullWidth
             PaperProps={{
                 sx: {
-                    width: '70%',
+                    width: 'auto',
                     height: 'auto',
-                    padding: '20px'
+                    padding: '20px',
+                    margin: 0,
+                    maxHeight: '100vh'
                 }
             }}
         >
@@ -150,19 +152,24 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose }
     );
 };
 const columns = [
-    { field: 'Vigência Inicial', headerName: 'initDate', width: 200 },
-    { field: 'Vigência Final', headerName: 'endDate', width: 200 },
+    { field: 'initDate', headerName: 'Vigência Inicial', flex: 2 },
+    { field: 'endDate', headerName: 'Vigência Final', flex: 2 },
     {
-        field: 'Cód. Procedimento',
-        headerName: 'procedureCode',
-        width: 200
+        field: 'procedureCode',
+        headerName: 'Cód. Procedimento',
+        flex: 2
     },
-    { field: 'Descrição Procedimento', headerName: 'procedureDescription', width: 300 },
-    { field: 'Valor Procedimento', headerName: 'value', width: 200 },
+    {
+        field: 'procedureDescription',
+        headerName: 'Descrição Procedimento',
+        flex: 3,
+        renderCell: (params: GridCellParams) => <span style={{ fontWeight: 'bold' }}>{params.value as String}</span>
+    },
+    { field: 'value', headerName: 'Valor Procedimento', flex: 4 },
     {
         field: 'Ações',
-        headerName: 'actions',
-        width: 200,
+        headerName: 'Ações',
+        flex: 1,
         renderCell: () => (
             <>
                 <Edit color="primary" />
@@ -204,6 +211,54 @@ const mockRows = [
         procedureCode: '654321',
         procedureDescription: 'Procedimento 4',
         value: 'R$ 400,00'
+    },
+    {
+        id: 5,
+        initDate: '01/01/2021',
+        endDate: '31/12/2021',
+        procedureCode: '654321',
+        procedureDescription: 'Procedimento 5',
+        value: 'R$ 500,00'
+    },
+    {
+        id: 6,
+        initDate: '01/01/2021',
+        endDate: '31/12/2021',
+        procedureCode: '654321',
+        procedureDescription: 'Procedimento 6',
+        value: 'R$ 600,00'
+    },
+    {
+        id: 7,
+        initDate: '01/01/2021',
+        endDate: '31/12/2021',
+        procedureCode: '654321',
+        procedureDescription: 'Procedimento 7',
+        value: 'R$ 700,00'
+    },
+    {
+        id: 8,
+        initDate: '01/01/2021',
+        endDate: '31/12/2021',
+        procedureCode: '654321',
+        procedureDescription: 'Procedimento 8',
+        value: 'R$ 800,00'
+    },
+    {
+        id: 9,
+        initDate: '01/01/2021',
+        endDate: '31/12/2021',
+        procedureCode: '654321',
+        procedureDescription: 'Procedimento 9',
+        value: 'R$ 900,00'
+    },
+    {
+        id: 10,
+        initDate: '01/01/2021',
+        endDate: '31/12/2021',
+        procedureCode: '654321',
+        procedureDescription: 'Procedimento 10',
+        value: 'R$ 1000,00'
     }
 ];
 const formControlStyles = {
