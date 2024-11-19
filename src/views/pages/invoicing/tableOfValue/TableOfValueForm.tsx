@@ -24,6 +24,7 @@ import Edit from '@mui/icons-material/EditOutlined';
 import Delete from '@mui/icons-material/DeleteOutlined';
 import { DataGrid, GridCellParams } from '@mui/x-data-grid';
 import ImportOfProcedure from './ImportOfProcedure';
+import BillingTableProcedureDialog from './BillingTableProcedure';
 type TableOfValueFormProps = {
     open: boolean;
     handleClose: () => void;
@@ -42,7 +43,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose }
     });
     const [institute, setInstitute] = React.useState<string[]>([]);
     const [importOpen, setImportOpen] = React.useState(false);
-
+    const [procedureTableFormOpen, setProcedureTableFormOpen] = React.useState(false);
     const validate = () => {
         const newErrors = { ...errors };
         if (!description) {
@@ -157,6 +158,9 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose }
                             />
                             <Fab
                                 color="primary"
+                                onClick={() => {
+                                    setProcedureTableFormOpen(true);
+                                }}
                                 sx={{
                                     width: 24,
                                     height: 24,
@@ -204,6 +208,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose }
                     </Button>
                 </DialogActions>
                 <ImportOfProcedure open={importOpen} handleClose={() => setImportOpen(false)} />
+                <BillingTableProcedureDialog open={procedureTableFormOpen} onClose={() => setProcedureTableFormOpen(false)} />
             </form>
         </Dialog>
     );
