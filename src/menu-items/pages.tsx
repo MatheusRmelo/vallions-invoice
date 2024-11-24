@@ -27,16 +27,23 @@ const pages: NavItemType = {
             children: [
                 {
                     id: 'procedure',
-                    title: 'Procedimento',
+                    title: 'Faturamento',
                     type: 'item',
                     url: '/faturamento/procedimento',
                     target: false
                 },
                 {
                     id: 'tableOfValues',
-                    title: 'Tabela de Valores',
+                    title: 'Faturamento',
                     type: 'item',
                     url: '/faturamento/tabela-de-valores',
+                    target: false
+                },
+                {
+                    id: 'rulesOfInvoicing',
+                    title: 'Faturamento',
+                    type: 'item',
+                    url: '/faturamento/regras-de-faturamento',
                     target: false
                 }
             ]
