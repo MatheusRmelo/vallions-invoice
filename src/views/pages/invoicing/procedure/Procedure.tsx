@@ -3,23 +3,13 @@ import MainCard from 'ui-component/cards/MainCard';
 import Search from '@mui/icons-material/Search';
 import Edit from '@mui/icons-material/Edit';
 import { Box } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridColDef, GridRowId } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
 
-// Columns for DataGrid
-const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 170 },
-    { field: 'Descrição do Procedimento', headerName: 'Descrição do Procedimento', width: 170 },
-    { field: 'Código CBHPM', headerName: 'Código CBHPM', width: 170 },
-    { field: 'Instituição', headerName: 'Instituição', width: 170 },
-    { field: 'Modalidade', headerName: 'Modalidade', width: 170 },
-    { field: 'Editar', headerName: 'Editar', width: 170, renderCell: () => <Edit color="primary" /> },
-    { field: 'Inativo/Ativo', headerName: 'Inativo/Ativo', width: 170, renderCell: () => <Switch /> }
-];
 
 // Mocked rows
 const rows = [
@@ -37,7 +27,7 @@ const rows = [
         'Código CBHPM': '123457',
         Instituição: 'Instituição 2',
         Modalidade: 'Modalidade 2',
-        'Inativo/Ativo': 'Ativo'
+        'Inativo/Ativo': 'Inativo'
     },
     {
         id: 3,
@@ -67,6 +57,7 @@ const rows = [
 
 const Procedure = () => {
     const [open, setOpen] = React.useState(false);
+    const [procedure, setProduce] = React.useState<any>(null);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -75,6 +66,17 @@ const Procedure = () => {
     const handleClose = () => {
         setOpen(false);
     };
+
+    const handleClickEdit = (id: GridRowId) => {
+        setProduce(getProcedureById(id));
+        setOpen(true);
+    }
+
+    const getProcedureById = (id: GridRowId) => {
+        let filtered = rows.filter((element) => element.id == id.valueOf());
+        if (filtered.length == 0) return null;
+        return filtered[0];
+    }
 
     return (
         <>
@@ -85,7 +87,7 @@ const Procedure = () => {
                         <AddIcon />
                     </Fab>
                 </Box>
-                <Box m="8px 0 0 0" width="100%" height="01vh" />
+                <Box m="8px 0 0 0" width="100%" height="1vh" />
                 <Box
                     m="8px 0 0 0"
                     width="100%"
@@ -97,7 +99,44 @@ const Procedure = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    <DataGrid disableRowSelectionOnClick rows={rows} columns={columns} />
+                    <DataGrid
+                        disableRowSelectionOnClick rows={rows} columns={[
+                            { field: 'id', headerName: 'ID', width: 170 },
+                            { field: 'Descrição do Procedimento', headerName: 'Descrição do Procedimento', width: 170 },
+                            { field: 'Código CBHPM', headerName: 'Código CBHPM', width: 170 },
+                            { field: 'Instituição', headerName: 'Instituição', width: 170 },
+                            { field: 'Modalidade', headerName: 'Modalidade', width: 170 },
+                            {
+                                field: 'actions',
+                                type: 'actions',
+                                headerName: 'Editar',
+                                width: 100,
+                                cellClassName: 'actions',
+                                getActions: ({ id }) => {
+                                    return [
+                                        <GridActionsCellItem
+                                            icon={<Edit color="primary" />}
+                                            label="Editar"
+                                            className="textPrimary"
+                                            onClick={() => handleClickEdit(id)}
+                                            color="inherit"
+                                        />,
+                                    ];
+                                },
+                            },
+                            {
+                                type: 'actions',
+                                field: 'Inativo/Ativo', headerName: 'Inativo/Ativo', width: 170,
+                                getActions: ({ id }) => {
+                                    let procedure = getProcedureById(id);
+                                    return [
+                                        <Switch checked={procedure?.['Inativo/Ativo'] == 'Ativo'} />,
+                                    ];
+                                },
+                            }
+                        ]}
+
+                    />
                 </Box>
             </MainCard>
 

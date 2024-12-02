@@ -98,16 +98,19 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
             <form onSubmit={handleSubmit}>
-                <DialogTitle sx={{ fontSize: '20px' }}>Procedimentos</DialogTitle>
+                <DialogTitle sx={{ fontSize: '20px' }}>
+                    Procedimentos
+                    <Box width={'100%'} borderBottom={'1px solid #E3F2FD'} marginTop={"16px"} />
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{ fontSize: '12px' }}>
                         <strong>Cadastro de Procedimento: </strong>
                         Insira todas as informações necessárias para o procedimento, incluindo descrição, código, instituição e modalidade.
                         Verifique se os dados estão corretos antes de salvar. Confirme se deseja cadastrar este procedimento.
                     </DialogContentText>
-                    <Box height={65} />
+                    <Box height={56} />
                     <Grid container spacing={2}>
-                        <Grid item xs={10} sm={7}>
+                        <Grid item xs={12} sm={7}>
                             <ProcedureFormTextField
                                 label="Descrição do Procedimento"
                                 name="description"
@@ -180,11 +183,11 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                     <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" onClick={handleClose} color="primary">
+                    <Button variant="outlined" onClick={handleClose} color="primary" size='large'>
                         Fechar
                     </Button>
                     <Box width={5} />
-                    <Button variant="contained" type="submit" sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}>
+                    <Button size='large' variant="contained" type="submit" sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}>
                         Salvar
                     </Button>
                 </DialogActions>

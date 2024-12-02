@@ -27,23 +27,30 @@ const pages: NavItemType = {
             children: [
                 {
                     id: 'procedure',
-                    title: 'Faturamento',
+                    title: 'Procedimento',
                     type: 'item',
                     url: '/faturamento/procedimento',
                     target: false
                 },
                 {
                     id: 'tableOfValues',
-                    title: 'Faturamento',
+                    title: 'Tabela de Valores',
                     type: 'item',
                     url: '/faturamento/tabela-de-valores',
                     target: false
                 },
                 {
                     id: 'rulesOfInvoicing',
-                    title: 'Faturamento',
+                    title: 'Regras de Faturamento',
                     type: 'item',
                     url: '/faturamento/regras-de-faturamento',
+                    target: false
+                },
+                {
+                    id: 'conferenceInvoice',
+                    title: 'Conferência Faturamento',
+                    type: 'item',
+                    url: '/faturamento/regras-de-faturamento2',
                     target: false
                 }
             ]
