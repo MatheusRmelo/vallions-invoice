@@ -10,7 +10,6 @@ import Switch from '@mui/material/Switch';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
 
-
 // Mocked rows
 const rows = [
     {
@@ -70,13 +69,13 @@ const Procedure = () => {
     const handleClickEdit = (id: GridRowId) => {
         setProduce(getProcedureById(id));
         setOpen(true);
-    }
+    };
 
     const getProcedureById = (id: GridRowId) => {
-        let filtered = rows.filter((element) => element.id == id.valueOf());
-        if (filtered.length == 0) return null;
+        let filtered = rows.filter((element) => element.id === id.valueOf());
+        if (filtered.length === 0) return null;
         return filtered[0];
-    }
+    };
 
     return (
         <>
@@ -100,7 +99,9 @@ const Procedure = () => {
                     }}
                 >
                     <DataGrid
-                        disableRowSelectionOnClick rows={rows} columns={[
+                        disableRowSelectionOnClick
+                        rows={rows}
+                        columns={[
                             { field: 'id', headerName: 'ID', width: 170 },
                             { field: 'Descrição do Procedimento', headerName: 'Descrição do Procedimento', width: 170 },
                             { field: 'Código CBHPM', headerName: 'Código CBHPM', width: 170 },
@@ -120,22 +121,21 @@ const Procedure = () => {
                                             className="textPrimary"
                                             onClick={() => handleClickEdit(id)}
                                             color="inherit"
-                                        />,
+                                        />
                                     ];
-                                },
+                                }
                             },
                             {
                                 type: 'actions',
-                                field: 'Inativo/Ativo', headerName: 'Inativo/Ativo', width: 170,
+                                field: 'Inativo/Ativo',
+                                headerName: 'Inativo/Ativo',
+                                width: 170,
                                 getActions: ({ id }) => {
                                     let procedure = getProcedureById(id);
-                                    return [
-                                        <Switch checked={procedure?.['Inativo/Ativo'] == 'Ativo'} />,
-                                    ];
-                                },
+                                    return [<Switch checked={procedure?.['Inativo/Ativo'] === 'Ativo'} />];
+                                }
                             }
                         ]}
-
                     />
                 </Box>
             </MainCard>

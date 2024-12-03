@@ -15,7 +15,7 @@ import {
     InputLabel
 } from '@mui/material';
 import RuleRow from './ruleRow';
-
+import AddRuleRow from './AddRuleRow';
 interface Props {
     open: boolean;
     onClose: () => void;
@@ -32,7 +32,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
             fullWidth
             PaperProps={{
                 sx: {
-                    width: '75%',
+                    width: '60%',
                     height: 'auto',
                     padding: '20px',
                     margin: 0,
@@ -101,7 +101,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                     <Button
                         variant="contained"
                         sx={{
-                            width: '14vh',
+                            width: '15vh',
                             height: '3.5vh',
                             fontWeight: 'bold',
                             fontSize: '1.5vh',
@@ -115,13 +115,41 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                 <RuleRow mockInstitutes={mockInstitutes} />
                 {/* Mocado remove dps */}
                 <RuleRow mockInstitutes={mockInstitutes} />
+                <Box mt={'6vh'} />
+                <Box display={'flex'} justifyContent={'space-between'}>
+                    <Box display={'flex'} flexDirection={'column'}>
+                        <span style={{ fontWeight: 'bold', fontSize: '1.5vh' }}>REGRAS ADICIONAIS</span>
+                        <Box height={'0.8vh'} />
+                        <span style={{ fontSize: '1.2vh', color: 'grey' }}>
+                            <strong>Regras Adicionais:</strong> Estabeleça as regras principais e inclua as regras adicionais, como as
+                            prioridades dos estudos, que determinarão o e faturamento
+                        </span>
+                    </Box>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            width: '15vh',
+                            height: '3.5vh',
+                            fontWeight: 'bold',
+                            fontSize: '1.5vh',
+                            backgroundColor: 'rgba(103, 58, 183, 1)'
+                        }}
+                    >
+                        Adicionar Regra
+                    </Button>
+                </Box>
+                <Box mt={'6vh'} />
+                <AddRuleRow mockInstitutes={mockInstitutes} />
+                {/* Mocado remove dps */}
+                <AddRuleRow mockInstitutes={mockInstitutes} />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="primary">
-                    Cancel
+                <Button variant="outlined" onClick={onClose} color="primary" size="large">
+                    Fechar
                 </Button>
-                <Button onClick={onClose} color="primary">
-                    Save
+                <Box width={5} />
+                <Button size="large" variant="contained" type="submit" sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}>
+                    Salvar
                 </Button>
             </DialogActions>
         </Dialog>
