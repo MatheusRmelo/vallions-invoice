@@ -7,6 +7,7 @@ import Loadable from 'ui-component/Loadable';
 import Procedure from 'views/pages/invoicing/procedure/Procedure';
 import TableOfValues from 'views/pages/invoicing/tableOfValue/TableOfValue';
 import RulesOfInvoicing from 'views/pages/invoicing/rulesOfInvoicing/rulesOfInvoicing';
+import BillingConference from 'views/pages/invoicing/billingConference/billing_conference';
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
@@ -39,6 +40,10 @@ const MainRoutes = {
         {
             path: '/faturamento/regras-de-faturamento',
             element: <RulesOfInvoicing />
+        },
+        {
+            path: '/faturamento/conferecia-faturamento',
+            element: <BillingConference />
         }
     ]
 };

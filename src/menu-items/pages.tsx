@@ -50,7 +50,7 @@ const pages: NavItemType = {
                     id: 'conferenceInvoice',
                     title: 'Conferência Faturamento',
                     type: 'item',
-                    url: '/faturamento/regras-de-faturamento2',
+                    url: '/faturamento/conferecia-faturamento',
                     target: false
                 }
             ]
