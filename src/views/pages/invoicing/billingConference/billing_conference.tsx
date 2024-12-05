@@ -195,23 +195,7 @@ const BillingConference: React.FC = () => {
                         <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
                     </Box>
                     <div style={{ height: 'auto', width: '100%', marginTop: 20 }}>
-                        <DataGrid
-                            rows={getRowsWithDetails()}
-                            columns={mockColumnsSearch}
-                            hideFooter
-                            getRowId={(row) => row.id}
-                            components={{
-                                Row: (props) => {
-                                    const { row } = props;
-                                    return (
-                                        <>
-                                            <div {...props} />
-                                            {row.isDetail && <div style={{ gridColumn: '1 / -1' }}>{row.details}</div>}
-                                        </>
-                                    );
-                                }
-                            }}
-                        />
+                        <DataGrid rows={getRowsWithDetails()} columns={mockColumnsSearch} hideFooter getRowId={(row) => row.id} />
                     </div>
                 </CardContent>
             </Card>
