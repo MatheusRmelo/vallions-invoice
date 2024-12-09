@@ -9,7 +9,8 @@ import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
-
+import { useApi } from 'hooks/useApi';
+import { Procedure, parseProcedure } from 'types/procedure';
 // Mocked rows
 const rows = [
     {
@@ -54,10 +55,14 @@ const rows = [
     }
 ];
 
-const Procedure = () => {
+const ProcedureView = () => {
     const [open, setOpen] = React.useState(false);
     const [procedure, setProduce] = React.useState<any>(null);
-
+    const { data, error } = useApi<Procedure[]>({
+        url: 'https://api.example.com/procedures',
+        method: 'get',
+        parser: (data: any) => data.map(parseProcedure)
+    });
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -102,16 +107,16 @@ const Procedure = () => {
                         disableRowSelectionOnClick
                         rows={rows}
                         columns={[
-                            { field: 'id', headerName: 'ID', width: 170 },
-                            { field: 'Descrição do Procedimento', headerName: 'Descrição do Procedimento', width: 170 },
-                            { field: 'Código CBHPM', headerName: 'Código CBHPM', width: 170 },
-                            { field: 'Instituição', headerName: 'Instituição', width: 170 },
-                            { field: 'Modalidade', headerName: 'Modalidade', width: 170 },
+                            { field: 'id', headerName: 'ID', flex: 2 },
+                            { field: 'Descrição do Procedimento', headerName: 'Descrição do Procedimento', flex: 2 },
+                            { field: 'Código CBHPM', headerName: 'Código CBHPM', flex: 2 },
+                            { field: 'Instituição', headerName: 'Instituição', flex: 2 },
+                            { field: 'Modalidade', headerName: 'Modalidade', flex: 2 },
                             {
                                 field: 'actions',
                                 type: 'actions',
                                 headerName: 'Editar',
-                                width: 100,
+                                flex: 1,
                                 cellClassName: 'actions',
                                 getActions: ({ id }) => {
                                     return [
@@ -129,7 +134,7 @@ const Procedure = () => {
                                 type: 'actions',
                                 field: 'Inativo/Ativo',
                                 headerName: 'Inativo/Ativo',
-                                width: 170,
+                                flex: 2,
                                 getActions: ({ id }) => {
                                     let procedure = getProcedureById(id);
                                     return [<Switch checked={procedure?.['Inativo/Ativo'] === 'Ativo'} />];
@@ -145,4 +150,4 @@ const Procedure = () => {
     );
 };
 
-export default Procedure;
+export default ProcedureView;

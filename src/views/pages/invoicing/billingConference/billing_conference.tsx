@@ -12,18 +12,20 @@ import {
     InputLabel,
     MenuItem,
     Button,
+    Typography,
     IconButton
 } from '@mui/material';
-import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowsProp, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import MainCard from 'ui-component/cards/MainCard';
 import { SendOutlined, Search, ExpandMore, ExpandLess } from '@mui/icons-material';
-import { JSX } from 'react/jsx-runtime';
 
 const BillingConference: React.FC = () => {
     const [startDate, setStartDate] = React.useState(new Date().toISOString().slice(0, 10));
     const [endDate, setEndDate] = React.useState(new Date().toISOString().slice(0, 10));
+    const [tabIndex, setTabIndex] = React.useState(0);
     const [expandedRowIds, setExpandedRowIds] = React.useState<number[]>([]); // Estado para gerenciar linhas expandidas
+    const mockSelects = ['Teste1', 'Teste2', 'Teste3'];
 
     const handleExpandClick = (id: number) => {
         setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
@@ -72,35 +74,8 @@ const BillingConference: React.FC = () => {
         }
     ];
 
-    const [tabIndex, setTabIndex] = React.useState(0);
-    const mockSelects = ['Teste1', 'Teste2', 'Teste3'];
-
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setTabIndex(newValue);
-    };
-
-    const getRowsWithDetails = () => {
-        var listT: { [x: string]: any; id?: string; isDetail?: boolean; details?: JSX.Element }[] = [];
-
-        mockRowsSearch.forEach((row) => {
-            listT.push(row);
-            if (expandedRowIds.includes(row.id)) {
-                listT.push({
-                    ...row,
-                    id: `${row.id}-details`,
-                    isDetail: true,
-                    details: (
-                        <Box mt={2} p={2} bgcolor="grey.100">
-                            <div>Detalhes da linha {row.id}</div>
-                        </Box>
-                    )
-                });
-            }
-        });
-        console.log(listT);
-        const rowsWithDetails: GridRowsProp = [...listT];
-        console.log(rowsWithDetails);
-        return rowsWithDetails;
     };
 
     return (
@@ -194,8 +169,37 @@ const BillingConference: React.FC = () => {
                         <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
                         <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
                     </Box>
-                    <div style={{ height: 'auto', width: '100%', marginTop: 20 }}>
-                        <DataGrid rows={getRowsWithDetails()} columns={mockColumnsSearch} hideFooter getRowId={(row) => row.id} />
+                    <div style={{ height: 400, width: '100%', marginTop: 20 }}>
+                        <DataGrid
+                            rows={mockRowsSearch}
+                            columns={mockColumnsSearch}
+                            hideFooter
+                            getRowId={(row) => row.id}
+                            slots={{
+                                row: (props) => {
+                                    const { row } = props;
+
+                                    return (
+                                        <>
+                                            <GridRow {...props} />
+                                            {expandedRowIds.includes(row.id) && (
+                                                <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
+                                                    <Typography variant="h6">Detalhes da linha {row.id}</Typography>
+                                                    <div style={{ height: 200, width: '100%' }}>
+                                                        <DataGrid
+                                                            rows={mockRowsSearch}
+                                                            columns={mockColumnsSearch}
+                                                            hideFooter
+                                                            getRowId={(row) => row.id}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                }
+                            }}
+                        />
                     </div>
                 </CardContent>
             </Card>
