@@ -18,8 +18,9 @@ import { SnackbarCloseReason } from '@mui/material/Snackbar';
 import ProcedureFormTextField from 'ui-component/inputs/procedureFormTextField';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import SnackBarAlert from './../../../../ui-component/SnackBarAlert';
-
-const mockInstitutes = ['Teste1', 'Teste2', 'Teste3'];
+import { Procedure } from 'types/procedure';
+import useAPI from 'hooks/hooks';
+import { Institute, parseInstitute } from 'types/institute';
 const mockModalities = ['Teste1', 'Teste2', 'Teste3'];
 
 const procedureSchema = z.object({
@@ -39,22 +40,41 @@ const procedureSchema = z.object({
 type ProcedureFormProps = {
     open: boolean;
     handleClose: () => void;
+    procedureEdit?: Procedure | null;
 };
 
-const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
+const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, procedureEdit }) => {
     const [description, setDescription] = React.useState('');
     const [code, setCode] = React.useState('');
+    const [procedure, setProcedure] = React.useState<Procedure | null>(null);
     const [institute, setInstitute] = React.useState<string[]>([]);
     const [modality, setModality] = React.useState<string[]>([]);
     const [openSucessSnack, setOpenSucessSnack] = React.useState(false);
     const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
     const [messageSnack, setMessageSnack] = React.useState('');
+    const [error, setError] = React.useState<string | null>(null);
+    const { get } = useAPI();
+
     const [errors, setErrors] = React.useState({
         description: '',
         code: '',
         institute: '',
         modality: ''
     });
+
+    const fetchInstitutes = async () => {
+        const response = await get('/api/institutionsAccess');
+        if (response.ok) {
+            const institutes = response.result.map((institute: any) => parseInstitute(institute));
+            setInstitute(institutes);
+        } else {
+            setError(response.message);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchInstitutes();
+    }, []);
 
     const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
         setMessageSnack(message);
@@ -66,6 +86,18 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
         setOpenSucessSnack(false);
         setOpenErrorSnack(false);
     };
+    const putInfo = () => {
+        if (procedureEdit) {
+            setDescription(procedureEdit.description);
+            setCode(procedureEdit.codeCbhpm);
+            setInstitute(procedureEdit.institute);
+            setModality([procedureEdit.modality]);
+        }
+    };
+
+    React.useEffect(() => {
+        putInfo();
+    }, []);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -100,7 +132,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
             <form onSubmit={handleSubmit}>
                 <DialogTitle sx={{ fontSize: '20px' }}>
                     Procedimentos
-                    <Box width={'100%'} borderBottom={'1px solid #E3F2FD'} marginTop={"16px"} />
+                    <Box width={'100%'} borderBottom={'1px solid #E3F2FD'} marginTop={'16px'} />
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{ fontSize: '12px' }}>
@@ -145,9 +177,9 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                                     IconComponent={ArrowDropDownIcon}
                                     sx={selectStyles}
                                 >
-                                    {mockInstitutes.map((mockInstitute) => (
-                                        <MenuItem key={mockInstitute} value={mockInstitute}>
-                                            {mockInstitute}
+                                    {institute.map((institute) => (
+                                        <MenuItem key={institute} value={institute}>
+                                            {institute}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -183,11 +215,16 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose }) => {
                     <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" onClick={handleClose} color="primary" size='large'>
+                    <Button variant="outlined" onClick={handleClose} color="primary" size="large">
                         Fechar
                     </Button>
                     <Box width={5} />
-                    <Button size='large' variant="contained" type="submit" sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}>
+                    <Button
+                        size="large"
+                        variant="contained"
+                        type="submit"
+                        sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}
+                    >
                         Salvar
                     </Button>
                 </DialogActions>

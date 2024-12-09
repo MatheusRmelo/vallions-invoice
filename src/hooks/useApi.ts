@@ -39,7 +39,6 @@ export function useApi<T>({ url, method, requestData, options, parser }: UseApip
                     setError(err instanceof Error ? err.message : 'An unknown error occurred');
                 }
             } finally {
-                // Cleanup
             }
             return () => {
                 controller.abort();
