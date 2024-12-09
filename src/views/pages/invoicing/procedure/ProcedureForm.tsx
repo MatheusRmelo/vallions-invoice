@@ -21,7 +21,6 @@ import SnackBarAlert from './../../../../ui-component/SnackBarAlert';
 import { Procedure } from 'types/procedure';
 import useAPI from 'hooks/hooks';
 import { Institute, parseInstitute } from 'types/institute';
-const mockModalities = ['Teste1', 'Teste2', 'Teste3'];
 
 const procedureSchema = z.object({
     description: z.string().min(1, 'Descrição do Procedimento é obrigatória'),
@@ -48,7 +47,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     const [code, setCode] = React.useState('');
     const [procedure, setProcedure] = React.useState<Procedure | null>(null);
     const [institute, setInstitute] = React.useState<string[]>([]);
-    const [modality, setModality] = React.useState<string[]>([]);
+    const [modalities, setModalities] = React.useState<string[]>([]);
     const [openSucessSnack, setOpenSucessSnack] = React.useState(false);
     const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
     const [messageSnack, setMessageSnack] = React.useState('');
@@ -72,8 +71,19 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         }
     };
 
+    const fetchModalities = async () => {
+        const response = await get('/api/modalities');
+        if (response.ok) {
+            const modalities = response.result.map((modality: any) => modality.name);
+            setModalities(modalities);
+        } else {
+            setError(response.message);
+        }
+    };
+
     React.useEffect(() => {
         fetchInstitutes();
+        fetchModalities();
     }, []);
 
     const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
@@ -91,7 +101,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
             setDescription(procedureEdit.description);
             setCode(procedureEdit.codeCbhpm);
             setInstitute(procedureEdit.institute);
-            setModality([procedureEdit.modality]);
+            setModalities([procedureEdit.modality]);
         }
     };
 
@@ -195,14 +205,14 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                                     id="modality-select"
                                     label="Modalidade"
                                     multiple
-                                    value={modality}
-                                    onChange={(e) => setModality(e.target.value as string[])}
+                                    value={modalities}
+                                    onChange={(e) => setModalities(e.target.value as string[])}
                                     fullWidth
                                     sx={selectStyles}
                                 >
-                                    {mockModalities.map((mockModality) => (
-                                        <MenuItem key={mockModality} value={mockModality}>
-                                            {mockModality}
+                                    {modalities.map((modality) => (
+                                        <MenuItem key={modality} value={modality}>
+                                            {modality}
                                         </MenuItem>
                                     ))}
                                 </Select>
