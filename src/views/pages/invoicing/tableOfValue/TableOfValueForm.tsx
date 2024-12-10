@@ -43,13 +43,14 @@ type TableOfValueFormErrors = {
 };
 
 const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, tableOfValue }) => {
-    const { get, post } = useAPI();
+    const { get, post, del, put } = useAPI();
     const [description, setDescription] = React.useState('');
     const [errors, setErrors] = React.useState<TableOfValueFormErrors>({
         description: null,
         institute: null
     });
     const [institute, setInstitute] = React.useState<Institute | null>(null);
+    const [institutes, setInstitutes] = React.useState<Institute[]>([]);
     const [importOpen, setImportOpen] = React.useState(false);
     const [procedureTableFormOpen, setProcedureTableFormOpen] = React.useState(false);
     const [proceduresCosts, setProceduresCosts] = React.useState<CostsProcedures[]>([]);
@@ -69,7 +70,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
             const data = await response.result;
-            setInstitute(data.map(parseInstitute));
+            setInstitutes(data.map(parseInstitute));
         } else {
             setError(response.message);
         }
@@ -104,6 +105,46 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     setError('Erro ao salvar os procedimentos');
                 }
             }
+        }
+    };
+
+    const handleDelete = async () => {
+        if (tableOfValue) {
+            const response = await del(`/api/medical-procedure-costs/${tableOfValue.id}`);
+            if (response.ok) {
+                handleClose();
+            } else {
+                setError(response.message);
+            }
+        }
+    };
+
+    const handleUpdateTableOfValue = async () => {
+        if (tableOfValue) {
+            const response = await put(`/api/medical-procedure-costs/${tableOfValue.id}`, {
+                description: description,
+                status: tableOfValue.status === 1 ? 0 : 1,
+                institution_fk: institute?.id
+            });
+            if (response.ok) {
+                handleClose();
+            } else {
+                setError(response.message);
+            }
+        }
+    };
+
+    const handleUpdateProcedureCost = async (procedureCost: CostsProcedures) => {
+        const response = await put(`/api/costs-has-procedures/${procedureCost.id}`, {
+            billing_procedures_fk: procedureCost.id,
+            price: procedureCost.valueProcedure,
+            initial_effective_date: procedureCost.validatyStart,
+            final_effective_date: procedureCost.validatyEnd
+        });
+        if (response.ok) {
+            handleClose();
+        } else {
+            setError(response.message);
         }
     };
 
@@ -198,17 +239,16 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 <Select
                                     labelId="institute-label"
                                     id="institute-select"
-                                    multiple
                                     value={institute}
                                     label="Instituição"
-                                    onChange={(e) => setInstitute(e.target.value as string[])}
+                                    onChange={(e) => setInstitute(e.target.value as Institute)}
                                     fullWidth
                                     IconComponent={ArrowDropDownIcon}
                                     sx={selectStyles}
                                 >
-                                    {mockInstitutes.map((mockInstitute) => (
-                                        <MenuItem key={mockInstitute} value={mockInstitute}>
-                                            {mockInstitute}
+                                    {institutes.map((institute) => (
+                                        <MenuItem key={institute.id} value={institute.id}>
+                                            {institute.name}
                                         </MenuItem>
                                     ))}
                                 </Select>
