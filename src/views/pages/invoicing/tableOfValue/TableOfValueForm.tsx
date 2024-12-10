@@ -25,9 +25,15 @@ import Delete from '@mui/icons-material/DeleteOutlined';
 import { DataGrid, GridCellParams } from '@mui/x-data-grid';
 import ImportOfProcedure from './ImportOfProcedure';
 import BillingTableProcedureDialog from './BillingTableProcedure';
+import { TableOfValue } from 'types/tableOfValue';
+import { CostsProcedures, parseCostsProcedures } from 'types/procedures_costs';
+import useAPI from 'hooks/hooks';
+import TableOfValues from './TableOfValue';
+
 type TableOfValueFormProps = {
     open: boolean;
     handleClose: () => void;
+    tableOfValue: TableOfValue | null;
 };
 
 type TableOfValueFormErrors = {
@@ -35,7 +41,8 @@ type TableOfValueFormErrors = {
     institute: string | null;
 };
 
-const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose }) => {
+const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, tableOfValue }) => {
+    const { get } = useAPI();
     const [description, setDescription] = React.useState('');
     const [errors, setErrors] = React.useState<TableOfValueFormErrors>({
         description: null,
@@ -44,6 +51,32 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose }
     const [institute, setInstitute] = React.useState<string[]>([]);
     const [importOpen, setImportOpen] = React.useState(false);
     const [procedureTableFormOpen, setProcedureTableFormOpen] = React.useState(false);
+    const [proceduresCosts, setProceduresCosts] = React.useState<CostsProcedures[]>([]);
+    const [error, setError] = React.useState<string | null>(null);
+
+    const fetchProceduresCosts = React.useCallback(async () => {
+        const response = await get(`/api/costs-has-procedures?medicalProcedureCost=${tableOfValue?.id}`);
+        if (response.ok) {
+            const data = await response.result;
+            setProceduresCosts(parseCostsProcedures(data));
+        } else {
+            setError(response.message);
+        }
+    }, [get, tableOfValue?.id]);
+
+    React.useEffect(() => {
+        if (open && tableOfValue?.id !== undefined) {
+            fetchProceduresCosts();
+        }
+    }, [fetchProceduresCosts, open, tableOfValue?.id]);
+
+    React.useEffect(() => {
+        if (tableOfValue) {
+            setDescription(tableOfValue.description);
+            setInstitute(tableOfValue.institute);
+        }
+    }, [tableOfValue]);
+
     const validate = () => {
         const newErrors = { ...errors };
         if (!description) {
@@ -175,7 +208,20 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose }
                         </Box>
                     </Box>
                     <Box height="6vh" />
-                    <DataGrid disableRowSelectionOnClick rows={mockRows} columns={columns} />
+                    {proceduresCosts !== null && proceduresCosts.length > 0 && (
+                        <DataGrid
+                            disableRowSelectionOnClick
+                            rows={proceduresCosts.map((procedureCost) => ({
+                                id: procedureCost.id,
+                                initDate: procedureCost.validatyStart,
+                                endDate: procedureCost.validatyEnd,
+                                procedureCode: procedureCost.codProcedure,
+                                procedureDescription: procedureCost.descriptionProcedure,
+                                value: procedureCost.valueProcedure
+                            }))}
+                            columns={columns}
+                        />
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -246,101 +292,35 @@ const columns = [
         field: 'Ações',
         headerName: 'Ações',
         flex: 1,
-        renderCell: () => (
-            <>
+        getActions: ({ id }: { id: number }) => {
+            return [
                 <Edit
-                    sx={{
-                        color: 'rgba(103, 58, 183, 1)'
+                    color="primary"
+                    onClick={() => {
+                        console.log('Editar');
+                    }}
+                />,
+                <Delete
+                    color="error"
+                    onClick={() => {
+                        console.log('Excluir');
                     }}
                 />
-                <Delete sx={{ color: 'rgba(105, 117, 134, 1)' }} />
-            </>
-        )
+            ];
+        }
+        // renderCell: () => (
+        //     <>
+        //         <Edit
+        //             sx={{
+        //                 color: 'rgba(103, 58, 183, 1)'
+        //             }}
+        //         />
+        //         <Delete sx={{ color: 'rgba(105, 117, 134, 1)' }} />
+        //     </>
+        // )
     }
 ];
 
-const mockRows = [
-    {
-        id: 1,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '123456',
-        procedureDescription: 'Procedimento 1',
-        value: 'R$ 100,00'
-    },
-    {
-        id: 2,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 2',
-        value: 'R$ 200,00'
-    },
-    {
-        id: 3,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 3',
-        value: 'R$ 300,00'
-    },
-    {
-        id: 4,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 4',
-        value: 'R$ 400,00'
-    },
-    {
-        id: 5,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 5',
-        value: 'R$ 500,00'
-    },
-    {
-        id: 6,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 6',
-        value: 'R$ 600,00'
-    },
-    {
-        id: 7,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 7',
-        value: 'R$ 700,00'
-    },
-    {
-        id: 8,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 8',
-        value: 'R$ 800,00'
-    },
-    {
-        id: 9,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 9',
-        value: 'R$ 900,00'
-    },
-    {
-        id: 10,
-        initDate: '01/01/2021',
-        endDate: '31/12/2021',
-        procedureCode: '654321',
-        procedureDescription: 'Procedimento 10',
-        value: 'R$ 1000,00'
-    }
-];
 const formControlStyles = {
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
