@@ -1,4 +1,4 @@
-import { Institute, parseInstitute } from './institute';
+import { Institute, parseInstitute, getMockInstitutes } from './institute';
 
 export type TableOfValue = {
     id: number;
@@ -27,4 +27,20 @@ export function parseTableOfValue(data: any): TableOfValue {
 
 export function parseTableOfValues(data: any): TableOfValue[] {
     return data.map(parseTableOfValue);
+}
+export function getMockTableOfValues(): TableOfValue[] {
+    return [
+        {
+            id: 1,
+            description: 'Mock Description 1',
+            institute: getMockInstitutes()[0],
+            status: 1
+        },
+        {
+            id: 2,
+            description: 'Mock Description 2',
+            institute: getMockInstitutes()[1],
+            status: 2
+        }
+    ];
 }

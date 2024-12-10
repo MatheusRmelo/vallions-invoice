@@ -9,3 +9,16 @@ export const parseInstitute = (data: any): Institute => {
         name: data.name
     };
 };
+
+export function getMockInstitutes(): Institute[] {
+    return [
+        {
+            id: '1',
+            name: 'Mock Institute 1'
+        },
+        {
+            id: '2',
+            name: 'Mock Institute 2'
+        }
+    ];
+}

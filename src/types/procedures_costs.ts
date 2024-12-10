@@ -21,3 +21,24 @@ export function parseCostsProcedure(data: any): CostsProcedures {
 export function parseCostsProcedures(data: any): CostsProcedures[] {
     return data.map(parseCostsProcedures);
 }
+
+export function getProcedureCostsMock(): CostsProcedures[] {
+    return [
+        {
+            id: 1,
+            validatyStart: '01/01/2021',
+            validatyEnd: '31/12/2021',
+            codProcedure: '123456',
+            descriptionProcedure: 'Procedure 1',
+            valueProcedure: 100
+        },
+        {
+            id: 2,
+            validatyStart: '01/01/2021',
+            validatyEnd: '31/12/2021',
+            codProcedure: '123457',
+            descriptionProcedure: 'Procedure 2',
+            valueProcedure: 200
+        }
+    ];
+}

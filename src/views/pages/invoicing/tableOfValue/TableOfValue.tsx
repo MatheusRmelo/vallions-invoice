@@ -9,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
 import TableOfValueForm from './TableOfValueForm';
-import { TableOfValue, parseTableOfValues } from 'types/tableOfValue';
+import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/tableOfValue';
 import useAPI from 'hooks/hooks';
 const TableOfValues = () => {
     const [open, setOpen] = React.useState(false);
@@ -54,6 +54,10 @@ const TableOfValues = () => {
             setTableOfValues(parseTableOfValues(data));
         } else {
             setError(response.message);
+        }
+
+        if (true) {
+            setTableOfValues(getMockTableOfValues());
         }
     };
 

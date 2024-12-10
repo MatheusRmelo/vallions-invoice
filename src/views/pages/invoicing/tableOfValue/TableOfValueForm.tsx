@@ -26,11 +26,9 @@ import { DataGrid, GridCellParams } from '@mui/x-data-grid';
 import ImportOfProcedure from './ImportOfProcedure';
 import BillingTableProcedureDialog from './BillingTableProcedure';
 import { TableOfValue } from 'types/tableOfValue';
-import { CostsProcedures, parseCostsProcedures } from 'types/procedures_costs';
+import { CostsProcedures, parseCostsProcedures, getProcedureCostsMock } from 'types/procedures_costs';
 import useAPI from 'hooks/hooks';
-import TableOfValues from './TableOfValue';
-import { Institute, parseInstitute } from 'types/institute';
-import { APIResponse } from 'types/apiresponse';
+import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
 type TableOfValueFormProps = {
     open: boolean;
     handleClose: () => void;
@@ -61,8 +59,13 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         if (response.ok) {
             const data = await response.result;
             setProceduresCosts(parseCostsProcedures(data));
+            /// Remove quando a API estiver pronta
         } else {
             setError(response.message);
+        }
+
+        if (true) {
+            setProceduresCosts(getProcedureCostsMock());
         }
     }, [get, tableOfValue?.id]);
 
@@ -71,8 +74,13 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         if (response.ok) {
             const data = await response.result;
             setInstitutes(data.map(parseInstitute));
+            /// Remove quando a API estiver pronta
         } else {
             setError(response.message);
+        }
+
+        if (true) {
+            setInstitutes(getMockInstitutes());
         }
     };
 
@@ -189,7 +197,56 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         setErrors(newErrors);
         return !Object.values(newErrors).some((error) => error !== null);
     };
+    const columns = [
+        {
+            field: 'initDate',
+            headerName: 'Vigência Inicial',
+            renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Inicial</span>,
+            flex: 2
+        },
+        {
+            field: 'endDate',
+            headerName: 'Vigência Final',
+            flex: 2,
+            renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Final</span>
+        },
+        {
+            field: 'procedureCode',
+            headerName: 'Cód. Procedimento',
+            renderHeader: () => <span style={{ fontWeight: 'bold' }}>Cód. Procedimento</span>,
+            flex: 2
+        },
+        {
+            field: 'procedureDescription',
+            headerName: 'Descrição Procedimento',
+            renderHeader: () => <span style={{ fontWeight: 'bold' }}>Descrição Procedimento</span>,
+            flex: 3,
 
+            renderCell: (params: GridCellParams) => <span style={{ fontWeight: 'bold' }}>{params.value as string}</span>
+        },
+        { field: 'value', headerName: 'Valor Procedimento', flex: 4 },
+        {
+            field: 'Ações',
+            headerName: 'Ações',
+            flex: 1,
+            getActions: ({ id }: { id: number }) => {
+                return [
+                    <Edit
+                        color="primary"
+                        onClick={() => {
+                            setProcedureTableFormOpen(true);
+                        }}
+                    />,
+                    <Delete
+                        color="error"
+                        onClick={() => {
+                            console.log('Excluir');
+                        }}
+                    />
+                ];
+            }
+        }
+    ];
     return (
         <Dialog
             open={open}
@@ -350,67 +407,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     );
 };
 
-const columns = [
-    {
-        field: 'initDate',
-        headerName: 'Vigência Inicial',
-        renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Inicial</span>,
-        flex: 2
-    },
-    {
-        field: 'endDate',
-        headerName: 'Vigência Final',
-        flex: 2,
-        renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Final</span>
-    },
-    {
-        field: 'procedureCode',
-        headerName: 'Cód. Procedimento',
-        renderHeader: () => <span style={{ fontWeight: 'bold' }}>Cód. Procedimento</span>,
-        flex: 2
-    },
-    {
-        field: 'procedureDescription',
-        headerName: 'Descrição Procedimento',
-        renderHeader: () => <span style={{ fontWeight: 'bold' }}>Descrição Procedimento</span>,
-        flex: 3,
-
-        renderCell: (params: GridCellParams) => <span style={{ fontWeight: 'bold' }}>{params.value as string}</span>
-    },
-    { field: 'value', headerName: 'Valor Procedimento', flex: 4 },
-    {
-        field: 'Ações',
-        headerName: 'Ações',
-        flex: 1,
-        getActions: ({ id }: { id: number }) => {
-            return [
-                <Edit
-                    color="primary"
-                    onClick={() => {
-                        console.log('Editar');
-                    }}
-                />,
-                <Delete
-                    color="error"
-                    onClick={() => {
-                        console.log('Excluir');
-                    }}
-                />
-            ];
-        }
-        // renderCell: () => (
-        //     <>
-        //         <Edit
-        //             sx={{
-        //                 color: 'rgba(103, 58, 183, 1)'
-        //             }}
-        //         />
-        //         <Delete sx={{ color: 'rgba(105, 117, 134, 1)' }} />
-        //     </>
-        // )
-    }
-];
-
 const formControlStyles = {
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -443,6 +439,5 @@ const selectStyles = {
         zIndex: 9999
     }
 };
-const mockInstitutes = ['Teste1', 'Teste2', 'Teste3'];
 
 export default TableOfValueForm;
