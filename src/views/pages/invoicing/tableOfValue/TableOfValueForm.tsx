@@ -29,7 +29,8 @@ import { TableOfValue } from 'types/tableOfValue';
 import { CostsProcedures, parseCostsProcedures } from 'types/procedures_costs';
 import useAPI from 'hooks/hooks';
 import TableOfValues from './TableOfValue';
-
+import { Institute, parseInstitute } from 'types/institute';
+import { APIResponse } from 'types/apiresponse';
 type TableOfValueFormProps = {
     open: boolean;
     handleClose: () => void;
@@ -42,13 +43,13 @@ type TableOfValueFormErrors = {
 };
 
 const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, tableOfValue }) => {
-    const { get } = useAPI();
+    const { get, post } = useAPI();
     const [description, setDescription] = React.useState('');
     const [errors, setErrors] = React.useState<TableOfValueFormErrors>({
         description: null,
         institute: null
     });
-    const [institute, setInstitute] = React.useState<string[]>([]);
+    const [institute, setInstitute] = React.useState<Institute | null>(null);
     const [importOpen, setImportOpen] = React.useState(false);
     const [procedureTableFormOpen, setProcedureTableFormOpen] = React.useState(false);
     const [proceduresCosts, setProceduresCosts] = React.useState<CostsProcedures[]>([]);
@@ -63,6 +64,59 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             setError(response.message);
         }
     }, [get, tableOfValue?.id]);
+
+    const fetchInstitutes = async () => {
+        const response = await get('/api/institutionsAccess');
+        if (response.ok) {
+            const data = await response.result;
+            setInstitute(data.map(parseInstitute));
+        } else {
+            setError(response.message);
+        }
+    };
+
+    const handleSave = async () => {
+        const intituteForeignKeyId = institute?.id;
+        if (validate() && intituteForeignKeyId !== null) {
+            /// Salvando a tabela de valores
+            const response = await post('/api/medical-procedure-costs', {
+                description: description,
+                status: 1,
+                institution_fk: intituteForeignKeyId
+            });
+            if (response.ok) {
+                /// Vinculando os custos dos procedimentos a tabela de valores
+                const results = proceduresCosts.map(async (procedureCost) => {
+                    return post('/api/costs-has-procedures', {
+                        medical_procedure_cost_fk: response.result.id,
+                        billing_procedures_fk: procedureCost.id,
+                        price: procedureCost.valueProcedure,
+                        initial_effective_date: procedureCost.validatyStart,
+                        final_effective_date: procedureCost.validatyEnd
+                    });
+                });
+
+                const responseCost = await Promise.all(results);
+
+                if (responseCost.every((res) => res.ok)) {
+                    handleClose();
+                } else {
+                    setError('Erro ao salvar os procedimentos');
+                }
+            }
+        }
+    };
+
+    ///TODO: Tratar erro de forma mais adequada
+    React.useEffect(() => {
+        if (error) {
+            console.log(error);
+        }
+    }, [error]);
+
+    React.useEffect(() => {
+        fetchInstitutes();
+    }, []);
 
     React.useEffect(() => {
         if (open && tableOfValue?.id !== undefined) {
@@ -85,7 +139,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             newErrors.description = null;
         }
 
-        if (institute.length === 0) {
+        if (institute === null) {
             newErrors.institute = 'Campo obrigatório';
         } else {
             newErrors.institute = null;
@@ -114,11 +168,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    if (validate()) {
-                        console.log('Formulário válido');
-                    } else {
-                        console.log('Formulário inválido');
-                    }
+                    handleSave();
                 }}
             >
                 <DialogTitle sx={{ fontSize: '20px' }}>Tabela de Valores</DialogTitle>

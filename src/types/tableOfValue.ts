@@ -1,7 +1,9 @@
+import { Institute, parseInstitute } from './institute';
+
 export type TableOfValue = {
     id: number;
     description: string;
-    institute: string[];
+    institute: Institute;
     // validityStart: string;
     // validityEnd: string;
     // codeProcedure: string;
@@ -13,7 +15,7 @@ export function parseTableOfValue(data: any): TableOfValue {
     return {
         id: data.id,
         description: data.description,
-        institute: data.institute,
+        institute: parseInstitute(data.institute),
         // active: data.active,
         // validityStart: data.validityStart,
         // validityEnd: data.validityEnd,
