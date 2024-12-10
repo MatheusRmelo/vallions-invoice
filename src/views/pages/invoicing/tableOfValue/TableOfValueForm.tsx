@@ -53,6 +53,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     const [procedureTableFormOpen, setProcedureTableFormOpen] = React.useState(false);
     const [proceduresCosts, setProceduresCosts] = React.useState<CostsProcedures[]>([]);
     const [error, setError] = React.useState<string | null>(null);
+    const [filter, setFilter] = React.useState<string>('');
 
     const fetchProceduresCosts = React.useCallback(async () => {
         const response = await get(`/api/costs-has-procedures?medicalProcedureCost=${tableOfValue?.id}`);
@@ -174,6 +175,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     }, [fetchProceduresCosts, open, tableOfValue?.id]);
 
     React.useEffect(() => {
+        console.log(tableOfValue);
         if (tableOfValue) {
             setDescription(tableOfValue.description);
             setInstitute(tableOfValue.institute);
@@ -321,7 +323,13 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 marginLeft: '30px'
                             }}
                         >
-                            <CustomTextFieldSearch label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
+                            <CustomTextFieldSearch
+                                label="Search"
+                                onChange={(e) => {
+                                    setFilter(e.target.value);
+                                }}
+                                prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />}
+                            />
                         </Box>
                         <Box
                             display={'flex'}
@@ -358,14 +366,22 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     {proceduresCosts !== null && proceduresCosts.length > 0 && (
                         <DataGrid
                             disableRowSelectionOnClick
-                            rows={proceduresCosts.map((procedureCost) => ({
-                                id: procedureCost.id,
-                                initDate: procedureCost.validatyStart,
-                                endDate: procedureCost.validatyEnd,
-                                procedureCode: procedureCost.codProcedure,
-                                procedureDescription: procedureCost.descriptionProcedure,
-                                value: procedureCost.valueProcedure
-                            }))}
+                            rows={proceduresCosts
+                                .filter((procedureCost) => {
+                                    return (
+                                        filter.length === 0 ||
+                                        procedureCost.descriptionProcedure.toLowerCase().includes(filter.toLowerCase()) ||
+                                        procedureCost.codProcedure.toLowerCase().includes(filter.toLowerCase())
+                                    );
+                                })
+                                .map((procedureCost) => ({
+                                    id: procedureCost.id,
+                                    initDate: procedureCost.validatyStart,
+                                    endDate: procedureCost.validatyEnd,
+                                    procedureCode: procedureCost.codProcedure,
+                                    procedureDescription: procedureCost.descriptionProcedure,
+                                    value: procedureCost.valueProcedure
+                                }))}
                             columns={columns}
                         />
                     )}

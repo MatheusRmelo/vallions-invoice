@@ -15,6 +15,9 @@ const TableOfValues = () => {
     const [open, setOpen] = React.useState(false);
     const { get, put } = useAPI();
     const handleOpen = () => {
+        /// Limpar os campos do formulário
+        setTableOfValue(null);
+
         setOpen(true);
     };
 
@@ -99,40 +102,60 @@ const TableOfValues = () => {
                             'Inativo/Ativo': '',
                             Excluir: ''
                         }))}
+                        editMode="row"
                         columns={[
                             { field: 'id', headerName: 'ID', flex: 2 },
                             { field: 'Descrição Tabela de Valores', headerName: 'Descrição do Procedimento', flex: 2 },
                             {
                                 field: 'Editar',
                                 headerName: 'Editar',
+
                                 flex: 1,
-                                getActions: ({ id }: { id: GridRowId }) => {
-                                    return [
-                                        <GridActionsCellItem
-                                            icon={<Edit color="primary" />}
-                                            label="Editar"
-                                            className="textPrimary"
-                                            onClick={() => handleClickEdit(id)}
-                                            color="inherit"
-                                        />
-                                    ];
-                                }
+                                renderCell: (params) => (
+                                    <GridActionsCellItem
+                                        icon={<Edit color="primary" />}
+                                        label="Editar"
+                                        className="textPrimary"
+                                        onClick={() => handleClickEdit(params.id)}
+                                        color="inherit"
+                                    />
+                                )
+                                // getActions: ({ id }: { id: GridRowId }) => {
+                                //     return [
+                                //         <GridActionsCellItem
+                                //             icon={<Edit color="primary" />}
+                                //             label="Editar"
+                                //             className="textPrimary"
+                                //             onClick={() => handleClickEdit(id)}
+                                //             color="inherit"
+                                //         />
+                                //     ];
+                                // }
                             },
                             {
                                 field: 'Inativo/Ativo',
                                 headerName: 'Inativo/Ativo',
                                 flex: 1,
-                                getActions: ({ id }: { id: GridRowId }) => {
-                                    return [
-                                        <GridActionsCellItem
-                                            icon={<Switch color="primary" checked={getTableById(id)?.status === 1} />}
-                                            label="Inativo/Ativo"
-                                            className="textPrimary"
-                                            onClick={() => handleStatusChange(id)}
-                                            color="inherit"
-                                        />
-                                    ];
-                                }
+                                renderCell: (params) => (
+                                    <GridActionsCellItem
+                                        icon={<Switch color="primary" checked={getTableById(params.id)?.status === 1} />}
+                                        label="Inativo/Ativo"
+                                        className="textPrimary"
+                                        onClick={() => handleStatusChange(params.id)}
+                                        color="inherit"
+                                    />
+                                )
+                                // getActions: ({ id }: { id: GridRowId }) => {
+                                //     return [
+                                //         <GridActionsCellItem
+                                //             icon={<Switch color="primary" checked={getTableById(id)?.status === 1} />}
+                                //             label="Inativo/Ativo"
+                                //             className="textPrimary"
+                                //             onClick={() => handleStatusChange(id)}
+                                //             color="inherit"
+                                //         />
+                                //     ];
+                                // }
                             }
                         ]}
                     />

@@ -165,10 +165,11 @@ const ProcedureView = () => {
                                 flex: 1,
                                 cellClassName: 'actions',
                                 renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
+
                                 getActions: ({ id }) => {
                                     return [
                                         <GridActionsCellItem
-                                            icon={<Edit color="primary" />}
+                                            icon={<Edit sx={{ color: 'black' }} />}
                                             label="Editar"
                                             className="textPrimary"
                                             onClick={() => handleClickEdit(id)}

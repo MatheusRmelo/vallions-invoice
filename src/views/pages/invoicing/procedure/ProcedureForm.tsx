@@ -52,7 +52,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
     const [messageSnack, setMessageSnack] = React.useState('');
     const [error, setError] = React.useState<string | null>(null);
-    const { get } = useAPI();
+    const { get, post } = useAPI();
 
     const [errors, setErrors] = React.useState({
         description: '',
@@ -96,6 +96,22 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         setOpenSucessSnack(false);
         setOpenErrorSnack(false);
     };
+
+    const handleProcedure = async () => {
+        const response = await post('/api/billingProcedure', {
+            name: description,
+            code: code,
+            institution: institute,
+            modality: modalities.join(',')
+        });
+        /// TODO: Tratar a resposta da API
+        if (response.ok) {
+            handleClickSnack({ message: 'Procedimento cadastrado com sucesso!', severity: 'success' });
+        } else {
+            handleClickSnack({ message: response.message, severity: 'error' });
+        }
+    };
+
     const putInfo = () => {
         if (procedureEdit) {
             setDescription(procedureEdit.description);
@@ -111,7 +127,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const formData = { description, code, institute, modality };
+        const formData = { description, code, institute, modalities };
         const result = procedureSchema.safeParse(formData);
 
         if (!result.success) {
@@ -132,7 +148,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                 severity: 'error'
             });
         } else {
-            console.log(formData);
+            handleProcedure();
             handleClose();
         }
     };
