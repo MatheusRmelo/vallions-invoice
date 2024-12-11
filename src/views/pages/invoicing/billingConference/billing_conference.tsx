@@ -19,64 +19,45 @@ import { DataGrid, GridColDef, GridRowsProp, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import MainCard from 'ui-component/cards/MainCard';
 import { SendOutlined, Search, ExpandMore, ExpandLess } from '@mui/icons-material';
-
+import useAPI from 'hooks/hooks';
+import { Billing, parseBillingList, generateMockBilling } from 'types/billing';
+import { MoreVert } from '@mui/icons-material';
 const BillingConference: React.FC = () => {
     const [startDate, setStartDate] = React.useState(new Date().toISOString().slice(0, 10));
     const [endDate, setEndDate] = React.useState(new Date().toISOString().slice(0, 10));
     const [tabIndex, setTabIndex] = React.useState(0);
-    const [expandedRowIds, setExpandedRowIds] = React.useState<number[]>([]); // Estado para gerenciar linhas expandidas
+    const [expandedRowIds, setExpandedRowIds] = React.useState<number[]>([]);
     const mockSelects = ['Teste1', 'Teste2', 'Teste3'];
+    const [billings, setBillings] = React.useState<Billing[]>([]);
+
+    const { get } = useAPI();
 
     const handleExpandClick = (id: number) => {
         setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
     };
 
-    const mockColumnsSearch: GridColDef[] = [
-        {
-            field: 'expand',
-            headerName: '',
-            width: 50,
-            renderCell: (params) => (
-                <IconButton onClick={() => handleExpandClick(params.row.id)}>
-                    {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
-                </IconButton>
-            )
-        },
-        { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2 },
-        { field: 'study_description', headerName: 'Descrição do Estudo', flex: 2 },
-        { field: 'dateOfStudy', headerName: 'Data do Estudo', flex: 1 },
-        { field: 'unity', headerName: 'Unidade', flex: 1 },
-        { field: 'quantity', headerName: 'Qtn', flex: 1 },
-        { field: 'valueUnit', headerName: '$ Valor Laudo', flex: 1 },
-        { field: 'valueTotal', headerName: '$ Total', flex: 1 }
-    ];
+    const fetchBilling = async () => {
+        const response = await get('/api/billings');
 
-    const mockRowsSearch: GridRowsProp = [
-        {
-            id: 1,
-            namePatient: 'John Doe',
-            study_description: 'Estudo 1',
-            dateOfStudy: '01/01/2021',
-            unity: 'Unidade 1',
-            quantity: 1,
-            valueUnit: 100.0,
-            valueTotal: 100.0
-        },
-        {
-            id: 2,
-            namePatient: 'Jane Smith',
-            study_description: 'Estudo 2',
-            dateOfStudy: '02/01/2021',
-            unity: 'Unidade 2',
-            quantity: 1,
-            valueUnit: 200.0,
-            valueTotal: 200.0
+        if (response.ok) {
+            const data = await response.result;
+            const billings = parseBillingList(data);
+            setBillings(billings);
+        } else {
+            console.log('Error');
         }
-    ];
+
+        ///remover em produção
+        setBillings([generateMockBilling()]);
+    };
 
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setTabIndex(newValue);
     };
+
+    React.useEffect(() => {
+        fetchBilling();
+    }, []);
 
     return (
         <MainCard title="Conferência de Laudos para Faturamento">
@@ -171,26 +152,98 @@ const BillingConference: React.FC = () => {
                     </Box>
                     <div style={{ height: 400, width: '100%', marginTop: 20 }}>
                         <DataGrid
-                            rows={mockRowsSearch}
-                            columns={mockColumnsSearch}
+                            rows={billings.map((billing) => {
+                                return {
+                                    id: billing.id,
+                                    unity: billing.unity.name,
+                                    monthOfBilling: billing.monthOfBilling,
+                                    statusOfBilling: billing.statusOfBilling,
+                                    QTN: billing.qtn,
+                                    totalValue: billing.priceTotal
+                                };
+                            })}
+                            columns={[
+                                {
+                                    field: 'expand',
+                                    headerName: '#',
+                                    width: 50,
+                                    renderCell: (params) => (
+                                        <IconButton onClick={() => handleExpandClick(params.row.id)}>
+                                            {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
+                                        </IconButton>
+                                    )
+                                },
+                                { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2 },
+                                { field: 'study_description', headerName: 'Descrição do Estudo', flex: 2 },
+                                { field: 'dateOfStudy', headerName: 'Data do Estudo', flex: 1 },
+                                { field: 'unity', headerName: 'Unidade', flex: 1 },
+                                { field: 'quantity', headerName: 'Qtn', flex: 1 },
+                                { field: 'valueUnit', headerName: '$ Valor Laudo', flex: 1 },
+                                { field: 'valueTotal', headerName: '$ Total', flex: 1 }
+                            ]}
                             hideFooter
                             getRowId={(row) => row.id}
                             slots={{
                                 row: (props) => {
                                     const { row } = props;
-
                                     return (
                                         <>
                                             <GridRow {...props} />
                                             {expandedRowIds.includes(row.id) && (
                                                 <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
-                                                    <Typography variant="h6">Detalhes da linha {row.id}</Typography>
+                                                    <Box height={20} />
+                                                    <Typography variant="h3">Laudos Sendo Faturados</Typography>
+                                                    <Box height={20} />
                                                     <div style={{ height: 200, width: '100%' }}>
                                                         <DataGrid
-                                                            rows={mockRowsSearch}
-                                                            columns={mockColumnsSearch}
+                                                            rows={(billings.find((billing) => billing.id === row.id)?.report || []).map(
+                                                                (report) => {
+                                                                    return {
+                                                                        namePatient: report.patientName,
+                                                                        reportDate: report.dateReport,
+                                                                        reportTitle: report.titleReport,
+                                                                        reportValue: report.valueReport,
+                                                                        status: report.statusReport
+                                                                    };
+                                                                }
+                                                            )}
+                                                            columns={[
+                                                                {
+                                                                    field: 'namePatient',
+                                                                    headerName: 'Nome do Paciente',
+                                                                    flex: 2
+                                                                },
+                                                                {
+                                                                    field: 'reportDate',
+                                                                    headerName: 'Data do Laudo',
+                                                                    flex: 2
+                                                                },
+                                                                {
+                                                                    field: 'reportTitle',
+                                                                    headerName: 'Título do Laudo',
+                                                                    flex: 1
+                                                                },
+                                                                {
+                                                                    field: 'reportValue',
+                                                                    headerName: '$ Valor Laudo',
+                                                                    flex: 1
+                                                                },
+                                                                {
+                                                                    field: 'status',
+                                                                    headerName: 'Status',
+                                                                    flex: 1
+                                                                },
+                                                                {
+                                                                    field: 'action',
+                                                                    headerName: ' ',
+                                                                    flex: 1,
+                                                                    renderCell(params) {
+                                                                        return <MoreVert sx={{ color: 'action.active' }} />;
+                                                                    }
+                                                                }
+                                                            ]}
                                                             hideFooter
-                                                            getRowId={(row) => row.id}
+                                                            getRowId={(row) => row.namePatient}
                                                         />
                                                     </div>
                                                 </div>
