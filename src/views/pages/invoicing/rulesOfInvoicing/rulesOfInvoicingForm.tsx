@@ -16,14 +16,42 @@ import {
 } from '@mui/material';
 import RuleRow from './ruleRow';
 import AddRuleRow from './AddRuleRow';
+import { RuleBilling } from 'types/rules_billing';
+import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
+import UseAPI from 'hooks/hooks';
+
 interface Props {
     open: boolean;
+    ruleEdit?: RuleBilling;
     onClose: () => void;
 }
 
-const mockInstitutes = ['Teste1', 'Teste2', 'Teste3'];
-
 const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
+    const { get } = UseAPI();
+
+    const [institutes, setInstitutes] = React.useState<Institute[]>([]);
+    const [error, setError] = React.useState<string | undefined>(undefined);
+
+    const fetchInstitutes = async () => {
+        const response = await get('/api/institutionsAccess');
+        if (response.ok) {
+            const institutes = response.result.map((institute: any) => parseInstitute(institute));
+            setInstitutes(institutes);
+        } else {
+            setError(response.message);
+        }
+
+        /// Remover
+        if (true) {
+            setInstitutes(getMockInstitutes());
+        }
+    };
+
+    /// Init State
+    React.useEffect(() => {
+        fetchInstitutes();
+    }, []);
+
     return (
         <Dialog
             open={open}
@@ -67,9 +95,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                             <InputLabel id="institute-label">Instituição</InputLabel>
 
                             <Select fullWidth id="institution" label="Instituição" variant="outlined" sx={{ mb: 2 }}>
-                                {mockInstitutes.map((institution) => (
-                                    <MenuItem key={institution} value={institution}>
-                                        {institution}
+                                {institutes.map((institution) => (
+                                    <MenuItem key={institution.id} value={institution.id}>
+                                        {institution.name}
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -79,9 +107,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                         <FormControl fullWidth>
                             <InputLabel id="institute-label">Unidade</InputLabel>
                             <Select fullWidth id="unidade" label="Unidade" variant="outlined" sx={{ mb: 2 }}>
-                                {mockInstitutes.map((institution) => (
-                                    <MenuItem key={institution} value={institution}>
-                                        {institution}
+                                {institutes.map((institution) => (
+                                    <MenuItem key={institution.id} value={institution.id}>
+                                        {institution.name}
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -114,7 +142,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                 <Box mt={'6vh'} />
                 <RuleRow mockInstitutes={mockInstitutes} />
                 {/* Mocado remove dps */}
-                <RuleRow mockInstitutes={mockInstitutes} />
                 <Box mt={'6vh'} />
                 <Box display={'flex'} justifyContent={'space-between'}>
                     <Box display={'flex'} flexDirection={'column'}>

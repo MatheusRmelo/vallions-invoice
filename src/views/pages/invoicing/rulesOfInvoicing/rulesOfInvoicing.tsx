@@ -8,47 +8,15 @@ import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
+import useAPI from 'hooks/hooks';
+import { RuleBilling, parseRuleBillingList, generateMockRuleBilling } from 'types/rules_billing';
 import RulesOfInvoicingForm from './rulesOfInvoicingForm';
-// Columns for DataGrid
-const columns = [
-    { field: 'rulesDescription', headerName: 'Descrição Regra', flex: 2 },
-    { field: 'intituição', headerName: 'Instituição', flex: 3 },
-    { field: 'unidade', headerName: 'Unidade', flex: 1 },
-    //
-    { field: 'editar', headerName: 'Editar', flex: 1, renderCell: () => <Edit color="primary" /> },
-    { field: 'Inativo/Ativo', headerName: 'Inativo/Ativo', flex: 1, renderCell: () => <Switch /> }
-];
-
-const mockRows = [
-    {
-        id: 1,
-        rulesDescription: 'Regra 1',
-        intituição: 'Instituição 1',
-        unidade: 'Unidade 1'
-    },
-    {
-        id: 2,
-        rulesDescription: 'Regra 2',
-        intituição: 'Instituição 2',
-        unidade: 'Unidade 2'
-    },
-    {
-        id: 3,
-        rulesDescription: 'Regra 3',
-        intituição: 'Instituição 3',
-        unidade: 'Unidade 3'
-    },
-    {
-        id: 4,
-        rulesDescription: 'Regra 4',
-        intituição: 'Instituição 4',
-        unidade: 'Unidade 4'
-    }
-];
 
 const RulesOfInvoicing = () => {
     const [open, setOpen] = React.useState(false);
-
+    const { get } = useAPI();
+    const [rules, setRules] = React.useState<RuleBilling[]>([]);
+    const [rule, setRule] = React.useState<RuleBilling | undefined>(undefined);
     const handleOpen = () => {
         setOpen(true);
     };
@@ -56,6 +24,31 @@ const RulesOfInvoicing = () => {
     const handleClose = () => {
         setOpen(false);
     };
+
+    const fetchBillingRules = async () => {
+        const response = await get('/api/billing-rules');
+        if (response.ok) {
+            const data = response.result;
+            const rules = parseRuleBillingList(data);
+            setRules(rules);
+        } else {
+            ///Tratamento de erro
+            console.error('Error fetching billing rules');
+        }
+        /// Remover
+        if (true) {
+            setRules(generateMockRuleBilling());
+        }
+    };
+
+    const getRuleById = (id: number): RuleBilling | undefined => {
+        return rules.find((rule) => rule.id === id);
+    };
+
+    React.useEffect(() => {
+        fetchBillingRules();
+    }, []);
+
     return (
         <>
             <MainCard title="Regras de Faturamento">
@@ -78,9 +71,55 @@ const RulesOfInvoicing = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    <DataGrid disableRowSelectionOnClick rows={mockRows} columns={columns} />
+                    <DataGrid
+                        disableRowSelectionOnClick
+                        rows={rules.map((rule) => ({
+                            id: rule.id,
+                            rulesDescription: rule.rulesDescription,
+                            institution: rule.institution,
+                            unity: rule.unity,
+                            status: rule.status
+                        }))}
+                        columns={[
+                            { field: 'rulesDescription', headerName: 'Descrição Regra', flex: 2 },
+                            { field: 'institution', headerName: 'Instituição', flex: 3 },
+                            { field: 'unity', headerName: 'Unidade', flex: 1 },
+                            {
+                                field: 'actions',
+                                headerName: 'Editar',
+                                flex: 1,
+                                renderCell: (params) => (
+                                    <Box display="flex" justifyContent="center">
+                                        <Edit
+                                            onClick={() => {
+                                                setRule(getRuleById(params.row.id));
+                                                handleOpen();
+                                            }}
+                                            style={{
+                                                fontSize: '2.5vh',
+                                                marginBottom: '1vh',
+                                                color: 'rgba(103, 58, 183, 1)'
+                                            }}
+                                        />
+                                    </Box>
+                                )
+                            },
+                            {
+                                field: 'status',
+                                headerName: 'Inativo/Ativo',
+                                flex: 1,
+                                renderCell: (params) => (
+                                    <Switch
+                                        checked={params.value === '1'}
+                                        color="primary"
+                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                    />
+                                )
+                            }
+                        ]}
+                    />
                 </Box>
-                <RulesOfInvoicingForm open={open} onClose={handleClose} />
+                <RulesOfInvoicingForm open={open} onClose={handleClose} ruleEdit={rule} />
             </MainCard>
         </>
     );
