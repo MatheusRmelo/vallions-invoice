@@ -57,6 +57,7 @@
     },
     "scripts": {
         "start": "vite",
+        "dev": "npm run start",
         "build": "tsc && vite build",
         "build-stage": "env-cmd -f .env.qa vite build",
         "preview": "vite preview",

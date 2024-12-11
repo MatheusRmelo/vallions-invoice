@@ -19,7 +19,8 @@ import AddRuleRow from './AddRuleRow';
 import { RuleBilling } from 'types/rules_billing';
 import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
 import UseAPI from 'hooks/hooks';
-
+import { TableOfValue } from 'types/tableOfValue';
+import { tag } from 'types/tag';
 interface Props {
     open: boolean;
     ruleEdit?: RuleBilling;
@@ -31,6 +32,10 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
 
     const [institutes, setInstitutes] = React.useState<Institute[]>([]);
     const [error, setError] = React.useState<string | undefined>(undefined);
+    const [tableOfValue, setTableOfValue] = React.useState<TableOfValue | undefined>(undefined);
+    const [tag, setTag] = React.useState<Tag | undefined>(undefined);
+    const [type, setType] = React.useState<string | undefined>(undefined);
+    const [value, setValue] = React.useState<string | undefined>(undefined);
 
     const fetchInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
@@ -104,6 +109,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                         </FormControl>
                     </Grid>
                     <Grid item xs={3}>
+                        {/* Não Há get de unidade */}
                         <FormControl fullWidth>
                             <InputLabel id="institute-label">Unidade</InputLabel>
                             <Select fullWidth id="unidade" label="Unidade" variant="outlined" sx={{ mb: 2 }}>
@@ -140,7 +146,16 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                     </Button>
                 </Box>
                 <Box mt={'6vh'} />
-                <RuleRow mockInstitutes={mockInstitutes} />
+                <RuleRow
+                    tag={tag}
+                    setTag={setTag}
+                    type={type || ''}
+                    setType={setType}
+                    value={value || '0'}
+                    setValue={setValue}
+                    tableOfValue={tableOfValue}
+                    setTableOfValue={setTableOfValue}
+                />
                 {/* Mocado remove dps */}
                 <Box mt={'6vh'} />
                 <Box display={'flex'} justifyContent={'space-between'}>
@@ -166,9 +181,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                     </Button>
                 </Box>
                 <Box mt={'6vh'} />
-                <AddRuleRow mockInstitutes={mockInstitutes} />
+                {/* <AddRuleRow mockInstitutes={mockInstitutes} /> */}
                 {/* Mocado remove dps */}
-                <AddRuleRow mockInstitutes={mockInstitutes} />
+                {/* <AddRuleRow mockInstitutes={mockInstitutes} /> */}
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={onClose} color="primary" size="large">

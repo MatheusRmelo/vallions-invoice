@@ -6,13 +6,12 @@ import UseAPI from 'hooks/hooks';
 import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/tableOfValue';
 
 interface RuleRowProps {
-    mockInstitutes: string[];
-    tableOfValue: TableOfValue | null;
-    setTableOfValue: (value: TableOfValue | null) => void;
+    tableOfValue: TableOfValue | undefined;
+    setTableOfValue: (value: TableOfValue | undefined) => void;
     value: string;
     setValue: (value: string) => void;
-    tag: Tag | null;
-    setTag: (value: Tag | null) => void;
+    tag: Tag | undefined;
+    setTag: (value: Tag | undefined) => void;
     type: string;
     setType: (value: string) => void;
 }
@@ -70,7 +69,7 @@ const RuleRow: React.FC<RuleRowProps> = ({ tableOfValue, setTableOfValue, value,
                         value={tableOfValue?.id || ''}
                         onChange={(event) => {
                             const selectedTableOfValue = tableOfValues.find((tov) => tov.id === event.target.value);
-                            setTableOfValue(selectedTableOfValue || null);
+                            setTableOfValue(selectedTableOfValue || undefined);
                         }}
                         label="Tabela de Valores"
                         variant="outlined"
@@ -127,7 +126,7 @@ const RuleRow: React.FC<RuleRowProps> = ({ tableOfValue, setTableOfValue, value,
                         value={tag?.id || ''}
                         onChange={(event) => {
                             const selectedTag = tags.find((t) => t.id === event.target.value);
-                            setTag(selectedTag || null);
+                            setTag(selectedTag || undefined);
                         }}
                     >
                         {tags.map((tag) => (
