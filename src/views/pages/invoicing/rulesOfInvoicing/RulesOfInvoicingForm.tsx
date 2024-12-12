@@ -19,9 +19,10 @@ import { RuleBilling } from 'types/rules_billing';
 import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
 import UseAPI from 'hooks/hooks';
 import { getMockTableOfValues, parseTableOfValues, TableOfValue } from 'types/tableOfValue';
-import { RuleType } from './types/RuleType';
+import { RuleType, RuleAdittion } from './types/RuleType';
 import { generateMockTag, parseTagList, Tag } from 'types/tag';
 import RuleRow from './RuleRow';
+import AddRule from './AddRuleRow';
 
 interface Props {
     open: boolean;
@@ -37,7 +38,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
     const [tags, setTags] = React.useState<Tag[]>([]);
     const [tableOfValues, setTableOfValues] = React.useState<TableOfValue[]>([]);
     const [rules, setRules] = useState<RuleType[]>([]);
-
+    const [rulesAddition, setRulesAddition] = useState<RuleAdittion[]>([]);
     const fetchInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
@@ -100,7 +101,20 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
         });
         console.log(newRules);
         setRules(newRules);
-    }
+    };
+
+    const handleClickAddRulesAditional = () => {
+        var newRules = [...rulesAddition];
+        newRules.push({
+            levelPriority: 0,
+            tableOfValues: undefined,
+            type: '',
+            value: ''
+        });
+
+        console.log(newRules);
+        setRulesAddition(newRules);
+    };
 
     return (
         <Dialog
@@ -192,8 +206,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                     </Button>
                 </Box>
                 <Box mt={'6vh'} />
-                {
-                    rules.map((element, index) => <RuleRow
+                {rules.map((element, index) => (
+                    <RuleRow
                         rule={element}
                         tableOfValues={tableOfValues}
                         tags={tags}
@@ -204,11 +218,11 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                         }}
                         onDelete={() => {
                             let newArray = [...rules];
-                            newArray = newArray.filter((element, checkIndex) => checkIndex != index);
+                            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
                             setRules(newArray);
                         }}
-                    />)
-                }
+                    />
+                ))}
 
                 {/* Mocado remove dps */}
                 <Box mt={'6vh'} />
@@ -230,12 +244,28 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                             fontSize: '1.5vh',
                             backgroundColor: 'rgba(103, 58, 183, 1)'
                         }}
-                        onClick={handleClickAddRule}
+                        onClick={handleClickAddRulesAditional}
                     >
                         Adicionar Regra
                     </Button>
                 </Box>
                 <Box mt={'6vh'} />
+                {rulesAddition.map((element, index) => (
+                    <AddRuleRow
+                        rule={element}
+                        tableOfValues={tableOfValues}
+                        setRule={(value) => {
+                            let newArray = [...rulesAddition];
+                            newArray[index] = value;
+                            setRulesAddition(newArray);
+                        }}
+                        onDelete={() => {
+                            let newArray = [...rulesAddition];
+                            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+                            setRulesAddition(newArray);
+                        }}
+                    />
+                ))}
                 {/* <AddRuleRow mockInstitutes={mockInstitutes} /> */}
                 {/* Mocado remove dps */}
                 {/* <AddRuleRow mockInstitutes={mockInstitutes} /> */}
