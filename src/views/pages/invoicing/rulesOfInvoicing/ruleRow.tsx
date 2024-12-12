@@ -1,62 +1,22 @@
 import React from 'react';
-import { Grid, FormControl, InputLabel, Select, MenuItem, TextField, Box } from '@mui/material';
+import { Grid, FormControl, InputLabel, Select, MenuItem, TextField, Box, IconButton } from '@mui/material';
 import Delete from '@mui/icons-material/DeleteOutline';
 import { Tag, parseTagList, generateMockTag } from 'types/tag';
-import UseAPI from 'hooks/hooks';
+import useAPI from 'hooks/hooks';
 import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/tableOfValue';
+import { RuleType } from './types/RuleType';
 
 interface RuleRowProps {
-    tableOfValue: TableOfValue | undefined;
-    setTableOfValue: (value: TableOfValue | undefined) => void;
-    value: string;
-    setValue: (value: string) => void;
-    tag: Tag | undefined;
-    setTag: (value: Tag | undefined) => void;
-    type: string;
-    setType: (value: string) => void;
+    rule: RuleType,
+    setRule: (value: RuleType) => void;
+    onDelete: () => void,
+
+    tags: Tag[],
+    tableOfValues: TableOfValue[],
 }
 
-const RuleRow: React.FC<RuleRowProps> = ({ tableOfValue, setTableOfValue, value, setValue, tag, setTag, type, setType }) => {
+const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, onDelete }) => {
     const typeCharge = ['FIXO', 'PERCENTUAL'];
-
-    const [tags, setTags] = React.useState<Tag[]>([]);
-    const [tableOfValues, setTableOfValues] = React.useState<TableOfValue[]>([]);
-    const { get } = UseAPI();
-
-    const fetchTags = async () => {
-        const response = await get('/api/tags');
-        if (response.ok) {
-            const tags = parseTagList(response.result);
-            setTags(tags);
-        } else {
-            ///Tratamento de erro
-            console.error('Error fetching tags');
-        }
-        /// Remover
-        if (true) {
-            setTags(generateMockTag());
-        }
-    };
-
-    const fetchTableOfValues = async () => {
-        const response = await get('/api/medical-procedure-costs');
-        if (response.ok) {
-            const tableOfValues = parseTableOfValues(response.result);
-            setTableOfValues(tableOfValues);
-        } else {
-            ///Tratamento de erro
-            console.error('Error fetching table of values');
-        }
-        /// Remover
-        if (true) {
-            setTableOfValues(getMockTableOfValues());
-        }
-    };
-
-    React.useEffect(() => {
-        fetchTags();
-        fetchTableOfValues();
-    }, []);
 
     return (
         <Grid container spacing={1} alignItems="center">
@@ -66,10 +26,11 @@ const RuleRow: React.FC<RuleRowProps> = ({ tableOfValue, setTableOfValue, value,
                     <Select
                         fullWidth
                         id="tableOfValue"
-                        value={tableOfValue?.id || ''}
+                        value={rule.tableOfValues?.id || ''}
                         onChange={(event) => {
                             const selectedTableOfValue = tableOfValues.find((tov) => tov.id === event.target.value);
-                            setTableOfValue(selectedTableOfValue || undefined);
+                            setRule({ ...rule, tableOfValues: selectedTableOfValue });
+
                         }}
                         label="Tabela de Valores"
                         variant="outlined"
@@ -89,8 +50,10 @@ const RuleRow: React.FC<RuleRowProps> = ({ tableOfValue, setTableOfValue, value,
                     <Select
                         fullWidth
                         id="typeCharge"
-                        value={type}
-                        onChange={(event) => setType(event.target.value)}
+                        value={rule.type}
+                        onChange={(event) => {
+                            setRule({ ...rule, type: event.target.value });
+                        }}
                         label="Tipo de cobrança"
                         variant="outlined"
                         sx={{ mb: 2 }}
@@ -107,8 +70,10 @@ const RuleRow: React.FC<RuleRowProps> = ({ tableOfValue, setTableOfValue, value,
                 <TextField
                     fullWidth
                     id="value"
-                    value={value}
-                    onChange={(event) => setValue(event.target.value)}
+                    value={rule.value}
+                    onChange={(event) => {
+                        setRule({ ...rule, value: event.target.value });
+                    }}
                     label="Valor/Percentual"
                     variant="outlined"
                     sx={{ mb: 2 }}
@@ -123,10 +88,11 @@ const RuleRow: React.FC<RuleRowProps> = ({ tableOfValue, setTableOfValue, value,
                         label="TAG"
                         variant="outlined"
                         sx={{ mb: 2 }}
-                        value={tag?.id || ''}
+                        value={rule.tag?.id || ''}
                         onChange={(event) => {
                             const selectedTag = tags.find((t) => t.id === event.target.value);
-                            setTag(selectedTag || undefined);
+                            setRule({ ...rule, tag: selectedTag || undefined });
+
                         }}
                     >
                         {tags.map((tag) => (
@@ -139,12 +105,10 @@ const RuleRow: React.FC<RuleRowProps> = ({ tableOfValue, setTableOfValue, value,
             </Grid>
             <Grid item xs={12} sm={1}>
                 <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                    <Delete
-                        style={{
-                            fontSize: '2.5vh',
-                            marginBottom: '1vh'
-                        }}
-                    />
+                    <IconButton onClick={onDelete}>
+                        <Delete />
+                    </IconButton>
+
                 </Box>
             </Grid>
         </Grid>

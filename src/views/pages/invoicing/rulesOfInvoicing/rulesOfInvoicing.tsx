@@ -10,7 +10,7 @@ import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
 import useAPI from 'hooks/hooks';
 import { RuleBilling, parseRuleBillingList, generateMockRuleBilling } from 'types/rules_billing';
-import RulesOfInvoicingForm from './rulesOfInvoicingForm';
+import RulesOfInvoicingForm from './RulesOfInvoicingForm';
 
 const RulesOfInvoicing = () => {
     const [open, setOpen] = React.useState(false);

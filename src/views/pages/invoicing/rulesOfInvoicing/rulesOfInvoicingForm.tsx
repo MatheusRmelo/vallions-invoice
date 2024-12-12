@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -14,13 +14,15 @@ import {
     FormControl,
     InputLabel
 } from '@mui/material';
-import RuleRow from './ruleRow';
 import AddRuleRow from './AddRuleRow';
 import { RuleBilling } from 'types/rules_billing';
 import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
 import UseAPI from 'hooks/hooks';
-import { TableOfValue } from 'types/tableOfValue';
-import { tag } from 'types/tag';
+import { getMockTableOfValues, parseTableOfValues, TableOfValue } from 'types/tableOfValue';
+import { RuleType } from './types/RuleType';
+import { generateMockTag, parseTagList, Tag } from 'types/tag';
+import RuleRow from './RuleRow';
+
 interface Props {
     open: boolean;
     ruleEdit?: RuleBilling;
@@ -30,12 +32,11 @@ interface Props {
 const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
     const { get } = UseAPI();
 
-    const [institutes, setInstitutes] = React.useState<Institute[]>([]);
-    const [error, setError] = React.useState<string | undefined>(undefined);
-    const [tableOfValue, setTableOfValue] = React.useState<TableOfValue | undefined>(undefined);
-    const [tag, setTag] = React.useState<Tag | undefined>(undefined);
-    const [type, setType] = React.useState<string | undefined>(undefined);
-    const [value, setValue] = React.useState<string | undefined>(undefined);
+    const [institutes, setInstitutes] = useState<Institute[]>([]);
+    const [error, setError] = useState<string | undefined>(undefined);
+    const [tags, setTags] = React.useState<Tag[]>([]);
+    const [tableOfValues, setTableOfValues] = React.useState<TableOfValue[]>([]);
+    const [rules, setRules] = useState<RuleType[]>([]);
 
     const fetchInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
@@ -52,10 +53,54 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
         }
     };
 
+    const fetchTags = async () => {
+        const response = await get('/api/tags');
+        if (response.ok) {
+            const tags = parseTagList(response.result);
+            setTags(tags);
+        } else {
+            ///Tratamento de erro
+            console.error('Error fetching tags');
+        }
+        /// Remover
+        if (true) {
+            setTags(generateMockTag());
+        }
+    };
+
+    const fetchTableOfValues = async () => {
+        const response = await get('/api/medical-procedure-costs');
+        if (response.ok) {
+            const tableOfValues = parseTableOfValues(response.result);
+            setTableOfValues(tableOfValues);
+        } else {
+            ///Tratamento de erro
+            console.error('Error fetching table of values');
+        }
+        /// Remover
+        if (true) {
+            setTableOfValues(getMockTableOfValues());
+        }
+    };
+
     /// Init State
-    React.useEffect(() => {
+    useEffect(() => {
         fetchInstitutes();
+        fetchTags();
+        fetchTableOfValues();
     }, []);
+
+    const handleClickAddRule = () => {
+        var newRules = [...rules];
+        newRules.push({
+            type: '',
+            value: '',
+            tableOfValues: undefined,
+            tag: undefined
+        });
+        console.log(newRules);
+        setRules(newRules);
+    }
 
     return (
         <Dialog
@@ -141,21 +186,30 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                             fontSize: '1.5vh',
                             backgroundColor: 'rgba(103, 58, 183, 1)'
                         }}
+                        onClick={handleClickAddRule}
                     >
                         Adicionar Regra
                     </Button>
                 </Box>
                 <Box mt={'6vh'} />
-                <RuleRow
-                    tag={tag}
-                    setTag={setTag}
-                    type={type || ''}
-                    setType={setType}
-                    value={value || '0'}
-                    setValue={setValue}
-                    tableOfValue={tableOfValue}
-                    setTableOfValue={setTableOfValue}
-                />
+                {
+                    rules.map((element, index) => <RuleRow
+                        rule={element}
+                        tableOfValues={tableOfValues}
+                        tags={tags}
+                        setRule={(value) => {
+                            let newArray = [...rules];
+                            newArray[index] = value;
+                            setRules(newArray);
+                        }}
+                        onDelete={() => {
+                            let newArray = [...rules];
+                            newArray = newArray.filter((element, checkIndex) => checkIndex != index);
+                            setRules(newArray);
+                        }}
+                    />)
+                }
+
                 {/* Mocado remove dps */}
                 <Box mt={'6vh'} />
                 <Box display={'flex'} justifyContent={'space-between'}>
@@ -176,6 +230,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
                             fontSize: '1.5vh',
                             backgroundColor: 'rgba(103, 58, 183, 1)'
                         }}
+                        onClick={handleClickAddRule}
                     >
                         Adicionar Regra
                     </Button>
