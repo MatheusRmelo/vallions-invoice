@@ -23,7 +23,7 @@ const MainRoutes = {
     children: [
         {
             path: '/',
-            element: <SamplePage />
+            element: <Procedure />
         },
         {
             path: '/sample-page',

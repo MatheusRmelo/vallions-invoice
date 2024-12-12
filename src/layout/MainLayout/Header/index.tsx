@@ -1,7 +1,7 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
-import { Box } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 // project imports
@@ -22,6 +22,7 @@ import { IconMenu2 } from '@tabler/icons-react';
 
 // types
 import { MenuOrientation, ThemeMode } from 'types/config';
+import { DarkModeOutlined, LightMode, LightModeOutlined, MarkUnreadChatAlt, MarkUnreadChatAltOutlined } from '@mui/icons-material';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -29,7 +30,7 @@ const Header = () => {
     const theme = useTheme();
     const downMD = useMediaQuery(theme.breakpoints.down('md'));
 
-    const { mode, menuOrientation } = useConfig();
+    const { mode, menuOrientation, onChangeMode } = useConfig();
     const { menuMaster } = useGetMenuMaster();
     const drawerOpen = menuMaster.isDashboardDrawerOpened;
     const isHorizontal = menuOrientation === MenuOrientation.HORIZONTAL && !downMD;
@@ -70,22 +71,35 @@ const Header = () => {
             <Box sx={{ flexGrow: 1 }} />
 
             {/* mega-menu */}
-            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            {/* <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                 <MegaMenuSection />
-            </Box>
+            </Box> */}
 
             {/* live customization & localization */}
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <LocalizationSection />
-            </Box>
+            </Box> */}
 
             {/* notification */}
-            <NotificationSection />
+            {/* <NotificationSection /> */}
 
             {/* full sceen toggler */}
-            <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+            {/* <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
                 <FullScreenSection />
-            </Box>
+            </Box> */}
+
+            <IconButton style={{ background: '#FFF8E1', borderRadius: '8px' }}>
+                <MarkUnreadChatAltOutlined style={{ color: '#FFC107' }} />
+            </IconButton>
+
+            <IconButton style={{ background: '#EDE7F6', borderRadius: '8px', marginLeft: '24px' }}
+                onClick={() => { onChangeMode(mode == ThemeMode.DARK ? ThemeMode.LIGHT : ThemeMode.DARK) }}>
+                {
+                    mode == ThemeMode.DARK ?
+                        <DarkModeOutlined style={{ color: '#673AB7' }} />
+                        : <LightModeOutlined style={{ color: '#673AB7' }} />
+                }
+            </IconButton>
 
             {/* profile */}
             <ProfileSection />

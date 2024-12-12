@@ -24,7 +24,8 @@ const CustomTextField = styled(TextField, {
     '& .MuiInputBase-root': {
         display: 'flex',
         alignItems: 'center',
-        color: 'white'
+        color: 'white',
+        padding: '0 16px',
     },
     '& .custom-label': {
         position: 'absolute',
@@ -42,10 +43,11 @@ const CustomTextField = styled(TextField, {
         zIndex: 9999
     },
     '& .MuiInputBase-input': {
-        backgroundColor: 'white'
+    },
+    '& .MuiInputLabel-root': {
+        paddingLeft: '16px',
     },
     /// Color white all field
-
     '& .MuiOutlinedInput-root': {
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
             border: 'none'
@@ -93,7 +95,8 @@ const SearchField: React.FC<SearchFieldProps> = ({
 
     return (
         <Box display="flex" alignItems="center" position="relative">
-            <Box
+
+            <Box sx={{ marginLeft: '20px' }}><Box
                 onClick={clickIcon}
                 sx={{
                     zIndex: 1000,
@@ -105,7 +108,6 @@ const SearchField: React.FC<SearchFieldProps> = ({
             >
                 {prefixIcon}
             </Box>
-            <Box sx={{ marginLeft: '20px' }}>
                 <CustomTextField
                     id={hashValueClick}
                     variant="outlined"
