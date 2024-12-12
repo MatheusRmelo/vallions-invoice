@@ -13,22 +13,25 @@ import {
     MenuItem,
     Button,
     Typography,
-    IconButton
+    IconButton,
+    Chip
 } from '@mui/material';
 import { DataGrid, GridColDef, GridRowsProp, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import MainCard from 'ui-component/cards/MainCard';
 import { SendOutlined, Search, ExpandMore, ExpandLess } from '@mui/icons-material';
 import useAPI from 'hooks/hooks';
-import { Billing, parseBillingList, generateMockBilling } from 'types/billing';
 import { MoreVert } from '@mui/icons-material';
+import { Conference, parseConferenceList, generateConference } from 'types/conference';
+
 const BillingConference: React.FC = () => {
     const [startDate, setStartDate] = React.useState(new Date().toISOString().slice(0, 10));
     const [endDate, setEndDate] = React.useState(new Date().toISOString().slice(0, 10));
     const [tabIndex, setTabIndex] = React.useState(0);
     const [expandedRowIds, setExpandedRowIds] = React.useState<number[]>([]);
+    const [conference, setConference] = React.useState<Conference[]>([]);
+
     const mockSelects = ['Teste1', 'Teste2', 'Teste3'];
-    const [billings, setBillings] = React.useState<Billing[]>([]);
 
     const { get } = useAPI();
 
@@ -41,14 +44,14 @@ const BillingConference: React.FC = () => {
 
         if (response.ok) {
             const data = await response.result;
-            const billings = parseBillingList(data);
-            setBillings(billings);
+            const conference = parseConferenceList(data);
+            setConference(conference);
         } else {
             console.log('Error');
         }
 
         ///remover em produção
-        setBillings([generateMockBilling()]);
+        setConference(generateConference());
     };
 
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -151,108 +154,324 @@ const BillingConference: React.FC = () => {
                         <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
                     </Box>
                     <div style={{ height: 400, width: '100%', marginTop: 20 }}>
-                        <DataGrid
-                            rows={billings.map((billing) => {
-                                return {
-                                    id: billing.id,
-                                    unity: billing.unity.name,
-                                    monthOfBilling: billing.monthOfBilling,
-                                    statusOfBilling: billing.statusOfBilling,
-                                    QTN: billing.qtn,
-                                    totalValue: billing.priceTotal
-                                };
-                            })}
-                            columns={[
-                                {
-                                    field: 'expand',
-                                    headerName: '#',
-                                    width: 50,
-                                    renderCell: (params) => (
-                                        <IconButton onClick={() => handleExpandClick(params.row.id)}>
-                                            {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
-                                        </IconButton>
-                                    )
-                                },
-                                { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2 },
-                                { field: 'study_description', headerName: 'Descrição do Estudo', flex: 2 },
-                                { field: 'dateOfStudy', headerName: 'Data do Estudo', flex: 1 },
-                                { field: 'unity', headerName: 'Unidade', flex: 1 },
-                                { field: 'quantity', headerName: 'Qtn', flex: 1 },
-                                { field: 'valueUnit', headerName: '$ Valor Laudo', flex: 1 },
-                                { field: 'valueTotal', headerName: '$ Total', flex: 1 }
-                            ]}
-                            hideFooter
-                            getRowId={(row) => row.id}
-                            slots={{
-                                row: (props) => {
-                                    const { row } = props;
-                                    return (
-                                        <>
-                                            <GridRow {...props} />
-                                            {expandedRowIds.includes(row.id) && (
-                                                <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
-                                                    <Box height={20} />
-                                                    <Typography variant="h3">Laudos Sendo Faturados</Typography>
-                                                    <Box height={20} />
-                                                    <div style={{ height: 200, width: '100%' }}>
-                                                        <DataGrid
-                                                            rows={(billings.find((billing) => billing.id === row.id)?.report || []).map(
-                                                                (report) => {
-                                                                    return {
-                                                                        namePatient: report.patientName,
-                                                                        reportDate: report.dateReport,
-                                                                        reportTitle: report.titleReport,
-                                                                        reportValue: report.valueReport,
-                                                                        status: report.statusReport
-                                                                    };
-                                                                }
-                                                            )}
-                                                            columns={[
-                                                                {
-                                                                    field: 'namePatient',
-                                                                    headerName: 'Nome do Paciente',
-                                                                    flex: 2
-                                                                },
-                                                                {
-                                                                    field: 'reportDate',
-                                                                    headerName: 'Data do Laudo',
-                                                                    flex: 2
-                                                                },
-                                                                {
-                                                                    field: 'reportTitle',
-                                                                    headerName: 'Título do Laudo',
-                                                                    flex: 1
-                                                                },
-                                                                {
-                                                                    field: 'reportValue',
-                                                                    headerName: '$ Valor Laudo',
-                                                                    flex: 1
-                                                                },
-                                                                {
-                                                                    field: 'status',
-                                                                    headerName: 'Status',
-                                                                    flex: 1
-                                                                },
-                                                                {
-                                                                    field: 'action',
-                                                                    headerName: ' ',
-                                                                    flex: 1,
-                                                                    renderCell(params) {
-                                                                        return <MoreVert sx={{ color: 'action.active' }} />;
+                        {/*Conferência*/}
+                        {tabIndex === 0 && (
+                            <DataGrid
+                                rows={billings.map((billing) => {
+                                    return {
+                                        id: billing.id,
+                                        unity: billing.unity.name,
+                                        monthOfBilling: billing.monthOfBilling,
+                                        statusOfBilling: billing.statusOfBilling,
+                                        QTN: billing.qtn,
+                                        totalValue: billing.priceTotal
+                                    };
+                                })}
+                                columns={[
+                                    {
+                                        field: 'expand',
+                                        headerName: '#',
+                                        width: 50,
+                                        renderCell: (params) => (
+                                            <IconButton onClick={() => handleExpandClick(params.row.id)}>
+                                                {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
+                                            </IconButton>
+                                        )
+                                    },
+                                    { field: 'unity', headerName: 'Unidade', flex: 1 },
+                                    { field: 'monthOfBilling', headerName: 'Mês da Fatura', flex: 1 },
+                                    { field: 'statusOfBilling', headerName: 'Status da Fatura', flex: 2 },
+                                    { field: 'qtn', headerName: 'Qtn', flex: 1 },
+                                    { field: 'quantity', headerName: 'Qtn', flex: 1 },
+                                    { field: 'valueTotal', headerName: '$ Total', flex: 1 }
+                                ]}
+                                hideFooter
+                                getRowId={(row) => row.id}
+                                slots={{
+                                    row: (props) => {
+                                        const { row } = props;
+                                        return (
+                                            <>
+                                                <GridRow {...props} />
+                                                {expandedRowIds.includes(row.id) && (
+                                                    <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
+                                                        <Box height={20} />
+                                                        <Typography variant="h3">Laudos Sendo Faturados</Typography>
+                                                        <Box height={20} />
+                                                        <div style={{ height: 200, width: '100%' }}>
+                                                            <DataGrid
+                                                                rows={(billings.find((billing) => billing.id === row.id)?.report || []).map(
+                                                                    (report) => {
+                                                                        return {
+                                                                            namePatient: report.patientName,
+                                                                            reportDate: report.dateReport,
+                                                                            reportTitle: report.titleReport,
+                                                                            reportValue: report.valueReport,
+                                                                            status: report.statusReport
+                                                                        };
                                                                     }
-                                                                }
-                                                            ]}
-                                                            hideFooter
-                                                            getRowId={(row) => row.namePatient}
-                                                        />
+                                                                )}
+                                                                columns={[
+                                                                    {
+                                                                        field: 'namePatient',
+                                                                        headerName: 'Nome do Paciente',
+                                                                        flex: 2
+                                                                    },
+                                                                    {
+                                                                        field: 'reportDate',
+                                                                        headerName: 'Data do Laudo',
+                                                                        flex: 2
+                                                                    },
+                                                                    {
+                                                                        field: 'doctor',
+                                                                        headerName: 'Médico',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'unity',
+                                                                        headerName: 'Unidade',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'titleOfReport',
+                                                                        headerName: 'Título do Laudo',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'valueOfReport',
+                                                                        headerName: '$ Valor Laudo'
+                                                                    },
+                                                                    {
+                                                                        field: 'action',
+                                                                        headerName: 'Remover',
+                                                                        flex: 1,
+                                                                        renderCell(params) {
+                                                                            return <MoreVert sx={{ color: 'action.active' }} />;
+                                                                        }
+                                                                    }
+                                                                ]}
+                                                                hideFooter
+                                                                getRowId={(row) => row.namePatient}
+                                                            />
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
-                                        </>
-                                    );
-                                }
-                            }}
-                        />
+                                                )}
+                                            </>
+                                        );
+                                    }
+                                }}
+                            />
+                        )}
+                        {/*Faturamento*/}
+                        {tabIndex === 1 && (
+                            <DataGrid
+                                rows={billings.map((billing) => {
+                                    return {
+                                        id: billing.id,
+                                        unity: billing.unity.name,
+                                        monthOfBilling: billing.monthOfBilling,
+                                        statusOfBilling: billing.statusOfBilling,
+                                        QTN: billing.qtn,
+                                        totalValue: billing.priceTotal
+                                    };
+                                })}
+                                columns={[
+                                    {
+                                        field: 'expand',
+                                        headerName: '#',
+                                        width: 50,
+                                        renderCell: (params) => (
+                                            <IconButton onClick={() => handleExpandClick(params.row.id)}>
+                                                {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
+                                            </IconButton>
+                                        )
+                                    },
+                                    { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2 },
+                                    { field: 'study_description', headerName: 'Descrição do Estudo', flex: 2 },
+                                    { field: 'dateOfStudy', headerName: 'Data do Estudo', flex: 1 },
+                                    { field: 'unity', headerName: 'Unidade', flex: 1 },
+                                    { field: 'quantity', headerName: 'Qtn', flex: 1 },
+                                    { field: 'valueUnit', headerName: '$ Valor Laudo', flex: 1 },
+                                    { field: 'valueTotal', headerName: '$ Total', flex: 1 }
+                                ]}
+                                hideFooter
+                                getRowId={(row) => row.id}
+                                slots={{
+                                    row: (props) => {
+                                        const { row } = props;
+                                        return (
+                                            <>
+                                                <GridRow {...props} />
+                                                {expandedRowIds.includes(row.id) && (
+                                                    <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
+                                                        <Box height={20} />
+                                                        <Typography variant="h3">Laudos</Typography>
+                                                        <Box height={20} />
+                                                        <div style={{ height: 200, width: '100%' }}>
+                                                            <DataGrid
+                                                                rows={(billings.find((billing) => billing.id === row.id)?.report || []).map(
+                                                                    (report) => {
+                                                                        return {
+                                                                            namePatient: report.patientName,
+                                                                            reportDate: report.dateReport,
+                                                                            reportTitle: report.titleReport,
+                                                                            reportValue: report.valueReport,
+                                                                            status: report.statusReport
+                                                                        };
+                                                                    }
+                                                                )}
+                                                                columns={[
+                                                                    {
+                                                                        field: 'namePatient',
+                                                                        headerName: 'Nome do Paciente',
+                                                                        flex: 2
+                                                                    },
+                                                                    {
+                                                                        field: 'reportDate',
+                                                                        headerName: 'Data do Laudo',
+                                                                        flex: 2
+                                                                    },
+                                                                    {
+                                                                        field: 'reportTitle',
+                                                                        headerName: 'Título do Laudo',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'reportValue',
+                                                                        headerName: '$ Valor Laudo',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'status',
+                                                                        headerName: 'Status',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'action',
+                                                                        headerName: ' ',
+                                                                        flex: 1,
+                                                                        renderCell(params) {
+                                                                            return <MoreVert sx={{ color: 'action.active' }} />;
+                                                                        }
+                                                                    }
+                                                                ]}
+                                                                hideFooter
+                                                                getRowId={(row) => row.namePatient}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </>
+                                        );
+                                    }
+                                }}
+                            />
+                        )}
+                        {/*Recebimento*/}
+                        {tabIndex === 2 && (
+                            <DataGrid
+                                rows={billings.map((billing) => {
+                                    return {
+                                        id: billing.id,
+                                        unity: billing.unity.name,
+                                        monthOfBilling: billing.monthOfBilling,
+                                        statusOfBilling: billing.statusOfBilling,
+                                        QTN: billing.qtn,
+                                        totalValue: billing.priceTotal
+                                    };
+                                })}
+                                columns={[
+                                    {
+                                        field: 'expand',
+                                        headerName: '#',
+                                        width: 50,
+                                        renderCell: (params) => (
+                                            <IconButton onClick={() => handleExpandClick(params.row.id)}>
+                                                {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
+                                            </IconButton>
+                                        )
+                                    },
+                                    { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2 },
+                                    { field: 'study_description', headerName: 'Descrição do Estudo', flex: 2 },
+                                    { field: 'dateOfStudy', headerName: 'Data do Estudo', flex: 1 },
+                                    { field: 'unity', headerName: 'Unidade', flex: 1 },
+                                    { field: 'quantity', headerName: 'Qtn', flex: 1 },
+                                    { field: 'valueUnit', headerName: '$ Valor Laudo', flex: 1 },
+                                    { field: 'valueTotal', headerName: '$ Total', flex: 1 }
+                                ]}
+                                hideFooter
+                                getRowId={(row) => row.id}
+                                slots={{
+                                    row: (props) => {
+                                        const { row } = props;
+                                        return (
+                                            <>
+                                                <GridRow {...props} />
+                                                {expandedRowIds.includes(row.id) && (
+                                                    <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
+                                                        <Box height={20} />
+                                                        <Typography variant="h3">Laudos</Typography>
+                                                        <Box height={20} />
+                                                        <div style={{ height: 200, width: '100%' }}>
+                                                            <DataGrid
+                                                                rows={(billings.find((billing) => billing.id === row.id)?.report || []).map(
+                                                                    (report) => {
+                                                                        return {
+                                                                            namePatient: report.patientName,
+                                                                            reportDate: report.dateReport,
+                                                                            reportTitle: report.titleReport,
+                                                                            reportValue: report.valueReport,
+                                                                            status: report.statusReport
+                                                                        };
+                                                                    }
+                                                                )}
+                                                                columns={[
+                                                                    {
+                                                                        field: 'namePatient',
+                                                                        headerName: 'Nome do Paciente',
+                                                                        flex: 2
+                                                                    },
+                                                                    {
+                                                                        field: 'reportDate',
+                                                                        headerName: 'Data do Laudo',
+                                                                        flex: 2
+                                                                    },
+                                                                    {
+                                                                        field: 'reportTitle',
+                                                                        headerName: 'Título do Laudo',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'reportValue',
+                                                                        headerName: '$ Valor Laudo',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'status',
+                                                                        headerName: 'Status',
+                                                                        flex: 1
+                                                                    },
+                                                                    {
+                                                                        field: 'action',
+                                                                        headerName: ' ',
+                                                                        flex: 1,
+                                                                        renderCell(params) {
+                                                                            return <MoreVert sx={{ color: 'action.active' }} />;
+                                                                        }
+                                                                    }
+                                                                ]}
+                                                                hideFooter
+                                                                getRowId={(row) => row.namePatient}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </>
+                                        );
+                                    }
+                                }}
+                            />
+                        )}
                     </div>
                 </CardContent>
             </Card>
