@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import {
     Tabs,
     Tab,
@@ -17,7 +17,9 @@ import {
     Chip,
     DialogContent,
     DialogTitle,
-    Dialog
+    Dialog,
+    DialogContentText,
+    DialogActions
 } from '@mui/material';
 import { DataGrid, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
@@ -27,18 +29,23 @@ import useAPI from 'hooks/hooks';
 import { MoreVert, DeleteOutline, RemoveRedEyeOutlined } from '@mui/icons-material';
 import { Conference, parseConferenceList, generateConference } from 'types/conference';
 import { Billing, parseBilling, generateBilling } from 'types/billing';
-
+import { Unity, parseUnityList, generateMockUnity } from 'types/unity';
 const BillingConference: React.FC = () => {
-    const [startDate, setStartDate] = React.useState(new Date().toISOString().slice(0, 10));
-    const [endDate, setEndDate] = React.useState(new Date().toISOString().slice(0, 10));
-    const [tabIndex, setTabIndex] = React.useState(0);
-    const [expandedRowIds, setExpandedRowIds] = React.useState<number[]>([]);
-    const [conferences, setConferences] = React.useState<Conference[]>([]);
-    const [billings, setBillings] = React.useState<Billing[]>([]);
+    const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
+    const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
+    const [tabIndex, setTabIndex] = useState(0);
+    const [expandedRowIds, setExpandedRowIds] = useState<number[]>([]);
+    const [conferences, setConferences] = useState<Conference[]>([]);
+    const [billings, setBillings] = useState<Billing[]>([]);
     const mockSelects = ['Teste1', 'Teste2', 'Teste3'];
-    const [open, setOpen] = React.useState(false);
-
-    const { get } = useAPI();
+    const [openDialogAction, setOpenDialogAction] = useState(false);
+    const [openBillingReversal, setOpenBillingReversal] = useState(false);
+    const [openBillingConfirm, setOpenBillingConfirm] = useState(false);
+    const [unities, setUnities] = useState<Unity[]>([]);
+    const [unity, setUnity] = useState<Unity>();
+    const [valueTotal, setValueTotal] = useState<number>(0);
+    const [obsReversal, setObsReversal] = useState<string>('');
+    const { get, put } = useAPI();
 
     const handleExpandClick = (id: number) => {
         setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
@@ -60,12 +67,43 @@ const BillingConference: React.FC = () => {
         setBillings(generateBilling());
     };
 
+    const fetchUnity = async () => {
+        const response = await get('/api/unities');
+
+        if (response.ok) {
+            const data = await response.result;
+            const unity = data;
+            setUnities(parseUnityList(unity));
+        } else {
+            console.log('Error');
+        }
+
+        ///remover em produção
+        setUnities([generateMockUnity()]);
+    };
+
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setTabIndex(newValue);
     };
 
-    React.useEffect(() => {
+    const handleReversalBilling = async (id: number, idUnit: number, valueTotal: number, obsReversal: string) => {
+        const response = await put(`/api/billings/${id}`, {
+            status: 3,
+            value_total: valueTotal,
+            obs_reversal: obsReversal,
+            branch_fk: idUnit
+        });
+
+        if (response.ok) {
+            fetchBilling();
+        } else {
+            console.log('Error');
+        }
+    };
+
+    useEffect(() => {
         fetchBilling();
+        fetchUnity();
     }, []);
 
     return (
@@ -380,7 +418,22 @@ const BillingConference: React.FC = () => {
                                                                             headerName: 'Remover',
                                                                             flex: 1,
                                                                             renderCell(params) {
-                                                                                return <MoreVert sx={{ color: 'action.active' }} />;
+                                                                                return (
+                                                                                    <Box>
+                                                                                        <IconButton
+                                                                                            onClick={() => setOpenBillingReversal(true)}
+                                                                                        >
+                                                                                            <DeleteOutline
+                                                                                                sx={{ color: 'action.active' }}
+                                                                                            />
+                                                                                        </IconButton>
+                                                                                        <IconButton
+                                                                                            onClick={() => setOpenBillingConfirm(true)}
+                                                                                        >
+                                                                                            <MoreVert sx={{ color: 'action.active' }} />
+                                                                                        </IconButton>
+                                                                                    </Box>
+                                                                                );
                                                                             }
                                                                         }
                                                                     ]}
@@ -511,7 +564,8 @@ const BillingConference: React.FC = () => {
                     </CardContent>
                 </Card>
             </MainCard>
-            <Dialog open={open} onClose={() => setOpen(false)}>
+            {/* Dialog de Ações */}
+            <Dialog open={openDialogAction} onClose={() => setOpenDialogAction(false)}>
                 <Box width={'10vw'} margin={'10px'}>
                     <DialogTitle>
                         <span style={{ fontSize: '2.2vh', fontWeight: 'bold' }}>Ações</span>
@@ -550,6 +604,129 @@ const BillingConference: React.FC = () => {
                         </Box>
                     </DialogContent>
                 </Box>
+            </Dialog>
+            {/* Dialog de Confirmação de Faturamento */}
+            <Dialog fullWidth maxWidth={'lg'} open={openBillingConfirm} onClose={() => setOpenBillingConfirm(false)}>
+                <form>
+                    <Box margin={'10px'}>
+                        <DialogTitle>
+                            <span style={{ fontSize: '2vh', fontWeight: 'bold' }}>Confirmação do Faturamento</span>
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText style={{ fontSize: '1.3vh' }}>
+                                <span style={{ fontWeight: 'bold' }}>Confirmação de Conferência de Laudos: </span>
+                                Verifique se todos os laudos foram revisados e estão corretos antes de prosseguir com o faturamento. Ao
+                                confirmar, você estará garantindo que todas as informações estão precisas e prontas para o envio. Deseja
+                                continuar com o faturamento?
+                            </DialogContentText>
+                            <Box height={40} />
+                            <Grid container spacing={2}>
+                                <Grid item xs={8}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="select-label">Unidade</InputLabel>
+                                        <Select labelId="select-label" label="Select">
+                                            <MenuItem value={10}>Ten</MenuItem>
+                                            <MenuItem value={20}>Twenty</MenuItem>
+                                            <MenuItem value={30}>Thirty</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField label="R$ Valor" fullWidth />
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <TextField label="Previsão" type="date" fullWidth InputLabelProps={{ shrink: true }} />
+                                </Grid>
+                                <Grid item xs={10}>
+                                    <TextField label="Observação" fullWidth />
+                                </Grid>
+                            </Grid>
+                        </DialogContent>
+                    </Box>
+                    <Box height={60} />
+                    <DialogActions>
+                        <Button variant="outlined" onClick={() => setOpenBillingConfirm(false)} color="primary" size="large">
+                            Fechar
+                        </Button>
+                        <Box width={5} />
+                        <Button
+                            size="large"
+                            variant="contained"
+                            type="submit"
+                            sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}
+                        >
+                            Salvar
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
+            {/* Dialog de Estorno de Faturamento */}
+            <Dialog fullWidth maxWidth={'lg'} open={openBillingReversal} onClose={() => setOpenBillingReversal(false)}>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleReversalBilling(
+                            billings.find((billing) => billing.id === unity?.id)?.id || 0,
+                            unity?.id || 0,
+                            valueTotal,
+                            obsReversal
+                        );
+                    }}
+                >
+                    <Box margin={'10px'}>
+                        <DialogTitle>
+                            <span style={{ fontSize: '2vh', fontWeight: 'bold' }}>Estorno do Faturamento</span>
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText style={{ fontSize: '1.3vh' }}>
+                                <span style={{ fontWeight: 'bold' }}>Atenção: </span>
+                                Você está prestes a estornar este faturamento. Ao realizar esta ação, o valor será revertido, e os dados
+                                voltarão para a conferência. Certifique-se de que esta ação é necessária, pois o estorno não poderá ser
+                                desfeito. Confirme se deseja prosseguir.
+                            </DialogContentText>
+                            <Box height={40} />
+                            <Grid container spacing={2}>
+                                <Grid item xs={8}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="select-label">Unidade</InputLabel>
+                                        <Select
+                                            labelId="select-label"
+                                            label="Select"
+                                            onChange={(e) => setUnity(unities.find((unity) => unity.id === Number(e.target.value)))}
+                                        >
+                                            {unities.map((unity) => (
+                                                <MenuItem key={unity.id} value={unity.id}>
+                                                    {unity.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField label="R$ Valor" fullWidth onChange={(e) => setValueTotal(Number(e.target.value))} />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField label="Motivo do Estorno" fullWidth onChange={(e) => setObsReversal(e.target.value)} />
+                                </Grid>
+                            </Grid>
+                        </DialogContent>
+                    </Box>
+                    <Box height={60} />
+                    <DialogActions>
+                        <Button variant="outlined" onClick={() => setOpenBillingReversal(false)} color="primary" size="large">
+                            Fechar
+                        </Button>
+                        <Box width={5} />
+                        <Button
+                            size="large"
+                            variant="contained"
+                            type="submit"
+                            sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}
+                        >
+                            Salvar
+                        </Button>
+                    </DialogActions>
+                </form>
             </Dialog>
         </>
     );
