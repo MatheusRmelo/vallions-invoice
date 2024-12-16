@@ -1,4 +1,4 @@
-export type CostsProcedures = {
+export type ProcedureCost = {
     id: number;
     validatyStart: string;
     validatyEnd: string;
@@ -7,7 +7,7 @@ export type CostsProcedures = {
     valueProcedure: number;
 };
 
-export function parseCostsProcedure(data: any): CostsProcedures {
+export function parseProcedureCost(data: any): ProcedureCost {
     return {
         id: data.id,
         validatyStart: data.validatyStart,
@@ -18,11 +18,11 @@ export function parseCostsProcedure(data: any): CostsProcedures {
     };
 }
 
-export function parseCostsProcedures(data: any): CostsProcedures[] {
-    return data.map(parseCostsProcedures);
+export function parseProcedureCosts(data: any): ProcedureCost[] {
+    return data.map(parseProcedureCosts);
 }
 
-export function getProcedureCostsMock(): CostsProcedures[] {
+export function getProcedureCostsMock(): ProcedureCost[] {
     return [
         {
             id: 1,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 import { Box } from '@mui/material';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
@@ -12,8 +12,24 @@ import TableOfValueForm from './TableOfValueForm';
 import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/tableOfValue';
 import useAPI from 'hooks/hooks';
 const TableOfValues = () => {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
+    const [tableOfValues, setTableOfValues] = useState<TableOfValue[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [tableOfValue, setTableOfValue] = useState<TableOfValue | null>(null);
+
     const { get, put } = useAPI();
+
+    useEffect(() => {
+        fetchTableOfValues();
+    }, []);
+
+    const getTableById = (id: GridRowId) => {
+        let rows = tableOfValues;
+        let filtered = rows.filter((element) => element.id === id.valueOf());
+        if (filtered.length === 0) return null;
+        return filtered[0];
+    };
+
     const handleOpen = () => {
         /// Limpar os campos do formulário
         setTableOfValue(null);
@@ -21,32 +37,26 @@ const TableOfValues = () => {
         setOpen(true);
     };
 
-    const [tableOfValues, setTableOfValues] = React.useState<TableOfValue[]>([]);
-    const [error, setError] = React.useState<string | null>(null);
-
-    const [tableOfValue, setTableOfValue] = React.useState<TableOfValue | null>(null);
-    const getTableById = (id: GridRowId) => {
-        let rows = tableOfValues;
-        let filtered = rows.filter((element) => element.id === id.valueOf());
-        if (filtered.length === 0) return null;
-        return filtered[0];
-    };
     const handleClickEdit = (id: GridRowId) => {
         setTableOfValue(getTableById(id));
         setOpen(true);
     };
 
-    const handleStatusChange = async (id: GridRowId) => {
-        const tableOfValue = getTableById(id);
-        if (tableOfValue) {
-            const response = await put(`/api/medical-procedure-costs/${tableOfValue.id}`, {
-                status: tableOfValue.status === 1 ? 0 : 1
-            });
-            if (response.ok) {
-                fetchTableOfValues();
-            } else {
-                setError(response.message);
+    const handleChangeStatus = async (id: GridRowId) => {
+        var newArray = [...tableOfValues];
+        var found: number = -1;
+        for (let i = 0; i < newArray.length; i++) {
+            var element = newArray[i];
+            if (element.id == id.valueOf()) {
+                newArray[i].status = !element.status;
+                found = i;
             }
+        }
+        if (found != -1) {
+            setTableOfValues(newArray);
+            await put(`/api/medical-procedure-costs/${id.valueOf()}`, {
+                ...newArray[found]
+            });
         }
     };
 
@@ -59,18 +69,16 @@ const TableOfValues = () => {
             setError(response.message);
         }
 
+        //TODO - REMOVE AFTER CONNECT API
         if (true) {
             setTableOfValues(getMockTableOfValues());
         }
     };
 
-    React.useEffect(() => {
-        fetchTableOfValues();
-    }, []);
-
     const handleClose = () => {
         setOpen(false);
     };
+
     return (
         <>
             <MainCard title="Tabela de Valores">
@@ -97,70 +105,46 @@ const TableOfValues = () => {
                         disableRowSelectionOnClick
                         rows={tableOfValues.map((tableOfValue) => ({
                             id: tableOfValue.id,
-                            'Descrição Tabela de Valores': tableOfValue.description,
-                            Editar: '',
-                            'Inativo/Ativo': '',
-                            Excluir: ''
+                            description: tableOfValue.description,
+                            status: tableOfValue.status,
                         }))}
                         editMode="row"
                         columns={[
                             { field: 'id', headerName: 'ID', flex: 2 },
-                            { field: 'Descrição Tabela de Valores', headerName: 'Descrição do Procedimento', flex: 2 },
+                            { field: 'description', headerName: 'Descrição do Procedimento', flex: 2 },
                             {
-                                field: 'Editar',
-                                headerName: 'Editar',
-
+                                field: 'actions',
+                                headerName: 'actions',
+                                type: 'actions',
                                 flex: 1,
-                                renderCell: (params) => (
-                                    <GridActionsCellItem
-                                        icon={<Edit color="primary" />}
-                                        label="Editar"
-                                        className="textPrimary"
-                                        onClick={() => handleClickEdit(params.id)}
-                                        color="inherit"
-                                    />
-                                )
-                                // getActions: ({ id }: { id: GridRowId }) => {
-                                //     return [
-                                //         <GridActionsCellItem
-                                //             icon={<Edit color="primary" />}
-                                //             label="Editar"
-                                //             className="textPrimary"
-                                //             onClick={() => handleClickEdit(id)}
-                                //             color="inherit"
-                                //         />
-                                //     ];
-                                // }
+                                cellClassName: 'actions',
+                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
+                                getActions: ({ id }) => {
+                                    return [
+                                        <GridActionsCellItem
+                                            icon={<Edit sx={{ color: 'black' }} />}
+                                            label="Editar"
+                                            className="textPrimary"
+                                            onClick={() => handleClickEdit(id)}
+                                            color="inherit"
+                                        />
+                                    ];
+                                }
                             },
                             {
-                                field: 'Inativo/Ativo',
+                                field: 'status',
                                 headerName: 'Inativo/Ativo',
+                                type: 'actions',
                                 flex: 1,
-                                renderCell: (params) => (
-                                    <GridActionsCellItem
-                                        icon={<Switch color="primary" checked={getTableById(params.id)?.status === 1} />}
-                                        label="Inativo/Ativo"
-                                        className="textPrimary"
-                                        onClick={() => handleStatusChange(params.id)}
-                                        color="inherit"
-                                    />
-                                )
-                                // getActions: ({ id }: { id: GridRowId }) => {
-                                //     return [
-                                //         <GridActionsCellItem
-                                //             icon={<Switch color="primary" checked={getTableById(id)?.status === 1} />}
-                                //             label="Inativo/Ativo"
-                                //             className="textPrimary"
-                                //             onClick={() => handleStatusChange(id)}
-                                //             color="inherit"
-                                //         />
-                                //     ];
-                                // }
+                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
+                                getActions: ({ id }) => {
+                                    let tableOfValue = getTableById(id);
+                                    return [<Switch checked={tableOfValue?.status ?? false} onChange={(value) => handleChangeStatus(id)} />];
+                                }
                             }
                         ]}
                     />
                 </Box>
-
                 <TableOfValueForm open={open} handleClose={handleClose} tableOfValue={tableOfValue} />
             </MainCard>
         </>

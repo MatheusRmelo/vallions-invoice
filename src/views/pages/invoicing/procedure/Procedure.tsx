@@ -28,11 +28,11 @@ const ProcedureView = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        fetchProcedures();
+        getProcedures();
     }, []);
 
 
-    const fetchProcedures = async () => {
+    const getProcedures = async () => {
         setLoading(true);
         const response = await get('/api/billingProcedure');
         if (response.ok) {

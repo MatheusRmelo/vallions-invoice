@@ -55,8 +55,6 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const { get, post } = useAPI();
-
     const [errors, setErrors] = useState({
         description: '',
         code: '',
@@ -64,7 +62,9 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         modality: ''
     });
 
-    const fetchInstitutes = async () => {
+    const { get, post, put } = useAPI();
+
+    const getInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
             setInstitutes(response.result.map((institute: any) => parseInstitute(institute)));
@@ -78,7 +78,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         }
     };
 
-    const fetchModalities = async () => {
+    const getModalities = async () => {
         const response = await get('/api/modalities');
         if (response.ok) {
             setModalities(response.result.map((modality: any) => parseModality(modality)));
@@ -105,16 +105,30 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         setOpenErrorSnack(false);
     };
 
-    const handleSaveProcedure = async () => {
+    const handleCreateProcedure = async () => {
         const response = await post('/api/billingProcedure', {
             name: description,
             code: code,
             institution: institute,
             modality: modality
         });
-        /// TODO: Tratar a resposta da API
         if (response.ok) {
             handleClickSnack({ message: 'Procedimento cadastrado com sucesso!', severity: 'success' });
+        } else {
+            handleClickSnack({ message: response.message, severity: 'error' });
+        }
+    };
+
+    const handleEditProcedure = async () => {
+        const response = await put(`/api/billingProcedure/${procedureEdit!.id}`, {
+            name: description,
+            code: code,
+            institution: institute,
+            modality: modality,
+            status: procedureEdit!.status
+        });
+        if (response.ok) {
+            handleClickSnack({ message: 'Procedimento editado com sucesso!', severity: 'success' });
         } else {
             handleClickSnack({ message: response.message, severity: 'error' });
         }
@@ -158,14 +172,14 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                 severity: 'error'
             });
         } else {
-            handleSaveProcedure();
+            procedureEdit ? handleEditProcedure() : handleCreateProcedure();
             handleClose();
         }
     };
 
     useEffect(() => {
-        fetchInstitutes();
-        fetchModalities();
+        getInstitutes();
+        getModalities();
     }, []);
 
     useEffect(() => {

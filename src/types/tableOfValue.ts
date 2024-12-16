@@ -8,7 +8,7 @@ export type TableOfValue = {
     // validityEnd: string;
     // codeProcedure: string;
     // value: number | null;
-    status: number;
+    status: boolean;
 };
 
 export function parseTableOfValue(data: any): TableOfValue {
@@ -32,15 +32,15 @@ export function getMockTableOfValues(): TableOfValue[] {
     return [
         {
             id: 1,
-            description: 'Mock Description 1',
+            description: 'TABELA DE VALORES 1',
             institute: getMockInstitutes()[0],
-            status: 1
+            status: true
         },
         {
             id: 2,
-            description: 'Mock Description 2',
+            description: 'TABELA DE VALORES 2',
             institute: getMockInstitutes()[1],
-            status: 2
+            status: false
         }
     ];
 }

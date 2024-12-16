@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -24,9 +24,10 @@ import Edit from '@mui/icons-material/EditOutlined';
 import Delete from '@mui/icons-material/DeleteOutlined';
 import { DataGrid, GridCellParams } from '@mui/x-data-grid';
 import ImportOfProcedure from './ImportOfProcedure';
-import BillingTableProcedureDialog from './BillingTableProcedure';
+import ProcedureCostForm from './ProcedureCostForm';
 import { TableOfValue } from 'types/tableOfValue';
-import { CostsProcedures, parseCostsProcedures, getProcedureCostsMock } from 'types/procedures_costs';
+import { parseProcedureCosts, getProcedureCostsMock, ProcedureCost } from 'types/procedures_costs';
+
 import useAPI from 'hooks/hooks';
 import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
 type TableOfValueFormProps = {
@@ -41,26 +42,36 @@ type TableOfValueFormErrors = {
 };
 
 const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, tableOfValue }) => {
-    const { get, post, del, put } = useAPI();
-    const [description, setDescription] = React.useState('');
-    const [errors, setErrors] = React.useState<TableOfValueFormErrors>({
+    const [errors, setErrors] = useState<TableOfValueFormErrors>({
         description: null,
         institute: null
     });
-    const [institute, setInstitute] = React.useState<Institute | null>(null);
-    const [institutes, setInstitutes] = React.useState<Institute[]>([]);
-    const [importOpen, setImportOpen] = React.useState(false);
-    const [procedureTableFormOpen, setProcedureTableFormOpen] = React.useState(false);
-    const [proceduresCosts, setProceduresCosts] = React.useState<CostsProcedures[]>([]);
-    const [error, setError] = React.useState<string | null>(null);
-    const [filter, setFilter] = React.useState<string>('');
+    const [description, setDescription] = useState('');
+    const [institute, setInstitute] = useState<Institute | null>(null);
+    const [institutes, setInstitutes] = useState<Institute[]>([]);
+    const [importOpen, setImportOpen] = useState(false);
+    const [procedureOpen, setProcedureOpen] = useState(false);
+    const [proceduresCosts, setProceduresCosts] = useState<ProcedureCost[]>([]);
+    const [procedureCost, setProcedureCost] = useState<ProcedureCost | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [filter, setFilter] = useState<string>('');
 
-    const fetchProceduresCosts = React.useCallback(async () => {
+    const { get, post, put } = useAPI();
+
+    useEffect(() => {
+        getInstitutes();
+    }, []);
+
+
+    useEffect(() => {
+        getTableOfValue();
+    }, [tableOfValue]);
+
+    const getProceduresCosts = async () => {
         const response = await get(`/api/costs-has-procedures?medicalProcedureCost=${tableOfValue?.id}`);
         if (response.ok) {
             const data = await response.result;
-            setProceduresCosts(parseCostsProcedures(data));
-            /// Remove quando a API estiver pronta
+            setProceduresCosts(parseProcedureCosts(data));
         } else {
             setError(response.message);
         }
@@ -68,22 +79,38 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         if (true) {
             setProceduresCosts(getProcedureCostsMock());
         }
-    }, [get, tableOfValue?.id]);
+    }
 
-    const fetchInstitutes = async () => {
+    const getInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
-            const data = await response.result;
-            setInstitutes(data.map(parseInstitute));
-            /// Remove quando a API estiver pronta
+            setInstitutes(response.result.map(parseInstitute));
         } else {
             setError(response.message);
         }
 
+        //TODO - REMOVE AFTER CONNECT API
         if (true) {
             setInstitutes(getMockInstitutes());
         }
     };
+
+    const getTableOfValue = () => {
+        if (tableOfValue) {
+            setDescription(tableOfValue.description);
+            setInstitute(tableOfValue.institute);
+        } else {
+            setDescription("");
+            setInstitute(null);
+        }
+    };
+
+    const getInstituteById = (id: string) => {
+        let rows = institutes;
+        let filtered = rows.filter((element) => element.id === id);
+        if (filtered.length === 0) return null;
+        return filtered[0];
+    }
 
     const handleSave = async () => {
         const intituteForeignKeyId = institute?.id;
@@ -117,22 +144,26 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         }
     };
 
-    const handleDelete = async () => {
-        if (tableOfValue) {
-            const response = await del(`/api/medical-procedure-costs/${tableOfValue.id}`);
-            if (response.ok) {
-                handleClose();
-            } else {
-                setError(response.message);
-            }
+    const handleClickAddProcedureCost = () => {
+        setProcedureCost(null);
+        setProcedureOpen(true);
+    }
+
+    const handleCloseProcedureCost = (procedureCost: ProcedureCost | null) => {
+        if (procedureCost) {
+            var newArray = [...proceduresCosts];
+            newArray.push(procedureCost!)
+            setProceduresCosts(newArray);
         }
-    };
+
+        setProcedureOpen(false);
+    }
 
     const handleUpdateTableOfValue = async () => {
         if (tableOfValue) {
             const response = await put(`/api/medical-procedure-costs/${tableOfValue.id}`, {
                 description: description,
-                status: tableOfValue.status === 1 ? 0 : 1,
+                status: tableOfValue.status,
                 institution_fk: institute?.id
             });
             if (response.ok) {
@@ -143,7 +174,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         }
     };
 
-    const handleUpdateProcedureCost = async (procedureCost: CostsProcedures) => {
+    const handleUpdateProcedureCost = async (procedureCost: ProcedureCost) => {
         const response = await put(`/api/costs-has-procedures/${procedureCost.id}`, {
             billing_procedures_fk: procedureCost.id,
             price: procedureCost.valueProcedure,
@@ -157,30 +188,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         }
     };
 
-    ///TODO: Tratar erro de forma mais adequada
-    React.useEffect(() => {
-        if (error) {
-            console.log(error);
-        }
-    }, [error]);
-
-    React.useEffect(() => {
-        fetchInstitutes();
-    }, []);
-
-    React.useEffect(() => {
-        if (open && tableOfValue?.id !== undefined) {
-            fetchProceduresCosts();
-        }
-    }, [fetchProceduresCosts, open, tableOfValue?.id]);
-
-    React.useEffect(() => {
-        console.log(tableOfValue);
-        if (tableOfValue) {
-            setDescription(tableOfValue.description);
-            setInstitute(tableOfValue.institute);
-        }
-    }, [tableOfValue]);
 
     const validate = () => {
         const newErrors = { ...errors };
@@ -199,6 +206,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         setErrors(newErrors);
         return !Object.values(newErrors).some((error) => error !== null);
     };
+
     const columns = [
         {
             field: 'initDate',
@@ -236,7 +244,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     <Edit
                         color="primary"
                         onClick={() => {
-                            setProcedureTableFormOpen(true);
+                            setProcedureOpen(true);
                         }}
                     />,
                     <Delete
@@ -298,9 +306,9 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 <Select
                                     labelId="institute-label"
                                     id="institute-select"
-                                    value={institute}
+                                    value={institute?.id}
                                     label="Instituição"
-                                    onChange={(e) => setInstitute(e.target.value as Institute)}
+                                    onChange={(e) => setInstitute(getInstituteById(e.target.value))}
                                     fullWidth
                                     IconComponent={ArrowDropDownIcon}
                                     sx={selectStyles}
@@ -311,7 +319,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                         </MenuItem>
                                     ))}
                                 </Select>
-                                {/* {errors.institute && <Box color="error.main">{errors.institute}</Box>} */}
                             </FormControl>
                         </Grid>
                         <Grid item xs={14} sm={4.7}></Grid>
@@ -346,9 +353,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                             />
                             <Fab
                                 color="primary"
-                                onClick={() => {
-                                    setProcedureTableFormOpen(true);
-                                }}
+                                onClick={handleClickAddProcedureCost}
                                 sx={{
                                     width: 24,
                                     height: 24,
@@ -417,7 +422,11 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     </Button>
                 </DialogActions>
                 <ImportOfProcedure open={importOpen} handleClose={() => setImportOpen(false)} />
-                <BillingTableProcedureDialog open={procedureTableFormOpen} onClose={() => setProcedureTableFormOpen(false)} />
+                <ProcedureCostForm
+                    procedureCost={procedureCost}
+                    institutes={institutes}
+                    open={procedureOpen}
+                    onClose={handleCloseProcedureCost} />
             </form>
         </Dialog>
     );
