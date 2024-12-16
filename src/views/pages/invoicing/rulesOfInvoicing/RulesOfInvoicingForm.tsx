@@ -106,7 +106,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
     const handleClickAddRulesAditional = () => {
         var newRules = [...rulesAddition];
         newRules.push({
-            levelPriority: 0,
+            levelPriority: '0',
             tableOfValues: undefined,
             type: '',
             value: ''

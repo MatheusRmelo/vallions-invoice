@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 import Search from '@mui/icons-material/Search';
 import Edit from '@mui/icons-material/Edit';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, SnackbarCloseReason } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef, GridRowId } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
@@ -10,72 +10,53 @@ import Switch from '@mui/material/Switch';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
 import useAPI from 'hooks/hooks';
-import { Procedure, parseProcedure } from 'types/procedure';
-// Mocked rows
-const rows = [
-    {
-        id: 1,
-        'Descrição do Procedimento': 'Procedimento 1',
-        'Código CBHPM': '123456',
-        Instituição: 'Instituição 1',
-        Modalidade: 'Modalidade 1',
-        'Inativo/Ativo': 'Ativo'
-    },
-    {
-        id: 2,
-        'Descrição do Procedimento': 'Procedimento 2',
-        'Código CBHPM': '123457',
-        Instituição: 'Instituição 2',
-        Modalidade: 'Modalidade 2',
-        'Inativo/Ativo': 'Inativo'
-    },
-    {
-        id: 3,
-        'Descrição do Procedimento': 'Procedimento 3',
-        'Código CBHPM': '123458',
-        Instituição: 'Instituição 3',
-        Modalidade: 'Modalidade 3',
-        'Inativo/Ativo': 'Ativo'
-    },
-    {
-        id: 4,
-        'Descrição do Procedimento': 'Procedimento 4',
-        'Código CBHPM': '123459',
-        Instituição: 'Instituição 4',
-        Modalidade: 'Modalidade 4',
-        'Inativo/Ativo': 'Ativo'
-    },
-    {
-        id: 5,
-        'Descrição do Procedimento': 'Procedimento 5',
-        'Código CBHPM': '123460',
-        Instituição: 'Instituição 5',
-        Modalidade: 'Modalidade 5',
-        'Inativo/Ativo': 'Ativo'
-    }
-];
+import { Procedure, getMockProcedures, parseProcedure } from 'types/procedure';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ThemeMode } from 'types/config';
+import useConfig from 'hooks/useConfig';
+import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 const ProcedureView = () => {
-    const [open, setOpen] = React.useState(false);
-    const [procedure, setProduce] = React.useState<any>(null);
-    const { get } = useAPI();
-    const [data, setData] = React.useState<Procedure[]>([]);
-    const [error, setError] = React.useState<string | null>(null);
+    const [open, setOpen] = useState(false);
+    const [procedure, setProcedure] = useState<Procedure | null>(null);
+    const { get, put } = useAPI();
+    const [data, setData] = useState<Procedure[]>([]);
+    const { mode } = useConfig();
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        fetchProcedures();
+    }, []);
+
 
     const fetchProcedures = async () => {
+        setLoading(true);
         const response = await get('/api/billingProcedure');
         if (response.ok) {
             setData(response.result.map((item: any) => parseProcedure(item)));
         } else {
-            setError(response.message);
+            setOpenErrorSnack(true);
+            setMessageSnack(response.message);
         }
+
+        //TODO - REMOVE AFTER CONNECT API
+        if (true) {
+            setData(getMockProcedures());
+        }
+        setLoading(false);
     };
 
-    React.useEffect(() => {
-        fetchProcedures();
-    }, []);
+    const getProcedureById = (id: GridRowId) => {
+        let filtered = data.filter((element) => element.id === id.valueOf());
+        if (filtered.length === 0) return null;
+        return filtered[0];
+    };
 
     const handleClickOpen = () => {
+        setProcedure(null);
         setOpen(true);
     };
 
@@ -84,15 +65,33 @@ const ProcedureView = () => {
     };
 
     const handleClickEdit = (id: GridRowId) => {
-        setProduce(getProcedureById(id));
+        setProcedure(getProcedureById(id));
         setOpen(true);
     };
 
-    const getProcedureById = (id: GridRowId) => {
-        let filtered = rows.filter((element) => element.id === id.valueOf());
-        if (filtered.length === 0) return null;
-        return filtered[0];
+    const handleChangeStatus = async (id: GridRowId) => {
+        var newArray = [...data];
+        var found: number = -1;
+        for (let i = 0; i < newArray.length; i++) {
+            var element = newArray[i];
+            if (element.id == id.valueOf()) {
+                newArray[i].status = !element.status;
+                found = i;
+            }
+        }
+        if (found != -1) {
+            setData(newArray);
+            await put(`/api/billingProcedure/${id.valueOf()}`, {
+                ...newArray[found]
+            });
+        }
+    }
+
+    const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway') return;
+        setOpenErrorSnack(false);
     };
+
 
     return (
         <>
@@ -115,87 +114,87 @@ const ProcedureView = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    {/* {data !== null && data.length > 0 && ( */}
-                    <DataGrid
-                        disableRowSelectionOnClick
-                        rows={data.map((item) => ({
-                            id: item.id,
-                            'Descrição do Procedimento': item.description,
-                            'Código CBHPM': item.codeCbhpm,
-                            Instituição: item.institute.join(', '),
-                            Modalidade: item.modality,
-                            'Inativo/Ativo': item.status
-                        }))}
-                        columns={[
-                            {
-                                field: 'id',
-                                headerName: 'ID',
-                                flex: 2,
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>
-                            },
-                            {
-                                field: 'Descrição do Procedimento',
-                                headerName: 'Descrição do Procedimento',
-                                flex: 2,
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
-                            },
-                            {
-                                field: 'Código CBHPM',
-                                headerName: 'Código CBHPM',
-                                flex: 2,
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
-                            },
-                            {
-                                field: 'Instituição',
-                                headerName: 'Instituição',
-                                flex: 2,
+                    {
+                        loading ? <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                            <CircularProgress />
+                        </Box>
+                            : <DataGrid
+                                disableRowSelectionOnClick
+                                rows={data.map((item) => ({
+                                    ...item,
+                                    institute: item.institute.join(', '),
+                                }))}
+                                columns={[
+                                    {
+                                        field: 'id',
+                                        headerName: 'ID',
+                                        flex: 2,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>
+                                    },
+                                    {
+                                        field: 'description',
+                                        headerName: 'Descrição do Procedimento',
+                                        flex: 2,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
+                                    },
+                                    {
+                                        field: 'codeCbhpm',
+                                        headerName: 'Código CBHPM',
+                                        flex: 2,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
+                                    },
+                                    {
+                                        field: 'institute',
+                                        headerName: 'Instituição',
+                                        flex: 2,
 
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
-                            },
-                            {
-                                field: 'Modalidade',
-                                headerName: 'Modalidade',
-                                flex: 2,
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
-                            },
-                            {
-                                field: 'actions',
-                                type: 'actions',
-                                headerName: 'Editar',
-                                flex: 1,
-                                cellClassName: 'actions',
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
+                                    },
+                                    {
+                                        field: 'modality',
+                                        headerName: 'Modalidade',
+                                        flex: 2,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
+                                    },
+                                    {
+                                        field: 'actions',
+                                        type: 'actions',
+                                        headerName: 'Editar',
+                                        flex: 1,
+                                        cellClassName: 'actions',
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
 
-                                getActions: ({ id }) => {
-                                    return [
-                                        <GridActionsCellItem
-                                            icon={<Edit sx={{ color: 'black' }} />}
-                                            label="Editar"
-                                            className="textPrimary"
-                                            onClick={() => handleClickEdit(id)}
-                                            color="inherit"
-                                        />
-                                    ];
-                                }
-                            },
-                            {
-                                type: 'actions',
-                                field: 'Inativo/Ativo',
-                                headerName: 'Inativo/Ativo',
-                                flex: 2,
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
-                                getActions: ({ id }) => {
-                                    let procedure = getProcedureById(id);
-                                    return [<Switch checked={procedure?.['Inativo/Ativo'] === 'Ativo'} />];
-                                }
-                            }
-                        ]}
-                    />
-                    {/*)} */}
+                                        getActions: ({ id }) => {
+                                            return [
+                                                <GridActionsCellItem
+                                                    icon={<Edit sx={{ color: 'black' }} />}
+                                                    label="Editar"
+                                                    className="textPrimary"
+                                                    onClick={() => handleClickEdit(id)}
+                                                    color="inherit"
+                                                />
+                                            ];
+                                        }
+                                    },
+                                    {
+                                        type: 'actions',
+                                        field: 'status',
+                                        headerName: 'Inativo/Ativo',
+                                        flex: 2,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
+                                        getActions: ({ id }) => {
+                                            let procedure = getProcedureById(id);
+                                            return [<Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />];
+                                        }
+                                    }
+                                ]}
+                            />
+                    }
+
                 </Box>
             </MainCard>
-
             <ProcedureForm open={open} handleClose={handleClose} procedureEdit={procedure} />
+            <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
         </>
     );
 };

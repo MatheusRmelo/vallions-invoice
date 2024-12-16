@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Button,
     Box,
@@ -20,7 +20,8 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import SnackBarAlert from './../../../../ui-component/SnackBarAlert';
 import { Procedure } from 'types/procedure';
 import useAPI from 'hooks/hooks';
-import { Institute, parseInstitute } from 'types/institute';
+import { getMockInstitutes, Institute, parseInstitute } from 'types/institute';
+import { getMockModalities, Modality, parseModality } from 'types/modality';
 
 const procedureSchema = z.object({
     description: z.string().min(1, 'Descrição do Procedimento é obrigatória'),
@@ -43,18 +44,20 @@ type ProcedureFormProps = {
 };
 
 const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, procedureEdit }) => {
-    const [description, setDescription] = React.useState('');
-    const [code, setCode] = React.useState('');
-    const [procedure, setProcedure] = React.useState<Procedure | null>(null);
-    const [institute, setInstitute] = React.useState<string[]>([]);
-    const [modalities, setModalities] = React.useState<string[]>([]);
-    const [openSucessSnack, setOpenSucessSnack] = React.useState(false);
-    const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
-    const [messageSnack, setMessageSnack] = React.useState('');
-    const [error, setError] = React.useState<string | null>(null);
+    const [description, setDescription] = useState('');
+    const [code, setCode] = useState('');
+    const [institutes, setInstitutes] = useState<Institute[]>([]);
+    const [institute, setInstitute] = useState<string[]>([]);
+    const [modalities, setModalities] = useState<Modality[]>([]);
+    const [modality, setModality] = useState<string[]>([]);
+
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
+    const [error, setError] = useState<string | null>(null);
     const { get, post } = useAPI();
 
-    const [errors, setErrors] = React.useState({
+    const [errors, setErrors] = useState({
         description: '',
         code: '',
         institute: '',
@@ -64,27 +67,32 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     const fetchInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
-            const institutes = response.result.map((institute: any) => parseInstitute(institute));
-            setInstitute(institutes);
+            setInstitutes(response.result.map((institute: any) => parseInstitute(institute)));
         } else {
             setError(response.message);
+        }
+
+        //TODO - REMOVE AFTER CONNECT API
+        if (true) {
+            setInstitutes(getMockInstitutes());
         }
     };
 
     const fetchModalities = async () => {
         const response = await get('/api/modalities');
         if (response.ok) {
-            const modalities = response.result.map((modality: any) => modality.name);
-            setModalities(modalities);
+            setModalities(response.result.map((modality: any) => parseModality(modality)));
         } else {
             setError(response.message);
         }
+
+        //TODO - REMOVE AFTER CONNECT API
+        if (true) {
+            setModalities(getMockModalities());
+        }
     };
 
-    React.useEffect(() => {
-        fetchInstitutes();
-        fetchModalities();
-    }, []);
+
 
     const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
         setMessageSnack(message);
@@ -97,12 +105,12 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         setOpenErrorSnack(false);
     };
 
-    const handleProcedure = async () => {
+    const handleSaveProcedure = async () => {
         const response = await post('/api/billingProcedure', {
             name: description,
             code: code,
             institution: institute,
-            modality: modalities.join(',')
+            modality: modality
         });
         /// TODO: Tratar a resposta da API
         if (response.ok) {
@@ -112,22 +120,24 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         }
     };
 
-    const putInfo = () => {
+    const handleReceiveProcedure = () => {
         if (procedureEdit) {
             setDescription(procedureEdit.description);
             setCode(procedureEdit.codeCbhpm);
             setInstitute(procedureEdit.institute);
-            setModalities([procedureEdit.modality]);
+            setModality(procedureEdit.modality);
+        } else {
+            setDescription("");
+            setCode("");
+            setInstitute([]);
+            setModality([]);
         }
     };
 
-    React.useEffect(() => {
-        putInfo();
-    }, []);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const formData = { description, code, institute, modalities };
+        const formData = { description, code, institute, modality };
         const result = procedureSchema.safeParse(formData);
 
         if (!result.success) {
@@ -148,10 +158,19 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                 severity: 'error'
             });
         } else {
-            handleProcedure();
+            handleSaveProcedure();
             handleClose();
         }
     };
+
+    useEffect(() => {
+        fetchInstitutes();
+        fetchModalities();
+    }, []);
+
+    useEffect(() => {
+        handleReceiveProcedure();
+    }, [procedureEdit]);
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
@@ -203,9 +222,9 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                                     IconComponent={ArrowDropDownIcon}
                                     sx={selectStyles}
                                 >
-                                    {institute.map((institute) => (
-                                        <MenuItem key={institute} value={institute}>
-                                            {institute}
+                                    {institutes.map((institute) => (
+                                        <MenuItem key={institute.name} value={institute.name}>
+                                            {institute.name}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -221,14 +240,14 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                                     id="modality-select"
                                     label="Modalidade"
                                     multiple
-                                    value={modalities}
-                                    onChange={(e) => setModalities(e.target.value as string[])}
+                                    value={modality}
+                                    onChange={(e) => setModality(e.target.value as string[])}
                                     fullWidth
                                     sx={selectStyles}
                                 >
                                     {modalities.map((modality) => (
-                                        <MenuItem key={modality} value={modality}>
-                                            {modality}
+                                        <MenuItem key={modality.name} value={modality.name}>
+                                            {modality.name}
                                         </MenuItem>
                                     ))}
                                 </Select>
