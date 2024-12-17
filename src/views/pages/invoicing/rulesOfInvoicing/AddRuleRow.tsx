@@ -13,7 +13,7 @@ interface AddRuleProps {
     tableOfValues: TableOfValue[];
 }
 
-const AddRule: React.FC<AddRuleProps> = ({ rule, levelPriority, tableOfValues, setRule, onDelete }) => {
+const AddRule: React.FC<AddRuleProps> = ({ rule, tableOfValues, setRule, onDelete }) => {
     const typeCharge = ['FIXO', 'PERCENTUAL'];
     const levelPriorityList = ['NIVEL 5', 'NIVEL 4', 'NIVEL 3', 'NIVEL 2', 'NIVEL 1'];
     return (

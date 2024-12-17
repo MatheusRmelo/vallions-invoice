@@ -45,6 +45,8 @@ const BillingConference: React.FC = () => {
     const [unity, setUnity] = useState<Unity>();
     const [valueTotal, setValueTotal] = useState<number>(0);
     const [obsReversal, setObsReversal] = useState<string>('');
+    const [open, setOpen] = useState(false);
+
     const { get, put } = useAPI();
 
     const handleExpandClick = (id: number) => {
