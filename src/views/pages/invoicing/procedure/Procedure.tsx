@@ -31,7 +31,6 @@ const ProcedureView = () => {
         getProcedures();
     }, []);
 
-
     const getProcedures = async () => {
         setLoading(true);
         const response = await get('/api/billingProcedure');
@@ -74,24 +73,23 @@ const ProcedureView = () => {
         var found: number = -1;
         for (let i = 0; i < newArray.length; i++) {
             var element = newArray[i];
-            if (element.id == id.valueOf()) {
+            if (element.id === id.valueOf()) {
                 newArray[i].status = !element.status;
                 found = i;
             }
         }
-        if (found != -1) {
+        if (found !== -1) {
             setData(newArray);
             await put(`/api/billingProcedure/${id.valueOf()}`, {
                 ...newArray[found]
             });
         }
-    }
+    };
 
     const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
         if (reason === 'clickaway') return;
         setOpenErrorSnack(false);
     };
-
 
     return (
         <>
@@ -114,83 +112,90 @@ const ProcedureView = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    {
-                        loading ? <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                    {loading ? (
+                        <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                             <CircularProgress />
                         </Box>
-                            : <DataGrid
-                                disableRowSelectionOnClick
-                                rows={data.map((item) => ({
-                                    ...item,
-                                    institute: item.institute.join(', '),
-                                }))}
-                                columns={[
-                                    {
-                                        field: 'id',
-                                        headerName: 'ID',
-                                        flex: 2,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>
-                                    },
-                                    {
-                                        field: 'description',
-                                        headerName: 'Descrição do Procedimento',
-                                        flex: 2,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
-                                    },
-                                    {
-                                        field: 'codeCbhpm',
-                                        headerName: 'Código CBHPM',
-                                        flex: 2,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
-                                    },
-                                    {
-                                        field: 'institute',
-                                        headerName: 'Instituição',
-                                        flex: 2,
+                    ) : (
+                        <DataGrid
+                            disableRowSelectionOnClick
+                            rows={data.map((item) => ({
+                                ...item,
+                                institute: item.institute.join(', ')
+                            }))}
+                            columns={[
+                                {
+                                    field: 'id',
+                                    headerName: 'ID',
+                                    flex: 2,
+                                    minWidth: 150,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>
+                                },
+                                {
+                                    field: 'description',
+                                    headerName: 'Descrição do Procedimento',
+                                    flex: 2,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
+                                },
+                                {
+                                    field: 'codeCbhpm',
+                                    headerName: 'Código CBHPM',
+                                    flex: 2,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
+                                },
+                                {
+                                    field: 'institute',
+                                    headerName: 'Instituição',
+                                    minWidth: 150,
+                                    flex: 2,
 
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
-                                    },
-                                    {
-                                        field: 'modality',
-                                        headerName: 'Modalidade',
-                                        flex: 2,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
-                                    },
-                                    {
-                                        field: 'actions',
-                                        type: 'actions',
-                                        headerName: 'Editar',
-                                        flex: 1,
-                                        cellClassName: 'actions',
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
+                                },
+                                {
+                                    field: 'modality',
+                                    headerName: 'Modalidade',
+                                    minWidth: 150,
+                                    flex: 2,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
+                                },
+                                {
+                                    field: 'actions',
+                                    type: 'actions',
+                                    headerName: 'Editar',
+                                    minWidth: 150,
+                                    flex: 1,
+                                    cellClassName: 'actions',
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
 
-                                        getActions: ({ id }) => {
-                                            return [
-                                                <GridActionsCellItem
-                                                    icon={<Edit sx={{ color: 'black' }} />}
-                                                    label="Editar"
-                                                    className="textPrimary"
-                                                    onClick={() => handleClickEdit(id)}
-                                                    color="inherit"
-                                                />
-                                            ];
-                                        }
-                                    },
-                                    {
-                                        type: 'actions',
-                                        field: 'status',
-                                        headerName: 'Inativo/Ativo',
-                                        flex: 2,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
-                                        getActions: ({ id }) => {
-                                            let procedure = getProcedureById(id);
-                                            return [<Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />];
-                                        }
+                                    getActions: ({ id }) => {
+                                        return [
+                                            <GridActionsCellItem
+                                                icon={<Edit sx={{ color: 'black' }} />}
+                                                label="Editar"
+                                                className="textPrimary"
+                                                onClick={() => handleClickEdit(id)}
+                                                color="inherit"
+                                            />
+                                        ];
                                     }
-                                ]}
-                            />
-                    }
-
+                                },
+                                {
+                                    type: 'actions',
+                                    field: 'status',
+                                    headerName: 'Inativo/Ativo',
+                                    minWidth: 150,
+                                    flex: 2,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
+                                    getActions: ({ id }) => {
+                                        let procedure = getProcedureById(id);
+                                        return [
+                                            <Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />
+                                        ];
+                                    }
+                                }
+                            ]}
+                        />
+                    )}
                 </Box>
             </MainCard>
             <ProcedureForm open={open} handleClose={handleClose} procedureEdit={procedure} />

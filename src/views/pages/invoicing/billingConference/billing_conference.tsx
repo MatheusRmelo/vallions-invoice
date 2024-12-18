@@ -19,7 +19,10 @@ import {
     DialogTitle,
     Dialog,
     DialogContentText,
-    DialogActions
+    DialogActions,
+    useMediaQuery,
+    useTheme,
+    Checkbox
 } from '@mui/material';
 import { DataGrid, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
@@ -46,7 +49,7 @@ const BillingConference: React.FC = () => {
     const [valueTotal, setValueTotal] = useState<number>(0);
     const [obsReversal, setObsReversal] = useState<string>('');
     const [open, setOpen] = useState(false);
-
+    const isMobile = useMediaQuery(useTheme().breakpoints.down('sm'));
     const { get, put } = useAPI();
 
     const handleExpandClick = (id: number) => {
@@ -114,7 +117,7 @@ const BillingConference: React.FC = () => {
                 <Card>
                     <CardContent>
                         <Grid container spacing={4}>
-                            <Grid item xs={1.5}>
+                            <Grid item xs={isMobile ? 6 : 2}>
                                 <TextField
                                     label="Data Início"
                                     type="date"
@@ -123,7 +126,7 @@ const BillingConference: React.FC = () => {
                                     onChange={(e) => setStartDate(e.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={1.5}>
+                            <Grid item xs={isMobile ? 6 : 2}>
                                 <TextField
                                     label="Data Fim"
                                     type="date"
@@ -132,7 +135,7 @@ const BillingConference: React.FC = () => {
                                     onChange={(e) => setEndDate(e.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={1.8}>
+                            <Grid item xs={isMobile ? 12 : 1.8}>
                                 <FormControl fullWidth>
                                     <InputLabel id="filter">Filtro</InputLabel>
                                     <Select fullWidth label="Filtro" variant="outlined" defaultValue="Teste1">
@@ -145,7 +148,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={1.8}>
+                            <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
                                     <InputLabel id="institute">Instituição</InputLabel>
                                     <Select fullWidth label="Instituição" variant="outlined" defaultValue="Teste1">
@@ -158,7 +161,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={1.8}>
+                            <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
                                     <InputLabel id="unity">Unidade</InputLabel>
                                     <Select fullWidth label="Unidade" variant="outlined" defaultValue="Teste1">
@@ -170,7 +173,7 @@ const BillingConference: React.FC = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={1.8}>
+                            <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
                                     <InputLabel id="doctor">Médico</InputLabel>
                                     <Select fullWidth label="Médico" variant="outlined" defaultValue="Teste1">
@@ -182,7 +185,7 @@ const BillingConference: React.FC = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={1}>
+                            <Grid item xs={isMobile ? 12 : 2}>
                                 <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }}>
                                     <span style={{ fontSize: '1.45vh' }}>Pesquisar</span>
                                 </Button>
@@ -220,20 +223,23 @@ const BillingConference: React.FC = () => {
                                         {
                                             field: 'expand',
                                             headerName: '#',
-                                            width: 50,
+                                            width: 100,
                                             renderCell: (params) => (
-                                                <IconButton onClick={() => handleExpandClick(params.row.id)}>
-                                                    {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
-                                                </IconButton>
+                                                <Box>
+                                                    <IconButton onClick={() => handleExpandClick(params.row.id)}>
+                                                        {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
+                                                    </IconButton>
+                                                    <Checkbox />
+                                                </Box>
                                             )
                                         },
-                                        { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2 },
-                                        { field: 'study_description', headerName: 'Descrição do Estudo', flex: 2 },
-                                        { field: 'dateOfStudy', headerName: 'Data do Estudo', flex: 1 },
-                                        { field: 'unity', headerName: 'Unidade', flex: 1 },
-                                        { field: 'quantity', headerName: 'Qtn', flex: 1 },
-                                        { field: 'valueUnit', headerName: '$ Valor Laudo', flex: 1 },
-                                        { field: 'valueTotal', headerName: '$ Total', flex: 1 }
+                                        { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2, minWidth: 150 },
+                                        { field: 'study_description', minWidth: 150, headerName: 'Descrição do Estudo', flex: 2 },
+                                        { field: 'dateOfStudy', minWidth: 150, headerName: 'Data do Estudo', flex: 1 },
+                                        { field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1 },
+                                        { field: 'quantity', minWidth: 150, headerName: 'Qtn', flex: 1 },
+                                        { field: 'valueUnit', minWidth: 150, headerName: '$ Valor Laudo', flex: 1 },
+                                        { field: 'valueTotal', minWidth: 150, headerName: '$ Total', flex: 1 }
                                     ]}
                                     hideFooter
                                     getRowId={(row) => row.id}
@@ -266,26 +272,36 @@ const BillingConference: React.FC = () => {
                                                                         {
                                                                             field: 'namePatient',
                                                                             headerName: 'Nome do Paciente',
+                                                                            minWidth: 150,
+
                                                                             flex: 2
                                                                         },
                                                                         {
                                                                             field: 'reportDate',
                                                                             headerName: 'Data do Laudo',
+                                                                            minWidth: 150,
+
                                                                             flex: 2
                                                                         },
                                                                         {
                                                                             field: 'titleOfReport',
                                                                             headerName: 'Título do Laudo',
+                                                                            minWidth: 150,
+
                                                                             flex: 2
                                                                         },
                                                                         {
                                                                             field: 'valueOfReport',
                                                                             headerName: '$ Valor Laudo',
+                                                                            minWidth: 150,
+
                                                                             flex: 2
                                                                         },
                                                                         {
                                                                             field: 'status',
                                                                             headerName: 'Status',
+                                                                            minWidth: 150,
+
                                                                             flex: 2,
                                                                             renderCell(params) {
                                                                                 return <Chip label={params.value} />;
@@ -295,6 +311,8 @@ const BillingConference: React.FC = () => {
                                                                         {
                                                                             field: 'action',
                                                                             headerName: ' ',
+                                                                            minWidth: 150,
+
                                                                             flex: 1,
                                                                             renderCell(params) {
                                                                                 return (

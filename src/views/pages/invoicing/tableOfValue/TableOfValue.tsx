@@ -106,17 +106,19 @@ const TableOfValues = () => {
                         rows={tableOfValues.map((tableOfValue) => ({
                             id: tableOfValue.id,
                             description: tableOfValue.description,
-                            status: tableOfValue.status,
+                            status: tableOfValue.status
                         }))}
                         editMode="row"
                         columns={[
-                            { field: 'id', headerName: 'ID', flex: 2 },
-                            { field: 'description', headerName: 'Descrição do Procedimento', flex: 2 },
+                            { field: 'id', headerName: 'ID', minWidth: 150, flex: 2 },
+                            { field: 'description', minWidth: 150, headerName: 'Descrição do Procedimento', flex: 2 },
                             {
                                 field: 'actions',
                                 headerName: 'actions',
                                 type: 'actions',
                                 flex: 1,
+                                minWidth: 150,
+
                                 cellClassName: 'actions',
                                 renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
                                 getActions: ({ id }) => {
@@ -136,10 +138,14 @@ const TableOfValues = () => {
                                 headerName: 'Inativo/Ativo',
                                 type: 'actions',
                                 flex: 1,
+                                minWidth: 150,
+
                                 renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
                                 getActions: ({ id }) => {
                                     let tableOfValue = getTableById(id);
-                                    return [<Switch checked={tableOfValue?.status ?? false} onChange={(value) => handleChangeStatus(id)} />];
+                                    return [
+                                        <Switch checked={tableOfValue?.status ?? false} onChange={(value) => handleChangeStatus(id)} />
+                                    ];
                                 }
                             }
                         ]}

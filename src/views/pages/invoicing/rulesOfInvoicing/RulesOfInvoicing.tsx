@@ -81,11 +81,13 @@ const RulesOfInvoicing = () => {
                             status: rule.status
                         }))}
                         columns={[
-                            { field: 'rulesDescription', headerName: 'Descrição Regra', flex: 2 },
-                            { field: 'institution', headerName: 'Instituição', flex: 3 },
-                            { field: 'unity', headerName: 'Unidade', flex: 1 },
+                            { field: 'rulesDescription', minWidth: 150, headerName: 'Descrição Regra', flex: 2 },
+                            { field: 'institution', minWidth: 150, headerName: 'Instituição', flex: 3 },
+                            { field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1 },
                             {
                                 field: 'actions',
+                                minWidth: 150,
+
                                 headerName: 'Editar',
                                 flex: 1,
                                 renderCell: (params) => (
@@ -106,6 +108,8 @@ const RulesOfInvoicing = () => {
                             },
                             {
                                 field: 'status',
+                                minWidth: 150,
+
                                 headerName: 'Inativo/Ativo',
                                 flex: 1,
                                 renderCell: (params) => (
