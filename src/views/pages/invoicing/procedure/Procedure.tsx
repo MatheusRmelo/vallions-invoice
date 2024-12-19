@@ -110,62 +110,49 @@ const ProcedureView = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    {loading ? (
+                    {loading ?
                         <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                             <CircularProgress />
                         </Box>
-<<<<<<< HEAD
-                    ) : (
-                        <DataGrid
+                        : <DataGrid
                             disableRowSelectionOnClick
-                            rows={data.map((item) => ({
-                                ...item,
-                                institute: item.institute.join(', ')
-                            }))}
+                            rows={data}
                             columns={[
                                 {
                                     field: 'id',
                                     headerName: 'ID',
-                                    flex: 2,
-                                    minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>
+                                    flex: 1, minWidth: 150,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>,
                                 },
                                 {
-                                    field: 'description',
+                                    field: 'name',
                                     headerName: 'Descrição do Procedimento',
-                                    flex: 2,
+                                    flex: 1, minWidth: 150,
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
                                 },
                                 {
-                                    field: 'codeCbhpm',
+                                    field: 'code',
                                     headerName: 'Código CBHPM',
-                                    flex: 2,
+                                    flex: 1, minWidth: 150,
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
                                 },
                                 {
-                                    field: 'institute',
+                                    field: 'institution_fk',
                                     headerName: 'Instituição',
-                                    minWidth: 150,
-                                    flex: 2,
-
+                                    flex: 1, minWidth: 150,
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
                                 },
                                 {
-                                    field: 'modality',
+                                    field: 'billing_procedures_fk',
                                     headerName: 'Modalidade',
-                                    minWidth: 150,
-                                    flex: 2,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
+                                    flex: 1, minWidth: 150, renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
                                 },
                                 {
                                     field: 'actions',
                                     type: 'actions',
                                     headerName: 'Editar',
-                                    minWidth: 150,
-                                    flex: 1,
-                                    cellClassName: 'actions',
+                                    flex: 1, minWidth: 150, cellClassName: 'actions',
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
-
                                     getActions: ({ id }) => {
                                         return [
                                             <GridActionsCellItem
@@ -176,68 +163,16 @@ const ProcedureView = () => {
                                                 color="inherit"
                                             />
                                         ];
-=======
-                            : <DataGrid
-                                disableRowSelectionOnClick
-                                rows={data}
-                                columns={[
-                                    {
-                                        field: 'id',
-                                        headerName: 'ID',
-                                        flex: 1, minWidth: 150,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>,
-                                    },
-                                    {
-                                        field: 'name',
-                                        headerName: 'Descrição do Procedimento',
-                                        flex: 1, minWidth: 150,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
-                                    },
-                                    {
-                                        field: 'code',
-                                        headerName: 'Código CBHPM',
-                                        flex: 1, minWidth: 150,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
-                                    },
-                                    {
-                                        field: 'institution_fk',
-                                        headerName: 'Instituição',
-                                        flex: 1, minWidth: 150,
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
-                                    },
-                                    {
-                                        field: 'billing_procedures_fk',
-                                        headerName: 'Modalidade',
-                                        flex: 1, minWidth: 150, renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
-                                    },
-                                    {
-                                        field: 'actions',
-                                        type: 'actions',
-                                        headerName: 'Editar',
-                                        flex: 1, minWidth: 150, cellClassName: 'actions',
-                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
-                                        getActions: ({ id }) => {
-                                            return [
-                                                <GridActionsCellItem
-                                                    icon={<Edit sx={{ color: 'black' }} />}
-                                                    label="Editar"
-                                                    className="textPrimary"
-                                                    onClick={() => handleClickEdit(id)}
-                                                    color="inherit"
-                                                />
-                                            ];
-                                        }
-                                    },
-                                    {
-                                        type: 'actions',
-                                        field: 'status',
-                                        headerName: 'Inativo/Ativo',
-                                        flex: 1, minWidth: 150, renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
-                                        getActions: ({ id }) => {
-                                            let procedure = getProcedureById(id);
-                                            return [<Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />];
-                                        }
->>>>>>> feat/integration-api
+                                    }
+                                },
+                                {
+                                    type: 'actions',
+                                    field: 'status',
+                                    headerName: 'Inativo/Ativo',
+                                    flex: 1, minWidth: 150, renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
+                                    getActions: ({ id }) => {
+                                        let procedure = getProcedureById(id);
+                                        return [<Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />];
                                     }
                                 },
                                 {
@@ -256,7 +191,7 @@ const ProcedureView = () => {
                                 }
                             ]}
                         />
-                    )}
+                    }
                 </Box>
             </MainCard>
             <ProcedureForm open={open} handleClose={handleClose} procedureEdit={procedure} />
