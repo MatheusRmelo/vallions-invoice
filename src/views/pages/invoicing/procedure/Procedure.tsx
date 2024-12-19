@@ -24,6 +24,8 @@ const ProcedureView = () => {
     const [data, setData] = useState<Procedure[]>([]);
     const { mode } = useConfig();
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+
     const [messageSnack, setMessageSnack] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -77,16 +79,28 @@ const ProcedureView = () => {
         }
         if (found !== -1) {
             setData(newArray);
-            await put(`/api/billingProcedure/${id.valueOf()}`, {
+            const req = await put(`/api/billingProcedure/${id.valueOf()}`, {
                 ...newArray[found],
-                status: newArray[found].status ? "1" : "0"
+                status: newArray[found].status ? '1' : '0'
             });
+
+            if (req.ok) {
+                setOpenSucessSnack(true);
+                setMessageSnack(
+                    newArray[found].status ? 'O Procedimento foi ativada com sucesso' : 'O Procedimento foi desativada com sucesso'
+                );
+            } else {
+                setOpenErrorSnack(true);
+                setMessageSnack('Não foi possível alterar o status do Procedimento. ');
+                newArray[found].status = !newArray[found].status;
+            }
         }
     };
 
     const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
         if (reason === 'clickaway') return;
         setOpenErrorSnack(false);
+        setOpenSucessSnack(false);
     };
 
     return (
@@ -110,48 +124,57 @@ const ProcedureView = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    {loading ?
+                    {loading ? (
                         <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                             <CircularProgress />
                         </Box>
-                        : <DataGrid
+                    ) : (
+                        <DataGrid
                             disableRowSelectionOnClick
                             rows={data}
                             columns={[
                                 {
                                     field: 'id',
                                     headerName: 'ID',
-                                    flex: 1, minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>,
+                                    flex: 1,
+                                    minWidth: 150,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>
                                 },
                                 {
                                     field: 'name',
                                     headerName: 'Descrição do Procedimento',
-                                    flex: 1, minWidth: 150,
+                                    flex: 1,
+                                    minWidth: 150,
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
                                 },
                                 {
                                     field: 'code',
                                     headerName: 'Código CBHPM',
-                                    flex: 1, minWidth: 150,
+                                    flex: 1,
+                                    minWidth: 150,
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
                                 },
                                 {
                                     field: 'institution_fk',
                                     headerName: 'Instituição',
-                                    flex: 1, minWidth: 150,
+                                    flex: 1,
+                                    minWidth: 150,
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
                                 },
                                 {
                                     field: 'billing_procedures_fk',
                                     headerName: 'Modalidade',
-                                    flex: 1, minWidth: 150, renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
+                                    flex: 1,
+                                    minWidth: 150,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
                                 },
                                 {
                                     field: 'actions',
                                     type: 'actions',
                                     headerName: 'Editar',
-                                    flex: 1, minWidth: 150, cellClassName: 'actions',
+                                    flex: 1,
+                                    minWidth: 150,
+                                    cellClassName: 'actions',
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
                                     getActions: ({ id }) => {
                                         return [
@@ -169,10 +192,14 @@ const ProcedureView = () => {
                                     type: 'actions',
                                     field: 'status',
                                     headerName: 'Inativo/Ativo',
-                                    flex: 1, minWidth: 150, renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
+                                    flex: 1,
+                                    minWidth: 150,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
                                     getActions: ({ id }) => {
                                         let procedure = getProcedureById(id);
-                                        return [<Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />];
+                                        return [
+                                            <Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />
+                                        ];
                                     }
                                 },
                                 {
@@ -191,11 +218,12 @@ const ProcedureView = () => {
                                 }
                             ]}
                         />
-                    }
+                    )}
                 </Box>
             </MainCard>
             <ProcedureForm open={open} handleClose={handleClose} procedureEdit={procedure} />
             <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
+            <SnackBarAlert open={openSucessSnack} message={messageSnack} severity="success" onClose={handleCloseSnack} />
         </>
     );
 };

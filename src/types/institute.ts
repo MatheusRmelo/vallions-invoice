@@ -5,8 +5,8 @@ export type Institute = {
 
 export const parseInstitute = (data: any): Institute => {
     return {
-        id: data.id,
-        name: data.name
+        id: data.id_institution,
+        name: data.institution
     };
 };
 

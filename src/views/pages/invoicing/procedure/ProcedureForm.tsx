@@ -48,13 +48,13 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     const [code, setCode] = useState('');
     const [institutes, setInstitutes] = useState<Institute[]>([]);
     const [institute, setInstitute] = useState<string[]>([]);
-    const [modalities, setModalities] = useState<Modality[]>([]);
     const [modality, setModality] = useState<string[]>([]);
 
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const modalities = ['CT', 'MR', 'US', 'CR', 'DO', 'OT', 'DX', 'MG', 'SC'];
     const [errors, setErrors] = useState({
         description: '',
         code: '',
@@ -73,22 +73,6 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         }
     };
 
-    const getModalities = async () => {
-        const response = await get('/api/modalities');
-        if (response.ok) {
-            setModalities(response.result.map((modality: any) => parseModality(modality)));
-        } else {
-            setError(response.message);
-        }
-
-        //TODO - REMOVE AFTER CONNECT API
-        if (true) {
-            setModalities(getMockModalities());
-        }
-    };
-
-
-
     const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
         setMessageSnack(message);
         severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
@@ -101,11 +85,15 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     };
 
     const handleCreateProcedure = async () => {
+        const idsInstitute = institutes
+            .filter((instituteCheck) => institute.includes(instituteCheck.name))
+            .map((institute) => institute.id);
+
         const response = await post('/api/billingProcedure', {
             name: description,
             code: code,
-            institution: institute,
-            modality: modality
+            institution: idsInstitute.join(','),
+            modality: modality.join(',')
         });
         if (response.ok) {
             handleClose();
@@ -119,8 +107,8 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         const response = await put(`/api/billingProcedure/${procedureEdit!.id}`, {
             name: description,
             code: code,
-            institution: institute,
-            modality: modality,
+            institution: institute.join(','),
+            modality: modality.join(','),
             status: procedureEdit!.status
         });
         if (response.ok) {
@@ -129,29 +117,29 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         } else {
             handleClickSnack({ message: response.message, severity: 'error' });
         }
-
     };
 
     const handleReceiveProcedure = () => {
         if (procedureEdit) {
             setDescription(procedureEdit.name);
             setCode(procedureEdit.code);
-            setInstitute(procedureEdit.institutions_fk.split(""));
-            setModality(procedureEdit.billing_procedures_fk.split(""));
+            setInstitute(procedureEdit.institutions_fk.split(''));
+            setModality(procedureEdit.billing_procedures_fk.split(''));
         } else {
-            setDescription("");
-            setCode("");
+            setDescription('');
+            setCode('');
             setInstitute([]);
             setModality([]);
         }
     };
 
-
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        // const modalityToApi = modality.join(',');
+        // const instituteToApi = institute.join(',');
         const formData = { description, code, institute, modality };
         const result = procedureSchema.safeParse(formData);
-
+        console.log(result);
         if (!result.success) {
             const newErrors = result.error.format();
             setErrors({
@@ -176,7 +164,6 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
 
     useEffect(() => {
         getInstitutes();
-        getModalities();
     }, []);
 
     useEffect(() => {
@@ -257,8 +244,8 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                                     sx={selectStyles}
                                 >
                                     {modalities.map((modality) => (
-                                        <MenuItem key={modality.name} value={modality.name}>
-                                            {modality.name}
+                                        <MenuItem key={modality} value={modality}>
+                                            {modality}
                                         </MenuItem>
                                     ))}
                                 </Select>
