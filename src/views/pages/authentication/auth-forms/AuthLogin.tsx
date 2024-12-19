@@ -29,6 +29,7 @@ import useScriptRef from 'hooks/useScriptRef';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
+
 // ===============================|| JWT LOGIN ||=============================== //
 
 const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
@@ -61,6 +62,20 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
+                    // await api.get('https://dev.apolo.vallions.com.br:8484/sanctum/csrf-cookie', { baseURL: '/' }).then((v) => {
+                    //     console.log(v);
+                    // });
+                    // await api.post('/auth/login', {
+                    //     'email': values.email,
+                    //     'password': values.password,
+                    //     'remember_me': 0
+                    // });
+                    //await login2(values.email, values.password);
+                    // await post('/api/auth/login', {
+                    //     'email': values.email,
+                    //     'password': values.password,
+                    //     'remember_me': 0
+                    // });
                     await login(values.email, values.password);
                     if (scriptedRef.current) {
                         setStatus({ success: true });

@@ -8,7 +8,7 @@ import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
-import useAPI from 'hooks/hooks';
+import useAPI from 'hooks/useAPI';
 import { RuleBilling, parseRuleBillingList, generateMockRuleBilling } from 'types/rules_billing';
 import RulesOfInvoicingForm from './RulesOfInvoicingForm';
 

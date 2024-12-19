@@ -9,8 +9,8 @@ import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
-import useAPI from 'hooks/hooks';
-import { Procedure, getMockProcedures, parseProcedure } from 'types/procedure';
+import useAPI from 'hooks/useAPI';
+import { Procedure, parseProcedure } from 'types/procedure';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ThemeMode } from 'types/config';
@@ -33,7 +33,8 @@ const ProcedureView = () => {
 
     const getProcedures = async () => {
         setLoading(true);
-        const response = await get('/api/billingProcedure');
+
+        const response = await get('/api/billingProcedure?institution=2');
         if (response.ok) {
             setData(response.result.map((item: any) => parseProcedure(item)));
         } else {
@@ -41,10 +42,6 @@ const ProcedureView = () => {
             setMessageSnack(response.message);
         }
 
-        //TODO - REMOVE AFTER CONNECT API
-        if (true) {
-            setData(getMockProcedures());
-        }
         setLoading(false);
     };
 
@@ -81,7 +78,8 @@ const ProcedureView = () => {
         if (found !== -1) {
             setData(newArray);
             await put(`/api/billingProcedure/${id.valueOf()}`, {
-                ...newArray[found]
+                ...newArray[found],
+                status: newArray[found].status ? "1" : "0"
             });
         }
     };
@@ -107,7 +105,7 @@ const ProcedureView = () => {
                     height="80vh"
                     sx={{
                         '& .MuiDataGrid-root': { border: 'none' },
-                        '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '10px' },
+                        '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '12px' },
                         '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '12px' },
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
@@ -116,6 +114,7 @@ const ProcedureView = () => {
                         <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                             <CircularProgress />
                         </Box>
+<<<<<<< HEAD
                     ) : (
                         <DataGrid
                             disableRowSelectionOnClick
@@ -177,6 +176,68 @@ const ProcedureView = () => {
                                                 color="inherit"
                                             />
                                         ];
+=======
+                            : <DataGrid
+                                disableRowSelectionOnClick
+                                rows={data}
+                                columns={[
+                                    {
+                                        field: 'id',
+                                        headerName: 'ID',
+                                        flex: 1, minWidth: 150,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>,
+                                    },
+                                    {
+                                        field: 'name',
+                                        headerName: 'Descrição do Procedimento',
+                                        flex: 1, minWidth: 150,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
+                                    },
+                                    {
+                                        field: 'code',
+                                        headerName: 'Código CBHPM',
+                                        flex: 1, minWidth: 150,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
+                                    },
+                                    {
+                                        field: 'institution_fk',
+                                        headerName: 'Instituição',
+                                        flex: 1, minWidth: 150,
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
+                                    },
+                                    {
+                                        field: 'billing_procedures_fk',
+                                        headerName: 'Modalidade',
+                                        flex: 1, minWidth: 150, renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
+                                    },
+                                    {
+                                        field: 'actions',
+                                        type: 'actions',
+                                        headerName: 'Editar',
+                                        flex: 1, minWidth: 150, cellClassName: 'actions',
+                                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
+                                        getActions: ({ id }) => {
+                                            return [
+                                                <GridActionsCellItem
+                                                    icon={<Edit sx={{ color: 'black' }} />}
+                                                    label="Editar"
+                                                    className="textPrimary"
+                                                    onClick={() => handleClickEdit(id)}
+                                                    color="inherit"
+                                                />
+                                            ];
+                                        }
+                                    },
+                                    {
+                                        type: 'actions',
+                                        field: 'status',
+                                        headerName: 'Inativo/Ativo',
+                                        flex: 1, minWidth: 150, renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
+                                        getActions: ({ id }) => {
+                                            let procedure = getProcedureById(id);
+                                            return [<Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />];
+                                        }
+>>>>>>> feat/integration-api
                                     }
                                 },
                                 {
