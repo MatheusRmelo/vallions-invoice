@@ -28,7 +28,7 @@ import ProcedureCostForm from './ProcedureCostForm';
 import { TableOfValue } from 'types/tableOfValue';
 import { parseProcedureCosts, getProcedureCostsMock, ProcedureCost } from 'types/procedures_costs';
 
-import useAPI from 'hooks/hooks';
+import useAPI from 'hooks/useAPI';
 import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
 type TableOfValueFormProps = {
     open: boolean;

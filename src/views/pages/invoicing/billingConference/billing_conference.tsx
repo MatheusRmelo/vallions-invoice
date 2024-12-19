@@ -25,7 +25,7 @@ import { DataGrid, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import MainCard from 'ui-component/cards/MainCard';
 import { SendOutlined, Search, ExpandMore, ExpandLess } from '@mui/icons-material';
-import useAPI from 'hooks/hooks';
+import useAPI from 'hooks/useAPI';
 import { MoreVert, DeleteOutline, RemoveRedEyeOutlined } from '@mui/icons-material';
 import { Conference, parseConferenceList, generateConference } from 'types/conference';
 import { Billing, parseBilling, generateBilling } from 'types/billing';

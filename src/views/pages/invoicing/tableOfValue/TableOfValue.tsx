@@ -10,7 +10,7 @@ import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
 import TableOfValueForm from './TableOfValueForm';
 import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/tableOfValue';
-import useAPI from 'hooks/hooks';
+import useAPI from 'hooks/useAPI';
 const TableOfValues = () => {
     const [open, setOpen] = useState(false);
     const [tableOfValues, setTableOfValues] = useState<TableOfValue[]>([]);

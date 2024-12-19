@@ -19,7 +19,7 @@ import ProcedureFormTextField from 'ui-component/inputs/procedureFormTextField';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import SnackBarAlert from './../../../../ui-component/SnackBarAlert';
 import { Procedure } from 'types/procedure';
-import useAPI from 'hooks/hooks';
+import useAPI from 'hooks/useAPI';
 import { getMockInstitutes, Institute, parseInstitute } from 'types/institute';
 import { getMockModalities, Modality, parseModality } from 'types/modality';
 
@@ -71,11 +71,6 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         } else {
             setError(response.message);
         }
-
-        //TODO - REMOVE AFTER CONNECT API
-        if (true) {
-            setInstitutes(getMockInstitutes());
-        }
     };
 
     const getModalities = async () => {
@@ -113,6 +108,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
             modality: modality
         });
         if (response.ok) {
+            handleClose();
             handleClickSnack({ message: 'Procedimento cadastrado com sucesso!', severity: 'success' });
         } else {
             handleClickSnack({ message: response.message, severity: 'error' });
@@ -128,18 +124,20 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
             status: procedureEdit!.status
         });
         if (response.ok) {
+            handleClose();
             handleClickSnack({ message: 'Procedimento editado com sucesso!', severity: 'success' });
         } else {
             handleClickSnack({ message: response.message, severity: 'error' });
         }
+
     };
 
     const handleReceiveProcedure = () => {
         if (procedureEdit) {
-            setDescription(procedureEdit.description);
-            setCode(procedureEdit.codeCbhpm);
-            setInstitute(procedureEdit.institute);
-            setModality(procedureEdit.modality);
+            setDescription(procedureEdit.name);
+            setCode(procedureEdit.code);
+            setInstitute(procedureEdit.institutions_fk.split(""));
+            setModality(procedureEdit.billing_procedures_fk.split(""));
         } else {
             setDescription("");
             setCode("");
@@ -173,7 +171,6 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
             });
         } else {
             procedureEdit ? handleEditProcedure() : handleCreateProcedure();
-            handleClose();
         }
     };
 

@@ -17,7 +17,7 @@ import {
 import AddRuleRow from './AddRuleRow';
 import { RuleBilling } from 'types/rules_billing';
 import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
-import UseAPI from 'hooks/hooks';
+import UseAPI from 'hooks/useAPI';
 import { getMockTableOfValues, parseTableOfValues, TableOfValue } from 'types/tableOfValue';
 import { RuleType, RuleAdittion } from './types/RuleType';
 import { generateMockTag, parseTagList, Tag } from 'types/tag';

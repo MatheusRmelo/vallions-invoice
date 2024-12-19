@@ -18,8 +18,8 @@ import {
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { ProcedureCost } from 'types/procedures_costs';
 import { Institute } from 'types/institute';
-import useAPI from 'hooks/hooks';
-import { getMockProcedures, parseProcedure, Procedure } from 'types/procedure';
+import useAPI from 'hooks/useAPI';
+import { parseProcedure, Procedure } from 'types/procedure';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 
@@ -49,17 +49,12 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
 
 
     const getProcedures = async () => {
-        const response = await get('/api/billingProcedure');
+        const response = await get('/api/billingProcedure?institution=2');
         if (response.ok) {
             setProcedures(response.result.map((item: any) => parseProcedure(item)));
         } else {
             setOpenErrorSnack(true);
             setMessageSnack(response.message);
-        }
-
-        //TODO - REMOVE AFTER CONNECT API
-        if (true) {
-            setProcedures(getMockProcedures());
         }
     };
 
@@ -96,7 +91,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
         if (true) {
             onClose({
                 codProcedure: procedure!.id.toString(),
-                descriptionProcedure: procedure!.description,
+                descriptionProcedure: procedure!.name,
                 id: 1,
                 validatyStart: startDate,
                 validatyEnd: endDate,
@@ -205,7 +200,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                             >
                                 {procedures.map((procedure) => (
                                     <MenuItem key={procedure.id} value={procedure.id}>
-                                        {procedure.description}
+                                        {procedure.name}
                                     </MenuItem>
                                 ))}
                             </Select>

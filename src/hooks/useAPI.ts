@@ -2,17 +2,23 @@ import axios, { AxiosInstance } from 'axios';
 import { APIResponse } from '../types/apiresponse';
 
 function useAPI() {
+    const token = '741|ptmfZDOhuOCKmPZvyg5sVUUj8mfLAwH1gC5UOg36';
     const client: AxiosInstance = axios.create({
-        baseURL: 'http://localhost:8000/api'
+        baseURL: 'https://dev.apolo.vallions.com.br:8484', withCredentials: true,
     });
 
     const get = async (path: string): Promise<APIResponse> => {
         try {
-            var result = await client.get(path);
+            var result = await client.get(path, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
             return {
                 message: result.data.message,
                 ok: true,
-                result: result.data.result
+                result: result.data
             };
         } catch (err: any) {
             return {
@@ -25,7 +31,11 @@ function useAPI() {
 
     const post = async (path: string, data: any): Promise<APIResponse> => {
         try {
-            var result = await client.post(path, data);
+            var result = await client.post(path, data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             return {
                 message: result.data.message,
                 ok: true,
@@ -42,7 +52,11 @@ function useAPI() {
 
     const put = async (path: string, data: any): Promise<APIResponse> => {
         try {
-            var result = await client.put(path, data);
+            var result = await client.put(path, data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             return {
                 message: result.data.message,
                 ok: true,
@@ -59,7 +73,11 @@ function useAPI() {
 
     const del = async (path: string): Promise<APIResponse> => {
         try {
-            var result = await client.delete(path);
+            var result = await client.delete(path, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             return {
                 message: result.data.message,
                 ok: true,
@@ -78,7 +96,7 @@ function useAPI() {
         get,
         post,
         put,
-        del
+        del,
     };
 }
 
