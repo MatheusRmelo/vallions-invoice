@@ -1,5 +1,3 @@
-import { GridFilterInputBooleanProps } from '@mui/x-data-grid';
-
 // models/Procedimento.ts
 export type Procedure = {
     id: number;
@@ -9,6 +7,7 @@ export type Procedure = {
     billing_procedures_fk: string;
     institution_fk: string;
     status: boolean;
+    modalities: string[] | undefined;
 };
 
 export const parseProcedure = (data: any): Procedure => {
@@ -19,6 +18,7 @@ export const parseProcedure = (data: any): Procedure => {
         institutions_fk: data.institutions_fk,
         billing_procedures_fk: data.billing_procedures_fk,
         institution_fk: data.institution_fk,
-        status: data.status == null ? false : data.status == '0' ? false : true
+        status: data.status == null ? false : data.status === '0' ? false : true,
+        modalities: undefined
     };
 };
