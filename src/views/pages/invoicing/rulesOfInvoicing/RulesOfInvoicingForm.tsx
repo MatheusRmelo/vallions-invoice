@@ -18,7 +18,7 @@ import AddRuleRow from './AddRuleRow';
 import { RuleBilling } from 'types/rules_billing';
 import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
 import UseAPI from 'hooks/useAPI';
-import { getMockTableOfValues, parseTableOfValues, TableOfValue } from 'types/tableOfValue';
+import { parseTableOfValues, TableOfValue } from 'types/tableOfValue';
 import { RuleType, RuleAdittion } from './types/RuleType';
 import { generateMockTag, parseTagList, Tag } from 'types/tag';
 import RuleRow from './RuleRow';
@@ -39,6 +39,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
     const [tableOfValues, setTableOfValues] = React.useState<TableOfValue[]>([]);
     const [rules, setRules] = useState<RuleType[]>([]);
     const [rulesAddition, setRulesAddition] = useState<RuleAdittion[]>([]);
+
     const fetchInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
@@ -46,11 +47,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
             setInstitutes(institutes);
         } else {
             setError(response.message);
-        }
-
-        /// Remover
-        if (true) {
-            setInstitutes(getMockInstitutes());
         }
     };
 
@@ -78,10 +74,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose }) => {
             ///Tratamento de erro
             console.error('Error fetching table of values');
         }
-        /// Remover
-        if (true) {
-            setTableOfValues(getMockTableOfValues());
-        }
+
     };
 
     /// Init State

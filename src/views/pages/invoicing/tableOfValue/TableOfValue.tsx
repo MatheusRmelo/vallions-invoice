@@ -9,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
 import TableOfValueForm from './TableOfValueForm';
-import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/tableOfValue';
+import { TableOfValue, parseTableOfValues } from 'types/tableOfValue';
 import useAPI from 'hooks/useAPI';
 const TableOfValues = () => {
     const [open, setOpen] = useState(false);
@@ -20,21 +20,24 @@ const TableOfValues = () => {
     const { get, put } = useAPI();
 
     useEffect(() => {
-        fetchTableOfValues();
+        getTableOfValues();
     }, []);
+
+    const getTableOfValues = async () => {
+        const response = await get('/api/medical-procedure-costs');
+        if (response.ok) {
+            const data = await response.result;
+            setTableOfValues(parseTableOfValues(data));
+        } else {
+            setError(response.message);
+        }
+    };
 
     const getTableById = (id: GridRowId) => {
         let rows = tableOfValues;
         let filtered = rows.filter((element) => element.id === id.valueOf());
         if (filtered.length === 0) return null;
         return filtered[0];
-    };
-
-    const handleOpen = () => {
-        /// Limpar os campos do formulário
-        setTableOfValue(null);
-
-        setOpen(true);
     };
 
     const handleClickEdit = (id: GridRowId) => {
@@ -55,29 +58,26 @@ const TableOfValues = () => {
         if (found != -1) {
             setTableOfValues(newArray);
             await put(`/api/medical-procedure-costs/${id.valueOf()}`, {
-                ...newArray[found]
+                ...newArray[found],
+                status: newArray[found].status ? 1 : 0
             });
         }
     };
 
-    const fetchTableOfValues = async () => {
-        const response = await get('/api/medical-procedure-costs');
-        if (response.ok) {
-            const data = await response.result;
-            setTableOfValues(parseTableOfValues(data));
-        } else {
-            setError(response.message);
-        }
+    const handleOpen = () => {
+        /// Limpar os campos do formulário
+        setTableOfValue(null);
 
-        //TODO - REMOVE AFTER CONNECT API
-        if (true) {
-            setTableOfValues(getMockTableOfValues());
-        }
+        setOpen(true);
     };
 
-    const handleClose = () => {
+    const handleClose = (refresh = false) => {
         setOpen(false);
+        if (refresh) {
+            getTableOfValues();
+        }
     };
+
 
     return (
         <>
@@ -151,7 +151,7 @@ const TableOfValues = () => {
                         ]}
                     />
                 </Box>
-                <TableOfValueForm open={open} handleClose={handleClose} tableOfValue={tableOfValue} />
+                <TableOfValueForm open={open} handleClose={(refresh) => handleClose(refresh)} tableOfValue={tableOfValue} />
             </MainCard>
         </>
     );

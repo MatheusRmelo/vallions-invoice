@@ -27,15 +27,16 @@ type Props = {
     open: boolean,
     procedureCost: ProcedureCost | null,
     institutes: Institute[],
+    tableOfValueId: string | null,
     onClose: (procedureCost: ProcedureCost | null) => void,
 }
 
-const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, institutes }) => {
+const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, institutes, tableOfValueId }) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [procedure, setProcedure] = useState<Procedure | null>(null);
+    const [procedure, setProcedure] = useState<string>('');
     const [value, setValue] = useState('');
-    const [institute, setInstitute] = useState<Institute | null>(null);
+    const [institute, setInstitute] = useState<string>('');
     const [procedures, setProcedures] = useState<Procedure[]>([]);
 
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
@@ -45,11 +46,31 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
 
     useEffect(() => {
         getProcedures();
-    }, []);
+    }, [institute]);
 
+    useEffect(() => {
+        getProcedureCost();
+    }, [procedureCost, open]);
+
+    const getProcedureCost = () => {
+        if (procedureCost) {
+            setValue(procedureCost.valueProcedure.toString());
+            setStartDate(procedureCost.validatyStart ? new Date(procedureCost.validatyStart!).toISOString().split('T')[0] : '');
+            setEndDate(procedureCost.validatyEnd ? new Date(procedureCost.validatyEnd!).toISOString().split('T')[0] : '');
+            if (institutes.length > 0) {
+                setInstitute(institutes[0].id);
+            }
+            setProcedure(procedureCost.codProcedure);
+        } else {
+            setValue('');
+            setStartDate('');
+            setEndDate('');
+            setProcedure('');
+        }
+    }
 
     const getProcedures = async () => {
-        const response = await get('/api/billingProcedure?institution=2');
+        const response = await get(`/api/billingProcedure?institution=${institute}`);
         if (response.ok) {
             setProcedures(response.result.map((item: any) => parseProcedure(item)));
         } else {
@@ -73,12 +94,23 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
     }
 
     const handleCreateProcedureCost = async () => {
+        if (tableOfValueId == null) {
+            onClose({
+                codProcedure: procedure,
+                descriptionProcedure: getProcedureById(procedure)?.name ?? null,
+                id: Math.floor(Math.random() * 10000),
+                validatyStart: startDate,
+                validatyEnd: endDate,
+                valueProcedure: parseFloat(value),
+            });
+            return;
+        }
         const response = await post('/api/costs-has-procedures', {
             price: parseFloat(value),
-            billing_procedures_fk: procedure?.id,
-            medical_procedure_cost_fk: institute?.id,
-            date_start: startDate,
-            date_end: endDate
+            billing_procedures_fk: procedure,
+            medical_procedure_cost_fk: tableOfValueId,
+            initial_effective_date: startDate,
+            final_effective_date: endDate
         });
         if (response.ok) {
             onClose(response.result);
@@ -86,27 +118,15 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             setOpenErrorSnack(true);
             setMessageSnack(response.message);
         }
-
-        //TODO - REMOVE AFTER CONNECT API
-        if (true) {
-            onClose({
-                codProcedure: procedure!.id.toString(),
-                descriptionProcedure: procedure!.name,
-                id: 1,
-                validatyStart: startDate,
-                validatyEnd: endDate,
-                valueProcedure: parseFloat(value),
-            })
-        }
     };
 
     const handleEditProcedureCost = async () => {
         const response = await put(`/api/costs-has-procedures/${procedureCost!.id}`, {
             price: value,
-            billing_procedures_fk: procedure?.id,
-            medical_procedure_cost_fk: institute?.id,
-            date_start: startDate,
-            date_end: endDate
+            billing_procedures_fk: procedure,
+            medical_procedure_cost_fk: tableOfValueId,
+            initial_effective_date: startDate,
+            final_effective_date: endDate
         });
         if (response.ok) {
             onClose(null);
@@ -169,9 +189,9 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                             <Select
                                 labelId="institute-label"
                                 id="institute-select"
-                                value={institute?.id}
+                                value={institute}
                                 label="Instituição"
-                                onChange={(e) => setInstitute(getInstituteById(e.target.value as string))}
+                                onChange={(e) => setInstitute(e.target.value as string)}
                                 fullWidth
                                 IconComponent={ArrowDropDownIcon}
                             >
@@ -192,9 +212,9 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                             <Select
                                 labelId="procedure-label"
                                 id="procedure-select"
-                                value={procedure?.id}
+                                value={procedure}
                                 label="Procedimento"
-                                onChange={(e) => setProcedure(getProcedureById(e.target.value as string))}
+                                onChange={(e) => setProcedure(e.target.value as string)}
                                 fullWidth
                                 IconComponent={ArrowDropDownIcon}
                             >

@@ -26,13 +26,13 @@ import { DataGrid, GridCellParams } from '@mui/x-data-grid';
 import ImportOfProcedure from './ImportOfProcedure';
 import ProcedureCostForm from './ProcedureCostForm';
 import { TableOfValue } from 'types/tableOfValue';
-import { parseProcedureCosts, getProcedureCostsMock, ProcedureCost } from 'types/procedures_costs';
+import { parseProcedureCosts, getProcedureCostsMock, ProcedureCost, parseProcedureCost } from 'types/procedures_costs';
 
 import useAPI from 'hooks/useAPI';
 import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
 type TableOfValueFormProps = {
     open: boolean;
-    handleClose: () => void;
+    handleClose: (refresh: boolean) => void;
     tableOfValue: TableOfValue | null;
 };
 
@@ -47,7 +47,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         institute: null
     });
     const [description, setDescription] = useState('');
-    const [institute, setInstitute] = useState<Institute | null>(null);
+    const [institute, setInstitute] = useState<string>("");
     const [institutes, setInstitutes] = useState<Institute[]>([]);
     const [importOpen, setImportOpen] = useState(false);
     const [procedureOpen, setProcedureOpen] = useState(false);
@@ -56,28 +56,22 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<string>('');
 
-    const { get, post, put } = useAPI();
+    const { get, post, put, del } = useAPI();
 
     useEffect(() => {
         getInstitutes();
-    }, []);
-
+    }, [tableOfValue]);
 
     useEffect(() => {
         getTableOfValue();
-    }, [tableOfValue]);
+    }, [open]);
 
     const getProceduresCosts = async () => {
         const response = await get(`/api/costs-has-procedures?medicalProcedureCost=${tableOfValue?.id}`);
         if (response.ok) {
-            const data = await response.result;
-            setProceduresCosts(parseProcedureCosts(data));
+            setProceduresCosts(response.result.map(parseProcedureCost));
         } else {
             setError(response.message);
-        }
-
-        if (true) {
-            setProceduresCosts(getProcedureCostsMock());
         }
     }
 
@@ -85,60 +79,72 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
             setInstitutes(response.result.map(parseInstitute));
+            getTableOfValue();
         } else {
             setError(response.message);
         }
 
-        //TODO - REMOVE AFTER CONNECT API
-        if (true) {
-            setInstitutes(getMockInstitutes());
-        }
     };
 
     const getTableOfValue = () => {
         if (tableOfValue) {
+            var institute = institutes.filter((element) => element.name == tableOfValue.nickname);
             setDescription(tableOfValue.description);
-            setInstitute(tableOfValue.institute);
+            setInstitute(institute[0].id);
+            getProceduresCosts();
         } else {
             setDescription("");
-            setInstitute(null);
+            setInstitute("");
         }
     };
 
-    const getInstituteById = (id: string) => {
-        let rows = institutes;
-        let filtered = rows.filter((element) => element.id === id);
+    const getProcedureCostById = (id: number) => {
+        let rows = proceduresCosts;
+        let filtered = rows.filter((element) => element.id == id);
         if (filtered.length === 0) return null;
         return filtered[0];
     }
 
     const handleSave = async () => {
-        const intituteForeignKeyId = institute?.id;
+        const intituteForeignKeyId = institute;
         if (validate() && intituteForeignKeyId !== null) {
-            /// Salvando a tabela de valores
-            const response = await post('/api/medical-procedure-costs', {
-                description: description,
-                status: 1,
-                institution_fk: intituteForeignKeyId
-            });
-            if (response.ok) {
-                /// Vinculando os custos dos procedimentos a tabela de valores
-                const results = proceduresCosts.map(async (procedureCost) => {
-                    return post('/api/costs-has-procedures', {
-                        medical_procedure_cost_fk: response.result.id,
-                        billing_procedures_fk: procedureCost.id,
-                        price: procedureCost.valueProcedure,
-                        initial_effective_date: procedureCost.validatyStart,
-                        final_effective_date: procedureCost.validatyEnd
-                    });
+            if (tableOfValue != null) {
+                const response = await put(`/api/medical-procedure-costs/${tableOfValue.id}`, {
+                    description: description,
+                    status: 1,
+                    institution_fk: intituteForeignKeyId
                 });
-
-                const responseCost = await Promise.all(results);
-
-                if (responseCost.every((res) => res.ok)) {
-                    handleClose();
+                if (response.ok) {
+                    handleClose(true);
                 } else {
                     setError('Erro ao salvar os procedimentos');
+                }
+            } else {
+                /// Salvando a tabela de valores
+                const response = await post('/api/medical-procedure-costs', {
+                    description: description,
+                    status: 1,
+                    institution_fk: intituteForeignKeyId
+                });
+                if (response.ok) {
+                    /// Vinculando os custos dos procedimentos a tabela de valores
+                    const results = proceduresCosts.map(async (procedureCost) => {
+                        return post('/api/costs-has-procedures', {
+                            medical_procedure_cost_fk: response.result.id,
+                            billing_procedures_fk: procedureCost.codProcedure,
+                            price: procedureCost.valueProcedure,
+                            initial_effective_date: procedureCost.validatyStart,
+                            final_effective_date: procedureCost.validatyEnd
+                        });
+                    });
+
+                    const responseCost = await Promise.all(results);
+
+                    if (responseCost.every((res) => res.ok)) {
+                        handleClose(true);
+                    } else {
+                        setError('Erro ao salvar os procedimentos');
+                    }
                 }
             }
         }
@@ -150,11 +156,16 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     }
 
     const handleCloseProcedureCost = (procedureCost: ProcedureCost | null) => {
-        if (procedureCost) {
-            var newArray = [...proceduresCosts];
-            newArray.push(procedureCost!)
-            setProceduresCosts(newArray);
+        if (tableOfValue != null) {
+            getProceduresCosts();
+        } else {
+            if (procedureCost) {
+                var newArray = [...proceduresCosts];
+                newArray.push(procedureCost!)
+                setProceduresCosts(newArray);
+            }
         }
+
 
         setProcedureOpen(false);
     }
@@ -164,30 +175,29 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             const response = await put(`/api/medical-procedure-costs/${tableOfValue.id}`, {
                 description: description,
                 status: tableOfValue.status,
-                institution_fk: institute?.id
+                institution_fk: institute
             });
             if (response.ok) {
-                handleClose();
+                handleClose(false);
             } else {
                 setError(response.message);
             }
         }
     };
 
-    const handleUpdateProcedureCost = async (procedureCost: ProcedureCost) => {
-        const response = await put(`/api/costs-has-procedures/${procedureCost.id}`, {
-            billing_procedures_fk: procedureCost.id,
-            price: procedureCost.valueProcedure,
-            initial_effective_date: procedureCost.validatyStart,
-            final_effective_date: procedureCost.validatyEnd
-        });
-        if (response.ok) {
-            handleClose();
+    const handleDeleteProcedureCost = async (id: number) => {
+        if (tableOfValue == null) {
+            let newArray = [...proceduresCosts];
+            setProceduresCosts(newArray.filter((element) => element.id != id));
         } else {
-            setError(response.message);
+            const response = await del(`/api/costs-has-procedures/${id}`);
+            if (response.ok) {
+                getProceduresCosts();
+            } else {
+                setError(response.message);
+            }
         }
-    };
-
+    }
 
     const validate = () => {
         const newErrors = { ...errors };
@@ -207,60 +217,10 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         return !Object.values(newErrors).some((error) => error !== null);
     };
 
-    const columns = [
-        {
-            field: 'initDate',
-            headerName: 'Vigência Inicial',
-            renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Inicial</span>,
-            flex: 2
-        },
-        {
-            field: 'endDate',
-            headerName: 'Vigência Final',
-            flex: 2,
-            renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Final</span>
-        },
-        {
-            field: 'procedureCode',
-            headerName: 'Cód. Procedimento',
-            renderHeader: () => <span style={{ fontWeight: 'bold' }}>Cód. Procedimento</span>,
-            flex: 2
-        },
-        {
-            field: 'procedureDescription',
-            headerName: 'Descrição Procedimento',
-            renderHeader: () => <span style={{ fontWeight: 'bold' }}>Descrição Procedimento</span>,
-            flex: 3,
-
-            renderCell: (params: GridCellParams) => <span style={{ fontWeight: 'bold' }}>{params.value as string}</span>
-        },
-        { field: 'value', headerName: 'Valor Procedimento', flex: 4 },
-        {
-            field: 'Ações',
-            headerName: 'Ações',
-            flex: 1,
-            getActions: ({ id }: { id: number }) => {
-                return [
-                    <Edit
-                        color="primary"
-                        onClick={() => {
-                            setProcedureOpen(true);
-                        }}
-                    />,
-                    <Delete
-                        color="error"
-                        onClick={() => {
-                            console.log('Excluir');
-                        }}
-                    />
-                ];
-            }
-        }
-    ];
     return (
         <Dialog
             open={open}
-            onClose={handleClose}
+            onClose={() => handleClose(false)}
             maxWidth={false}
             fullWidth
             PaperProps={{
@@ -306,9 +266,10 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 <Select
                                     labelId="institute-label"
                                     id="institute-select"
-                                    value={institute?.id}
+                                    value={institute}
+                                    displayEmpty
                                     label="Instituição"
-                                    onChange={(e) => setInstitute(getInstituteById(e.target.value))}
+                                    onChange={(e) => setInstitute(e.target.value as string)}
                                     fullWidth
                                     IconComponent={ArrowDropDownIcon}
                                     sx={selectStyles}
@@ -375,7 +336,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 .filter((procedureCost) => {
                                     return (
                                         filter.length === 0 ||
-                                        procedureCost.descriptionProcedure.toLowerCase().includes(filter.toLowerCase()) ||
+                                        procedureCost.descriptionProcedure?.toLowerCase().includes(filter.toLowerCase()) ||
                                         procedureCost.codProcedure.toLowerCase().includes(filter.toLowerCase())
                                     );
                                 })
@@ -387,7 +348,63 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                     procedureDescription: procedureCost.descriptionProcedure,
                                     value: procedureCost.valueProcedure
                                 }))}
-                            columns={columns}
+                            columns={[
+                                {
+                                    field: 'initDate',
+                                    headerName: 'Vigência Inicial',
+                                    renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Inicial</span>,
+                                    flex: 2,
+                                    minWidth: 150,
+                                },
+                                {
+                                    field: 'endDate',
+                                    headerName: 'Vigência Final',
+                                    flex: 2, minWidth: 150,
+                                    renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Final</span>
+                                },
+                                {
+                                    field: 'procedureCode',
+                                    headerName: 'Cód. Procedimento',
+                                    renderHeader: () => <span style={{ fontWeight: 'bold' }}>Cód. Procedimento</span>,
+                                    flex: 2,
+                                    minWidth: 150,
+                                },
+                                {
+                                    field: 'procedureDescription',
+                                    headerName: 'Descrição Procedimento',
+                                    renderHeader: () => <span style={{ fontWeight: 'bold' }}>Descrição Procedimento</span>,
+                                    flex: 3,
+                                    minWidth: 150,
+                                    renderCell: (params: GridCellParams) => <span style={{ fontWeight: 'bold' }}>{params.value as string}</span>
+                                },
+                                { field: 'value', headerName: 'Valor Procedimento', flex: 4 },
+                                {
+                                    field: 'actions',
+                                    headerName: 'Ações',
+                                    flex: 1,
+                                    minWidth: 150,
+                                    cellClassName: 'actions',
+                                    type: 'actions',
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Ações</strong>,
+                                    getActions: ({ id }) => {
+                                        return [
+                                            <Edit
+                                                color="primary"
+                                                onClick={() => {
+                                                    setProcedureCost(getProcedureCostById(id.valueOf() as number));
+                                                    setProcedureOpen(true);
+                                                }}
+                                            />,
+                                            <Delete
+                                                color="error"
+                                                onClick={() => {
+                                                    handleDeleteProcedureCost(id.valueOf() as number);
+                                                }}
+                                            />
+                                        ];
+                                    }
+                                }
+                            ]}
                         />
                     )}
                 </DialogContent>
@@ -400,7 +417,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                             fontWeight: 'bold',
                             fontSize: '1.5vh'
                         }}
-                        onClick={handleClose}
+                        onClick={() => handleClose(false)}
                         color="primary"
                     >
                         Fechar
@@ -426,6 +443,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     procedureCost={procedureCost}
                     institutes={institutes}
                     open={procedureOpen}
+                    tableOfValueId={tableOfValue ? tableOfValue.id.toString() : null}
                     onClose={handleCloseProcedureCost} />
             </form>
         </Dialog>

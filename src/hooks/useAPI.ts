@@ -39,7 +39,7 @@ function useAPI() {
             return {
                 message: result.data.message,
                 ok: true,
-                result: result.data.result
+                result: result.data
             };
         } catch (err: any) {
             return {
@@ -60,7 +60,7 @@ function useAPI() {
             return {
                 message: result.data.message,
                 ok: true,
-                result: result.data.result
+                result: result.data
             };
         } catch (err: any) {
             return {
@@ -81,7 +81,7 @@ function useAPI() {
             return {
                 message: result.data.message,
                 ok: true,
-                result: result.data.result
+                result: result.data
             };
         } catch (err: any) {
             return {
