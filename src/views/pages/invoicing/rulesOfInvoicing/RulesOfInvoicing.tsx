@@ -1,6 +1,6 @@
 import React from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import Search from '@mui/icons-material/Search';
 import { DataGrid } from '@mui/x-data-grid';
@@ -9,16 +9,27 @@ import AddIcon from '@mui/icons-material/Add';
 import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
 import useAPI from 'hooks/useAPI';
-import { RuleBilling, parseRuleBillingList, generateMockRuleBilling } from 'types/rules_billing';
+import { RuleBilling, parseRuleBillingList } from 'types/rules_billing';
 import RulesOfInvoicingForm from './RulesOfInvoicingForm';
+import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 const RulesOfInvoicing = () => {
     const [open, setOpen] = React.useState(false);
     const { get } = useAPI();
     const [rules, setRules] = React.useState<RuleBilling[]>([]);
     const [rule, setRule] = React.useState<RuleBilling | undefined>(undefined);
+    const [loading, setLoading] = React.useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
+    const [openSucessSnack, setOpenSucessSnack] = React.useState(false);
+    const [messageSnack, setMessageSnack] = React.useState('');
+
     const handleOpen = () => {
         setOpen(true);
+    };
+
+    const handleCloseSnack = () => {
+        setOpenErrorSnack(false);
+        setOpenSucessSnack(false);
     };
 
     const handleClose = () => {
@@ -26,19 +37,17 @@ const RulesOfInvoicing = () => {
     };
 
     const fetchBillingRules = async () => {
+        setLoading(true);
         const response = await get('/api/billing-rules');
         if (response.ok) {
             const data = response.result;
             const rules = parseRuleBillingList(data);
             setRules(rules);
         } else {
-            ///Tratamento de erro
-            console.error('Error fetching billing rules');
+            setMessageSnack('Erro' + response.message);
+            setOpenErrorSnack(true);
         }
-        /// Remover
-        if (true) {
-            setRules(generateMockRuleBilling());
-        }
+        setLoading(false);
     };
 
     const getRuleById = (id: number): RuleBilling | undefined => {
@@ -71,59 +80,67 @@ const RulesOfInvoicing = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    <DataGrid
-                        disableRowSelectionOnClick
-                        rows={rules.map((rule) => ({
-                            id: rule.id,
-                            rulesDescription: rule.rulesDescription,
-                            institution: rule.institution,
-                            unity: rule.unity,
-                            status: rule.status
-                        }))}
-                        columns={[
-                            { field: 'rulesDescription', minWidth: 150, headerName: 'Descrição Regra', flex: 2 },
-                            { field: 'institution', minWidth: 150, headerName: 'Instituição', flex: 3 },
-                            { field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1 },
-                            {
-                                field: 'actions',
-                                minWidth: 150,
+                    {loading ? (
+                        <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : (
+                        <DataGrid
+                            disableRowSelectionOnClick
+                            rows={rules.map((rule) => ({
+                                id: rule.id,
+                                rulesDescription: rule.rulesDescription,
+                                institution: rule.institution,
+                                unity: rule.unity,
+                                status: rule.status
+                            }))}
+                            columns={[
+                                { field: 'rulesDescription', minWidth: 150, headerName: 'Descrição Regra', flex: 2 },
+                                { field: 'institution', minWidth: 150, headerName: 'Instituição', flex: 3 },
+                                { field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1 },
+                                {
+                                    field: 'actions',
+                                    minWidth: 150,
 
-                                headerName: 'Editar',
-                                flex: 1,
-                                renderCell: (params) => (
-                                    <Box display="flex" justifyContent="center">
-                                        <Edit
-                                            onClick={() => {
-                                                setRule(getRuleById(params.row.id));
-                                                handleOpen();
-                                            }}
-                                            style={{
-                                                fontSize: '2.5vh',
-                                                marginBottom: '1vh',
-                                                color: 'rgba(103, 58, 183, 1)'
-                                            }}
+                                    headerName: 'Editar',
+                                    flex: 1,
+                                    renderCell: (params) => (
+                                        <Box display="flex" justifyContent="center">
+                                            <Edit
+                                                onClick={() => {
+                                                    setRule(getRuleById(params.row.id));
+                                                    handleOpen();
+                                                }}
+                                                style={{
+                                                    fontSize: '2.5vh',
+                                                    marginBottom: '1vh',
+                                                    color: 'rgba(103, 58, 183, 1)'
+                                                }}
+                                            />
+                                        </Box>
+                                    )
+                                },
+                                {
+                                    field: 'status',
+                                    minWidth: 150,
+
+                                    headerName: 'Inativo/Ativo',
+                                    flex: 1,
+                                    renderCell: (params) => (
+                                        <Switch
+                                            checked={params.value === '1'}
+                                            color="primary"
+                                            inputProps={{ 'aria-label': 'primary checkbox' }}
                                         />
-                                    </Box>
-                                )
-                            },
-                            {
-                                field: 'status',
-                                minWidth: 150,
-
-                                headerName: 'Inativo/Ativo',
-                                flex: 1,
-                                renderCell: (params) => (
-                                    <Switch
-                                        checked={params.value === '1'}
-                                        color="primary"
-                                        inputProps={{ 'aria-label': 'primary checkbox' }}
-                                    />
-                                )
-                            }
-                        ]}
-                    />
+                                    )
+                                }
+                            ]}
+                        />
+                    )}
                 </Box>
                 <RulesOfInvoicingForm open={open} onClose={handleClose} ruleEdit={rule} />
+                <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
+                <SnackBarAlert open={openSucessSnack} message={messageSnack} severity="success" onClose={handleCloseSnack} />
             </MainCard>
         </>
     );

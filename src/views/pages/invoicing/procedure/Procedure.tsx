@@ -3,7 +3,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import Search from '@mui/icons-material/Search';
 import Edit from '@mui/icons-material/Edit';
 import { Box, CircularProgress, SnackbarCloseReason } from '@mui/material';
-import { DataGrid, GridActionsCellItem, GridColDef, GridRowId } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridRowId } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
@@ -11,9 +11,7 @@ import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
 import useAPI from 'hooks/useAPI';
 import { Procedure, parseProcedure } from 'types/procedure';
-import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ThemeMode } from 'types/config';
 import useConfig from 'hooks/useConfig';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 
@@ -32,21 +30,28 @@ const ProcedureView = () => {
     useEffect(() => {
         getProcedures();
     }, []);
-
     const getProcedures = async () => {
         setLoading(true);
 
-        const response = await get('/api/billingProcedure?institution=2');
-        if (response.ok) {
-            setData(response.result.map((item: any) => parseProcedure(item)));
+        const response = await get('/api/billingProcedure?institution=1');
+        if (response.ok && Array.isArray(response.result)) {
+            let procedures: Procedure[] = response.result.map((item: any) => parseProcedure(item));
+            let reqsModalities = procedures.map((procedure) => get(`/api/billingProcedure/${procedure.id}`));
+            let modalities = await Promise.all(reqsModalities);
+            procedures = procedures.map((procedure, index) => ({
+                ...procedure,
+                modalities: modalities[index].result.modalities.map((modality: any) => modality.modality)
+            }));
+            console.log(procedures);
+
+            setData(procedures);
         } else {
             setOpenErrorSnack(true);
-            setMessageSnack(response.message);
+            setMessageSnack(response.message || 'Erro ao buscar procedimentos');
         }
 
         setLoading(false);
     };
-
     const getProcedureById = (id: GridRowId) => {
         let filtered = data.filter((element) => element.id === id.valueOf());
         if (filtered.length === 0) return null;
@@ -162,7 +167,7 @@ const ProcedureView = () => {
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
                                 },
                                 {
-                                    field: 'billing_procedures_fk',
+                                    field: 'modalities',
                                     headerName: 'Modalidade',
                                     flex: 1,
                                     minWidth: 150,
@@ -188,20 +193,7 @@ const ProcedureView = () => {
                                         ];
                                     }
                                 },
-                                {
-                                    type: 'actions',
-                                    field: 'status',
-                                    headerName: 'Inativo/Ativo',
-                                    flex: 1,
-                                    minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
-                                    getActions: ({ id }) => {
-                                        let procedure = getProcedureById(id);
-                                        return [
-                                            <Switch checked={procedure?.status ?? false} onChange={(value) => handleChangeStatus(id)} />
-                                        ];
-                                    }
-                                },
+
                                 {
                                     type: 'actions',
                                     field: 'status',

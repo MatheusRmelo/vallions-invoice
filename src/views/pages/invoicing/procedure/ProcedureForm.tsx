@@ -123,8 +123,9 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         if (procedureEdit) {
             setDescription(procedureEdit.name);
             setCode(procedureEdit.code);
-            setInstitute(procedureEdit.institutions_fk.split(''));
-            setModality(procedureEdit.billing_procedures_fk.split(''));
+            setInstitute(procedureEdit.institution_fk?.split('') || []);
+            console.log(procedureEdit);
+            setModality(procedureEdit.modalities || []);
         } else {
             setDescription('');
             setCode('');
@@ -213,7 +214,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                                     labelId="institute-label"
                                     id="institute-select"
                                     multiple
-                                    value={institute}
+                                    value={Array.isArray(institute) ? institute : []}
                                     label="Instituição"
                                     onChange={(e) => setInstitute(e.target.value as string[])}
                                     fullWidth
@@ -238,7 +239,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                                     id="modality-select"
                                     label="Modalidade"
                                     multiple
-                                    value={modality}
+                                    value={Array.isArray(modality) ? modality : []}
                                     onChange={(e) => setModality(e.target.value as string[])}
                                     fullWidth
                                     sx={selectStyles}

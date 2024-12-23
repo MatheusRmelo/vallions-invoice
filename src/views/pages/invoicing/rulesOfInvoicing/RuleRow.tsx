@@ -7,12 +7,12 @@ import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/ta
 import { RuleType } from './types/RuleType';
 
 interface RuleRowProps {
-    rule: RuleType,
+    rule: RuleType;
     setRule: (value: RuleType) => void;
-    onDelete: () => void,
+    onDelete: () => void;
 
-    tags: Tag[],
-    tableOfValues: TableOfValue[],
+    tags: Tag[];
+    tableOfValues: TableOfValue[];
 }
 
 const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, onDelete }) => {
@@ -30,7 +30,6 @@ const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, o
                         onChange={(event) => {
                             const selectedTableOfValue = tableOfValues.find((tov) => tov.id === event.target.value);
                             setRule({ ...rule, tableOfValues: selectedTableOfValue });
-
                         }}
                         label="Tabela de Valores"
                         variant="outlined"
@@ -92,7 +91,6 @@ const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, o
                         onChange={(event) => {
                             const selectedTag = tags.find((t) => t.id === event.target.value);
                             setRule({ ...rule, tag: selectedTag || undefined });
-
                         }}
                     >
                         {tags.map((tag) => (
@@ -108,7 +106,6 @@ const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, o
                     <IconButton onClick={onDelete}>
                         <Delete />
                     </IconButton>
-
                 </Box>
             </Grid>
         </Grid>
