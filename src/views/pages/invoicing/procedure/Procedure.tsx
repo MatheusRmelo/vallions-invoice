@@ -3,7 +3,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import Search from '@mui/icons-material/Search';
 import Edit from '@mui/icons-material/Edit';
 import { Box, CircularProgress, SnackbarCloseReason } from '@mui/material';
-import { DataGrid, GridActionsCellItem, GridColDef, GridRowId } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridRowId } from '@mui/x-data-grid';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Switch from '@mui/material/Switch';
@@ -11,9 +11,7 @@ import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import ProcedureForm from './ProcedureForm';
 import useAPI from 'hooks/useAPI';
 import { Procedure, parseProcedure } from 'types/procedure';
-import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ThemeMode } from 'types/config';
 import useConfig from 'hooks/useConfig';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 

@@ -1,5 +1,5 @@
 export type RuleBilling = {
-    id: number;
+    id: number | null;
     rulesDescription: string;
     institution: string;
     unity: string;
@@ -18,6 +18,15 @@ export function parseRuleBilling(data: any): RuleBilling {
 
 export function parseRuleBillingList(data: any): RuleBilling[] {
     return data.map(parseRuleBilling);
+}
+
+export function toJSONRuleBilling(data: RuleBilling): any {
+    return {
+        description: data.rulesDescription,
+        institution_fk: data.institution,
+        branch_fk: data.unity,
+        status: data.status
+    };
 }
 
 export function generateMockRuleBilling(): RuleBilling[] {
