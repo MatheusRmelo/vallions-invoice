@@ -15,9 +15,12 @@ interface RuleRowProps {
     tableOfValues: TableOfValue[];
 }
 
-const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, onDelete }) => {
-    const typeCharge = ['FIXO', 'PERCENTUAL'];
+enum TypeChargeEnum {
+    FIXED = 'FIXO',
+    PERCENTAGE = 'PERCENTUAL'
+}
 
+const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, onDelete }) => {
     return (
         <Grid container spacing={1} alignItems="center">
             <Grid item xs={12} sm={3}>
@@ -57,11 +60,12 @@ const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, o
                         variant="outlined"
                         sx={{ mb: 2 }}
                     >
-                        {typeCharge.map((type) => (
-                            <MenuItem key={type} value={type}>
-                                {type}
-                            </MenuItem>
-                        ))}
+                        <MenuItem key={'fixed'} value={'fixed'}>
+                            {'FIXO'}
+                        </MenuItem>
+                        <MenuItem key={'percentage'} value={'percentage'}>
+                            {'PORCENTAGEM'}
+                        </MenuItem>
                     </Select>
                 </FormControl>
             </Grid>

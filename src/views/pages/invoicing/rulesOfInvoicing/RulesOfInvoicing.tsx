@@ -9,13 +9,13 @@ import AddIcon from '@mui/icons-material/Add';
 import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
 import useAPI from 'hooks/useAPI';
-import { RuleBilling, parseRuleBillingList } from 'types/rules_billing';
+import { RuleBilling, parseRuleBillingList, toJSONRuleBilling } from 'types/rules_billing';
 import RulesOfInvoicingForm from './RulesOfInvoicingForm';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 const RulesOfInvoicing = () => {
     const [open, setOpen] = React.useState(false);
-    const { get } = useAPI();
+    const { get, put } = useAPI();
     const [rules, setRules] = React.useState<RuleBilling[]>([]);
     const [rule, setRule] = React.useState<RuleBilling | undefined>(undefined);
     const [loading, setLoading] = React.useState(false);
@@ -54,6 +54,20 @@ const RulesOfInvoicing = () => {
         return rules.find((rule) => rule.id === id);
     };
 
+    const updateStatusRule = async (rule: RuleBilling) => {
+        const reqCore = await put(`/api/billing-rules/${rule.id}/status`, {
+            status: rule.status === 1 ? 0 : 1
+        });
+        if (reqCore.ok) {
+            fetchBillingRules();
+            setMessageSnack('Status da Regra de faturamento atualizada com sucesso');
+            setOpenSucessSnack(true);
+        } else {
+            setMessageSnack('Erro ao atualizar situação regra de faturamento');
+            setOpenErrorSnack(true);
+        }
+    };
+
     React.useEffect(() => {
         fetchBillingRules();
     }, []);
@@ -90,25 +104,24 @@ const RulesOfInvoicing = () => {
                             rows={rules.map((rule) => ({
                                 id: rule.id,
                                 rulesDescription: rule.rulesDescription,
-                                institution: rule.institution,
+                                institution: '',
                                 unity: rule.unity,
                                 status: rule.status
                             }))}
                             columns={[
-                                { field: 'rulesDescription', minWidth: 150, headerName: 'Descrição Regra', flex: 2 },
-                                { field: 'institution', minWidth: 150, headerName: 'Instituição', flex: 3 },
+                                { field: 'rulesDescription', minWidth: 150, headerName: 'Descrição Regra', flex: 1 },
+                                { field: 'institution', minWidth: 150, headerName: 'Instituição', flex: 1 },
                                 { field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1 },
                                 {
                                     field: 'actions',
                                     minWidth: 150,
-
                                     headerName: 'Editar',
                                     flex: 1,
                                     renderCell: (params) => (
                                         <Box display="flex" justifyContent="center">
                                             <Edit
                                                 onClick={() => {
-                                                    setRule(getRuleById(params.row.id));
+                                                    setRule(getRuleById(params.row.id as number));
                                                     handleOpen();
                                                 }}
                                                 style={{
@@ -123,12 +136,14 @@ const RulesOfInvoicing = () => {
                                 {
                                     field: 'status',
                                     minWidth: 150,
-
                                     headerName: 'Inativo/Ativo',
                                     flex: 1,
                                     renderCell: (params) => (
                                         <Switch
-                                            checked={params.value === '1'}
+                                            checked={params.value === 1}
+                                            onChange={() => {
+                                                updateStatusRule(getRuleById(params.row.id as number) as RuleBilling);
+                                            }}
                                             color="primary"
                                             inputProps={{ 'aria-label': 'primary checkbox' }}
                                         />

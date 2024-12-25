@@ -25,6 +25,7 @@ import { generateMockTag, parseTagList, Tag } from 'types/tag';
 import RuleRow from './RuleRow';
 import AddRule from './AddRuleRow';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
+import { Unity, parseUnityList } from 'types/unity';
 
 interface Props {
     open: boolean;
@@ -43,9 +44,10 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     const [rulesAddition, setRulesAddition] = useState<RuleAdittion[]>([]);
     const [description, setDescription] = useState<string>('');
     const [institution, setInstitution] = useState<Institute | undefined>(undefined);
-    const [unit, setUnit] = useState<string | undefined>(undefined);
+    const [unit, setUnit] = useState<Unity | undefined>(undefined);
+    const [unities, setUnities] = useState<Unity[]>([]);
     const [loading, setLoading] = React.useState(false);
-
+    const [idRules, setIdRules] = React.useState('');
     const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
     const [openSucessSnack, setOpenSucessSnack] = React.useState(false);
     const [messageSnack, setMessageSnack] = React.useState('');
@@ -67,10 +69,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         } else {
             setError('Não foi possível carregar as tags.' + response.message);
         }
-        /// Remover
-        if (true) {
-            setTags(generateMockTag());
-        }
     };
 
     const fetchTableOfValues = async () => {
@@ -81,7 +79,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         } else {
             setError('Não foi possível carregar a tabela de valores.' + response.message);
         }
-
     };
 
     /// Init State
@@ -91,13 +88,33 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         fetchTableOfValues();
     }, []);
 
+    // use Effect para ser executado ao abrir o dialog
+    useEffect(() => {
+        console.log('RuleEdit: ' + ruleEdit?.id + ' ' + ruleEdit?.rulesDescription + ' ' + ruleEdit?.unity);
+
+        if (ruleEdit) {
+            setIdRules(ruleEdit.id?.toString() || '');
+            setDescription(ruleEdit.rulesDescription);
+            setUnit({ name: ruleEdit.unity });
+            setRules([]);
+            setRulesAddition([]);
+        } else {
+            setIdRules('');
+            setDescription('');
+            setUnit(undefined);
+            setRules([]);
+            setRulesAddition([]);
+        }
+    }, [ruleEdit]);
+
     const handleClickAddRule = () => {
         var newRules = [...rules];
         newRules.push({
             type: '',
             value: '',
             tableOfValues: undefined,
-            tag: undefined
+            tag: undefined,
+            id: undefined
         });
         console.log(newRules);
         setRules(newRules);
@@ -109,13 +126,25 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             levelPriority: '0',
             tableOfValues: undefined,
             type: '',
-            value: ''
+            value: '',
+            id: undefined
         });
 
         console.log(newRules);
         setRulesAddition(newRules);
     };
-
+    const fetchUnity = async () => {
+        //mock
+        const response = await get(`/api/branchAccessUsersIntitution?institution=${institution?.id_institution}`);
+        console.log(response);
+        if (response.ok) {
+            const unities = parseUnityList(response.result);
+            console.log(unities);
+            setUnities(unities);
+        } else {
+            setError('Não foi possível carregar as unidades.' + response.message);
+        }
+    };
     const handleCloseSnack = () => {
         setOpenErrorSnack(false);
         setOpenSucessSnack(false);
@@ -125,16 +154,19 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         setOpenErrorSnack(true);
     }, [error]);
 
+    useEffect(() => {
+        if (institution) fetchUnity();
+    }, [institution]);
     const saveRules = async () => {
         const rulesBilling: RuleBilling = {
             id: null,
             rulesDescription: description,
-            institution: institution?.id || '',
-            unity: unit || '',
-            status: '1'
+            unity: unit?.cd_unidade || '',
+            status: 1
         };
         const reqCore = await post('/api/billing-rules', toJSONRuleBilling(rulesBilling));
         const reqId = reqCore.result.id;
+        setIdRules(reqId);
         if (reqCore.ok) {
             const reqsRulesBillingsRaw = rules.map((e) =>
                 post('/api/billing-rule-goals', {
@@ -146,6 +178,56 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                 })
             );
             const reqsRulesPriorityRaw = rulesAddition.map((e) =>
+                post('/api/priority-billing-rules', {
+                    priority: e.levelPriority,
+                    type: e.type,
+                    value: e.value,
+                    medical_procedure_cost_fk: e.tableOfValues?.id,
+                    billing_rule_fk: reqId
+                })
+            );
+            console.log(reqsRulesBillingsRaw);
+            const reqsRulesBillings = await Promise.all(reqsRulesBillingsRaw);
+            const reqsRulesPriority = await Promise.all(reqsRulesPriorityRaw);
+
+            if (reqsRulesBillings.every((e) => e.ok) && reqsRulesPriority.every((e) => e.ok)) {
+                onClose();
+                setOpenSucessSnack(true);
+                setMessageSnack('Regras de faturamento salvas com sucesso!');
+                setError(undefined);
+            } else {
+                const error: string[] = reqsRulesBillings
+                    .concat(reqsRulesPriority)
+                    .filter((e) => !e.ok)
+                    .map((e) => e.message);
+                setError('Falha ao salvar às Regras de faturamento: ' + error.join(', '));
+            }
+        } else {
+            setError('Falha ao salvar às Regras de faturamento');
+        }
+    };
+
+    const editRules = async () => {
+        const rulesBilling: RuleBilling = {
+            id: ruleEdit?.id || null,
+            rulesDescription: description,
+            unity: unit?.name || '',
+            status: ruleEdit?.status || 1
+        };
+        console.log('Regras de faturamento: ' + rulesBilling);
+        const reqCore = await put('/api/billing-rules', toJSONRuleBilling(rulesBilling));
+        const reqId = reqCore.result.id;
+        if (reqCore.ok) {
+            const reqsRulesBillingsRaw = rules.map((e) =>
+                post('/api/billing-rule-goals', {
+                    type: e.type,
+                    value: e.value,
+                    medical_procedure_cost_fk: e.tableOfValues?.id,
+                    billing_rule_fk: reqId,
+                    tag_fk: `${e.tag?.id}`
+                })
+            );
+            const reqsRulesPriorityRaw = rulesAddition.map((e) =>
                 post('/api/billing-rule-priority', {
                     priority: e.levelPriority,
                     type: e.type,
@@ -154,6 +236,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                     billing_rule_fk: reqId
                 })
             );
+            console.log(reqsRulesBillingsRaw);
             const reqsRulesBillings = await Promise.all(reqsRulesBillingsRaw);
             const reqsRulesPriority = await Promise.all(reqsRulesPriorityRaw);
 
@@ -172,13 +255,14 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     };
 
     return (
-        <form
-            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-                console.log('Click submit');
-                event.preventDefault();
-                saveRules();
-            }}
-        >
+        // <form
+        //     onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+        //         console.log('submit');
+        //         event.preventDefault();
+        //         saveRules();
+        //     }}
+        // >
+        <>
             <Dialog
                 open={open}
                 onClose={onClose}
@@ -211,7 +295,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             <Box mt={'6vh'} />
                             <Grid container spacing={2}>
                                 <Grid item xs={2}>
-                                    <TextField fullWidth id="idRules" label="ID Regra" variant="outlined" sx={{ mb: 2 }} />
+                                    <TextField value={idRules} fullWidth id="idRules" label="ID Regra" variant="outlined" sx={{ mb: 2 }} />
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
@@ -234,12 +318,15 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                             variant="outlined"
                                             sx={{ mb: 2 }}
                                             onChange={(event) => {
-                                                const institute = institutes.find((institute) => institute.id === event.target.value);
+                                                const institute = institutes.find(
+                                                    (institute) => institute.id_institution === event.target.value
+                                                );
                                                 setInstitution(institute);
+                                                fetchUnity();
                                             }}
                                         >
                                             {institutes.map((institution) => (
-                                                <MenuItem key={institution.id} value={institution.id}>
+                                                <MenuItem key={institution.id_institution} value={institution.id_institution}>
                                                     {institution.name}
                                                 </MenuItem>
                                             ))}
@@ -247,22 +334,23 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={3}>
-                                    {/* Não Há get de unidade */}
                                     <FormControl fullWidth>
-                                        <InputLabel id="institute-label">Unidade</InputLabel>
+                                        <InputLabel id="unity-label">Unidade</InputLabel>
                                         <Select
                                             fullWidth
                                             id="unidade"
                                             label="Unidade"
                                             variant="outlined"
                                             sx={{ mb: 2 }}
+                                            disabled={!institution || unities.length === 0}
                                             onChange={(event) => {
-                                                setUnit(event.target.value as string);
+                                                const unit: Unity | undefined = unities.find((unit) => unit.name === event.target.value);
+                                                setUnit(unit!);
                                             }}
                                         >
-                                            {institutes.map((institution) => (
-                                                <MenuItem key={institution.id} value={institution.id}>
-                                                    {institution.name}
+                                            {unities.map((unity) => (
+                                                <MenuItem key={unity.name} value={unity.name}>
+                                                    {unity.name}
                                                 </MenuItem>
                                             ))}
                                         </Select>
@@ -366,7 +454,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             <Button
                                 size="large"
                                 variant="contained"
-                                type="submit"
+                                onClick={() => {
+                                    saveRules();
+                                }}
                                 sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}
                             >
                                 Salvar
@@ -377,7 +467,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             </Dialog>
             <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
             <SnackBarAlert open={openSucessSnack} message={messageSnack} severity="success" onClose={handleCloseSnack} />
-        </form>
+        </>
+        // </form>
     );
 };
 

@@ -14,8 +14,7 @@ interface AddRuleProps {
 }
 
 const AddRule: React.FC<AddRuleProps> = ({ rule, tableOfValues, setRule, onDelete }) => {
-    const typeCharge = ['FIXO', 'PERCENTUAL'];
-    const levelPriorityList = ['NIVEL 5', 'NIVEL 4', 'NIVEL 3', 'NIVEL 2', 'NIVEL 1'];
+    const levelPriorityList = ['5', '4', '3', '2', '1'];
     return (
         <Grid container spacing={1} alignItems="center">
             <Grid item xs={12} sm={2}>
@@ -35,7 +34,7 @@ const AddRule: React.FC<AddRuleProps> = ({ rule, tableOfValues, setRule, onDelet
                     >
                         {levelPriorityList.map((levelPriority) => (
                             <MenuItem key={levelPriority} value={levelPriority}>
-                                {levelPriority}
+                                {`NIVEL ${levelPriority}`}
                             </MenuItem>
                         ))}
                     </Select>
@@ -78,11 +77,12 @@ const AddRule: React.FC<AddRuleProps> = ({ rule, tableOfValues, setRule, onDelet
                         variant="outlined"
                         sx={{ mb: 2 }}
                     >
-                        {typeCharge.map((type) => (
-                            <MenuItem key={type} value={type}>
-                                {type}
-                            </MenuItem>
-                        ))}
+                        <MenuItem key={'fixed'} value={'fixed'}>
+                            {'FIXO'}
+                        </MenuItem>
+                        <MenuItem key={'percentage'} value={'percentage'}>
+                            {'PORCENTAGEM'}
+                        </MenuItem>
                     </Select>
                 </FormControl>
             </Grid>
