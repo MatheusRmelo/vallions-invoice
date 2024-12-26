@@ -364,6 +364,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         id="rulesDescription"
                                         label="Descrição da Regra de Faturamento"
                                         variant="outlined"
+                                        value={description}
                                         onChange={(event) => setDescription(event.target.value)}
                                         sx={{ mb: 2 }}
                                     />
@@ -403,7 +404,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                             label="Unidade"
                                             variant="outlined"
                                             sx={{ mb: 2 }}
-                                            disabled={!institution || unities.length === 0}
+                                            value={unit?.name}
+                                            disabled={(!institution || unities.length === 0) && unit === undefined}
                                             onChange={(event) => {
                                                 const unit: Unity | undefined = unities.find((unit) => unit.name === event.target.value);
                                                 setUnit(unit!);
