@@ -35,7 +35,7 @@ interface Props {
 }
 
 const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
-    const { get, post, put } = UseAPI();
+    const { get, post, put, del } = UseAPI();
 
     const [institutes, setInstitutes] = useState<Institute[]>([]);
     const [error, setError] = useState<string | undefined>(undefined);
@@ -187,6 +187,28 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     const handleCloseSnack = () => {
         setOpenErrorSnack(false);
         setOpenSucessSnack(false);
+    };
+
+    const deleteRule = async (index: number) => {
+        const req = await del(`/api/billing-rule-goals/${rules[index].id}`);
+        if (req.ok) {
+            let newArray = [...rules];
+            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+            setRules(newArray);
+        } else {
+            setError('Falha ao deletar a regra de faturamento.');
+        }
+    };
+
+    const deleteRuleAddition = async (index: number) => {
+        const req = await del(`/api/priority-billing-rules/${rulesAddition[index].id}`);
+        if (req.ok) {
+            let newArray = [...rulesAddition];
+            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+            setRulesAddition(newArray);
+        } else {
+            setError('Falha ao deletar a regra de faturamento.');
+        }
     };
 
     useEffect(() => {
@@ -432,9 +454,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         setRules(newArray);
                                     }}
                                     onDelete={() => {
-                                        let newArray = [...rules];
-                                        newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
-                                        setRules(newArray);
+                                        deleteRule(index);
                                     }}
                                 />
                             ))}
@@ -475,9 +495,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         setRulesAddition(newArray);
                                     }}
                                     onDelete={() => {
-                                        let newArray = [...rulesAddition];
-                                        newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
-                                        setRulesAddition(newArray);
+                                        deleteRuleAddition(index);
                                     }}
                                 />
                             ))}
