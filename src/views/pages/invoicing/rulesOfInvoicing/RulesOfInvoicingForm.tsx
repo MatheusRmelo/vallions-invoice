@@ -102,14 +102,21 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             if (ruleEdit.id !== null) {
                 fetchDetailsRule(ruleEdit.id);
             }
-        } else {
+        }
+    }, [ruleEdit]);
+
+    useEffect(() => {
+        console.log('here' + open + ' ' + ruleEdit);
+
+        if (open && !ruleEdit) {
             setIdRules('');
             setDescription('');
             setUnit(undefined);
             setRules([]);
             setRulesAddition([]);
         }
-    }, [ruleEdit]);
+    }, [open]);
+
     const fetchDetailsRule = async (id: Number) => {
         const response = await get(`/api/billing-rules/${id}`);
         if (response.ok) {

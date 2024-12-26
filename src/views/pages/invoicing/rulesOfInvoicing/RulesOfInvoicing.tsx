@@ -78,7 +78,16 @@ const RulesOfInvoicing = () => {
                 <Box display="flex" justifyContent="space-between">
                     <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
 
-                    <Fab size="small" color="primary" aria-label="add" onClick={handleOpen}>
+                    <Fab
+                        size="small"
+                        color="primary"
+                        aria-label="add"
+                        onClick={() => {
+                            setRule(undefined);
+
+                            handleOpen();
+                        }}
+                    >
                         <AddIcon />
                     </Fab>
                 </Box>
