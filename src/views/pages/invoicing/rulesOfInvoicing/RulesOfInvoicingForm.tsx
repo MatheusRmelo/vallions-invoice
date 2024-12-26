@@ -26,6 +26,7 @@ import RuleRow from './RuleRow';
 import AddRule from './AddRuleRow';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 import { Unity, parseUnityList } from 'types/unity';
+import { Rule } from '@mui/icons-material';
 
 interface Props {
     open: boolean;
@@ -98,6 +99,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setUnit({ name: ruleEdit.unity });
             setRules([]);
             setRulesAddition([]);
+            if (ruleEdit.id !== null) {
+                fetchDetailsRule(ruleEdit.id);
+            }
         } else {
             setIdRules('');
             setDescription('');
@@ -106,7 +110,42 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setRulesAddition([]);
         }
     }, [ruleEdit]);
+    const fetchDetailsRule = async (id: Number) => {
+        const response = await get(`/api/billing-rules/${id}`);
+        if (response.ok) {
+            const rule = response.result;
+            let billingRuleGoals: RuleType[] = rule.billing_rule_goals.map((e: any) => {
+                let tag = tags.find((tag) => tag.id == e.tag_fk);
+                let table = tableOfValues.find((table) => table.id == e.medical_procedure_cost_fk);
+                console.log('Table: ' + table);
+                console.log('Tag: ' + tag);
+                return {
+                    type: e.type,
+                    value: e.value,
+                    tableOfValues: table,
+                    tag: tag,
+                    id: e.id
+                };
+            });
 
+            let priorityBillingRules: RuleAdittion[] = rule.priority_billing_rules.map((e: any) => {
+                let table = tableOfValues.find((table) => table.id == e.medical_procedure_cost_fk);
+                console.log('Table: ' + table);
+                return {
+                    levelPriority: e.priority,
+                    tableOfValues: table,
+                    type: e.type,
+                    value: e.value,
+                    id: e.id
+                };
+            });
+
+            setRules(billingRuleGoals);
+            setRulesAddition(priorityBillingRules);
+        } else {
+            setError('Não foi possível carregar as regras.' + response.message);
+        }
+    };
     const handleClickAddRule = () => {
         var newRules = [...rules];
         newRules.push({
