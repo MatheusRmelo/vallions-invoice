@@ -95,10 +95,10 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setIdRules(ruleEdit.id?.toString() || '');
             setDescription(ruleEdit.rulesDescription);
             setInstitution(institutes[0]);
-
             setUnit(ruleEdit.unity);
 
             setInstitution(institutes[0]);
+            setUnit(ruleEdit.unity);
 
             setRules([]);
             setRulesAddition([]);
@@ -114,6 +114,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setDescription('');
             setUnit(undefined);
             setRules([]);
+            setInstitution(undefined);
             setRulesAddition([]);
         }
     }, [open]);
@@ -226,6 +227,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     useEffect(() => {
         if (institution) fetchUnity();
     }, [institution]);
+
     const saveRules = async () => {
         const rulesBilling: RuleBilling = {
             id: null,
@@ -413,15 +415,16 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                             label="Unidade"
                                             variant="outlined"
                                             sx={{ mb: 2 }}
-                                            value={unit?.name || ''}
-                                            disabled={institution === undefined}
+                                            value={unit?.cd_unidade || ''}
                                             onChange={(event) => {
-                                                const unit: Unity | undefined = unities.find((unit) => unit.name === event.target.value);
+                                                const unit: Unity | undefined = unities.find(
+                                                    (unit) => unit.cd_unidade === event.target.value
+                                                );
                                                 setUnit(unit!);
                                             }}
                                         >
                                             {unities.map((unity) => (
-                                                <MenuItem key={unity.name} value={unity.name}>
+                                                <MenuItem key={unity.cd_unidade} value={unity.cd_unidade}>
                                                     {unity.name}
                                                 </MenuItem>
                                             ))}
