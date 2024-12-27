@@ -91,12 +91,15 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
 
     // use Effect para ser executado ao abrir o dialog
     useEffect(() => {
-        console.log('RuleEdit: ' + ruleEdit?.id + ' ' + ruleEdit?.rulesDescription + ' ' + ruleEdit?.unity);
-
         if (ruleEdit) {
             setIdRules(ruleEdit.id?.toString() || '');
             setDescription(ruleEdit.rulesDescription);
-            setUnit({ name: ruleEdit.unity });
+            setInstitution(institutes[0]);
+
+            setUnit(ruleEdit.unity);
+
+            setInstitution(institutes[0]);
+
             setRules([]);
             setRulesAddition([]);
             if (ruleEdit.id !== null) {
@@ -106,8 +109,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     }, [ruleEdit]);
 
     useEffect(() => {
-        console.log('here' + open + ' ' + ruleEdit);
-
         if (open && !ruleEdit) {
             setIdRules('');
             setDescription('');
@@ -229,7 +230,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         const rulesBilling: RuleBilling = {
             id: null,
             rulesDescription: description,
-            unity: unit?.cd_unidade || '',
+            unity: unit!,
             status: 1
         };
         const reqCore = await post('/api/billing-rules', toJSONRuleBilling(rulesBilling));
@@ -279,7 +280,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         const rulesBilling: RuleBilling = {
             id: ruleEdit?.id || null,
             rulesDescription: description,
-            unity: unit?.name || '',
+            unity: unit!,
             status: ruleEdit?.status || 1
         };
         console.log('Regras de faturamento: ' + rulesBilling);
@@ -386,6 +387,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                             label="Instituição"
                                             variant="outlined"
                                             sx={{ mb: 2 }}
+                                            value={institution?.id_institution || ''}
                                             onChange={(event) => {
                                                 const institute = institutes.find(
                                                     (institute) => institute.id_institution === event.target.value
@@ -411,8 +413,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                             label="Unidade"
                                             variant="outlined"
                                             sx={{ mb: 2 }}
-                                            value={unit?.name}
-                                            disabled={(!institution || unities.length === 0) && unit === undefined}
+                                            value={unit?.name || ''}
+                                            disabled={institution === undefined}
                                             onChange={(event) => {
                                                 const unit: Unity | undefined = unities.find((unit) => unit.name === event.target.value);
                                                 setUnit(unit!);

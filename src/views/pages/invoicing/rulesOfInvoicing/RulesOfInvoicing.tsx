@@ -42,6 +42,7 @@ const RulesOfInvoicing = () => {
         if (response.ok) {
             const data = response.result;
             const rules = parseRuleBillingList(data);
+
             setRules(rules);
         } else {
             setMessageSnack('Erro' + response.message);

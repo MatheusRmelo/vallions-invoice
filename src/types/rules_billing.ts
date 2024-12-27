@@ -1,7 +1,9 @@
+import { Unity, parseUnity } from './unity';
+
 export type RuleBilling = {
     id: number | null;
     rulesDescription: string;
-    unity: string;
+    unity: Unity;
     unity_fk?: number;
     status: number;
 };
@@ -11,7 +13,7 @@ export function parseRuleBilling(data: any): RuleBilling {
         id: data.id,
         rulesDescription: data.description,
         unity_fk: data.branch_fk,
-        unity: data.name,
+        unity: parseUnity(data.name),
         status: Number(data.status)
     };
 }
