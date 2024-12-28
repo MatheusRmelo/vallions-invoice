@@ -131,7 +131,9 @@ const RulesOfInvoicing = () => {
                                         <Box display="flex" justifyContent="center">
                                             <Edit
                                                 onClick={() => {
-                                                    setRule(getRuleById(params.row.id as number));
+                                                    let rule = getRuleById(params.row.id as number);
+                                                    console.log('aqui a rule unity' + rule?.unity.name);
+                                                    setRule(rule);
                                                     handleOpen();
                                                 }}
                                                 style={{
