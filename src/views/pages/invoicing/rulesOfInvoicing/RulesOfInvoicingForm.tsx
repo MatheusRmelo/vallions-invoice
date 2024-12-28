@@ -195,6 +195,12 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     };
 
     const deleteRule = async (index: number) => {
+        if (rules[index].id === undefined) {
+            let newArray = [...rules];
+            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+            setRules(newArray);
+            return;
+        }
         const req = await del(`/api/billing-rule-goals/${rules[index].id}`);
         if (req.ok) {
             let newArray = [...rules];
@@ -206,6 +212,12 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     };
 
     const deleteRuleAddition = async (index: number) => {
+        if (rulesAddition[index].id === undefined) {
+            let newArray = [...rulesAddition];
+            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+            setRulesAddition(newArray);
+            return;
+        }
         const req = await del(`/api/priority-billing-rules/${rulesAddition[index].id}`);
         if (req.ok) {
             let newArray = [...rulesAddition];
