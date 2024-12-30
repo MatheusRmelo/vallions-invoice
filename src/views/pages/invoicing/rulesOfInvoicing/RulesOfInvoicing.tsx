@@ -99,8 +99,8 @@ const RulesOfInvoicing = () => {
                     height="80vh"
                     sx={{
                         '& .MuiDataGrid-root': { border: 'none' },
-                        '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '1.2vh' },
-                        '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '1.5vh' },
+                        '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '12px' },
+                        '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '12px' },
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
@@ -115,17 +115,36 @@ const RulesOfInvoicing = () => {
                                 id: rule.id,
                                 rulesDescription: rule.rulesDescription,
                                 institution: rule.id,
-                                unity: rule.unity,
+                                unity: rule.unity.name,
                                 status: rule.status
                             }))}
                             columns={[
-                                { field: 'rulesDescription', minWidth: 150, headerName: 'Descrição Regra', flex: 1 },
-                                { field: 'institution', minWidth: 150, headerName: 'Instituição', flex: 1 },
-                                { field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1 },
+                                {
+                                    field: 'rulesDescription',
+                                    minWidth: 150,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição Regra</strong>,
+                                    headerName: 'Descrição Regra',
+                                    flex: 1
+                                },
+                                {
+                                    field: 'institution',
+                                    minWidth: 150,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>,
+                                    headerName: 'Instituição',
+                                    flex: 1
+                                },
+                                {
+                                    field: 'unity',
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Unidade</strong>,
+                                    minWidth: 150,
+                                    headerName: 'Unidade',
+                                    flex: 1
+                                },
                                 {
                                     field: 'actions',
                                     minWidth: 150,
                                     headerName: 'Editar',
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
                                     flex: 1,
                                     renderCell: (params) => (
                                         <Box display="flex" justifyContent="center">
@@ -149,6 +168,7 @@ const RulesOfInvoicing = () => {
                                     field: 'status',
                                     minWidth: 150,
                                     headerName: 'Inativo/Ativo',
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
                                     flex: 1,
                                     renderCell: (params) => (
                                         <Switch
