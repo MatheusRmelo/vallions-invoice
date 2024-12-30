@@ -53,8 +53,8 @@ const MainCard = React.forwardRef(
             sx = {},
             title,
             ...others
-        }: MainCardProps,
-        ref: Ref<HTMLDivElement>
+        }: any,
+        ref: any
     ) => {
         const { mode } = useConfig();
         const defaultShadow = mode === ThemeMode.DARK ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 14px 0 rgb(32 40 45 / 8%)';
