@@ -23,10 +23,10 @@ const ProcedureView = () => {
     const { mode } = useConfig();
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
-
+    const [searchKey, setSearchKey] = useState('');
     const [messageSnack, setMessageSnack] = useState('');
     const [loading, setLoading] = useState(false);
-
+    const [dataRaw, setDataRaw] = useState<Procedure[]>([]);
     useEffect(() => {
         getProcedures();
     }, []);
@@ -45,6 +45,7 @@ const ProcedureView = () => {
             console.log(procedures);
 
             setData(procedures);
+            setDataRaw(procedures);
         } else {
             setOpenErrorSnack(true);
             setMessageSnack(response.message || 'Erro ao buscar procedimentos');
@@ -72,6 +73,15 @@ const ProcedureView = () => {
         setOpen(true);
     };
 
+    const handleSearch = (searchKey: string) => {
+        setSearchKey(searchKey);
+        if (searchKey === '') {
+            getProcedures();
+        } else {
+            const filtered = dataRaw.filter((element) => element.name.toLowerCase().includes(searchKey.toLowerCase()));
+            setData(filtered);
+        }
+    };
     const handleChangeStatus = async (id: GridRowId) => {
         var newArray = [...data];
         var found: number = -1;
@@ -84,6 +94,7 @@ const ProcedureView = () => {
         }
         if (found !== -1) {
             setData(newArray);
+            setDataRaw(newArray);
             const req = await put(`/api/billingProcedure/${id.valueOf()}`, {
                 ...newArray[found],
                 status: newArray[found].status ? '1' : '0'
@@ -112,7 +123,12 @@ const ProcedureView = () => {
         <>
             <MainCard title="Cadastro de Procedimentos">
                 <Box display="flex" justifyContent="space-between">
-                    <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
+                    <CustomTextField
+                        label="Search"
+                        value={searchKey}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />}
+                    />
                     <Fab size="small" color="primary" aria-label="add" onClick={handleClickOpen}>
                         <AddIcon />
                     </Fab>
