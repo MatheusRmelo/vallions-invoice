@@ -20,7 +20,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import SnackBarAlert from './../../../../ui-component/SnackBarAlert';
 import { Procedure } from 'types/procedure';
 import useAPI from 'hooks/useAPI';
-import { getMockInstitutes, Institute, parseInstitute } from 'types/institute';
+import { Institute, parseInstitute } from 'types/institute';
 import { getMockModalities, Modality, parseModality } from 'types/modality';
 
 const procedureSchema = z.object({
@@ -87,7 +87,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     const handleCreateProcedure = async () => {
         const idsInstitute = institutes
             .filter((instituteCheck) => institute.includes(instituteCheck.name))
-            .map((institute) => institute.id);
+            .map((institute) => institute.id_institution);
 
         const response = await post('/api/billingProcedure', {
             name: description,

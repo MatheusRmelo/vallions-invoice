@@ -17,11 +17,11 @@ import {
 } from '@mui/material';
 import AddRuleRow from './AddRuleRow';
 import { RuleBilling, toJSONRuleBilling } from 'types/rules_billing';
-import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
+import { Institute, parseInstitute } from 'types/institute';
 import UseAPI from 'hooks/useAPI';
 import { parseTableOfValues, TableOfValue } from 'types/tableOfValue';
 import { RuleType, RuleAdittion } from './types/RuleType';
-import { generateMockTag, parseTagList, Tag } from 'types/tag';
+import { parseTagList, Tag } from 'types/tag';
 import RuleRow from './RuleRow';
 import AddRule from './AddRuleRow';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
