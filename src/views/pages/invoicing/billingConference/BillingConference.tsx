@@ -27,12 +27,16 @@ import {
 import { DataGrid, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import MainCard from 'ui-component/cards/MainCard';
-import { SendOutlined, Search, ExpandMore, ExpandLess } from '@mui/icons-material';
+import { SendOutlined, Search, ExpandMore, ExpandLess, RefreshOutlined, MoneyOutlined, MonetizationOn } from '@mui/icons-material';
 import useAPI from 'hooks/useAPI';
 import { MoreVert, DeleteOutline, RemoveRedEyeOutlined } from '@mui/icons-material';
 import { Conference, parseConferenceList, generateConference } from 'types/conference';
 import { Billing, parseBilling, generateBilling } from 'types/billing';
 import { Unity, parseUnityList, generateMockUnity } from 'types/unity';
+import { Institute, parseInstitute } from 'types/institute';
+import ConfirmBillingForm from './ConfirmBillingForm';
+
+
 const BillingConference: React.FC = () => {
     const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
     const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
@@ -49,6 +53,10 @@ const BillingConference: React.FC = () => {
     const [valueTotal, setValueTotal] = useState<number>(0);
     const [obsReversal, setObsReversal] = useState<string>('');
     const [open, setOpen] = useState(false);
+    const [institutes, setInstitutes] = useState<Institute[]>([]);
+    const [institute, setInstitute] = useState<string>();
+    const [error, setError] = useState<string | null>(null);
+
     const isMobile = useMediaQuery(useTheme().breakpoints.down('sm'));
     const { get, put } = useAPI();
 
@@ -56,12 +64,22 @@ const BillingConference: React.FC = () => {
         setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
     };
 
-    const fetchBilling = async () => {
-        const response = await get('/api/billings');
+
+    const getInstitutes = async () => {
+        const response = await get('/api/institutionsAccess');
+        if (response.ok) {
+            setInstitutes(response.result.map((institute: any) => parseInstitute(institute)));
+        } else {
+            setError(response.message);
+        }
+    };
+
+    const getBillings = async () => {
+        const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&branches=${institute}`);
 
         if (response.ok) {
-            const data = await response.result;
-            const conference = parseConferenceList(data);
+            console.log(response.result);
+            const conference = parseConferenceList(response.result);
             setConferences(conference);
         } else {
             console.log('Error');
@@ -100,16 +118,21 @@ const BillingConference: React.FC = () => {
         });
 
         if (response.ok) {
-            fetchBilling();
+            getBillings();
         } else {
             console.log('Error');
         }
     };
 
     useEffect(() => {
-        fetchBilling();
+        getInstitutes();
+        //getBillings();
         fetchUnity();
     }, []);
+
+    const handleSearch = () => {
+        getBillings();
+    }
 
     return (
         <>
@@ -151,10 +174,13 @@ const BillingConference: React.FC = () => {
                             <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
                                     <InputLabel id="institute">Instituição</InputLabel>
-                                    <Select fullWidth label="Instituição" variant="outlined" defaultValue="Teste1">
-                                        {mockSelects.map((institution) => (
-                                            <MenuItem key={institution} value={institution}>
-                                                {institution}
+                                    <Select fullWidth label="Instituição" variant="outlined"
+                                        value={institute}
+                                        onChange={(e) => setInstitute(e.target.value as string)}
+                                    >
+                                        {institutes.map((institution) => (
+                                            <MenuItem key={institution.id_institution} value={institution.id_institution}>
+                                                {institution.name}
                                             </MenuItem>
                                         ))}
                                     </Select>
@@ -186,7 +212,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 2}>
-                                <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }}>
+                                <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }} onClick={handleSearch}>
                                     <span style={{ fontSize: '1.45vh' }}>Pesquisar</span>
                                 </Button>
                             </Grid>
@@ -201,7 +227,20 @@ const BillingConference: React.FC = () => {
 
                         <Box display="flex" justifyContent="space-between">
                             <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
-                            <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
+                            {
+                                tabIndex == 0 ?
+                                    <IconButton onClick={() => setOpenBillingConfirm(true)}>
+                                        <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
+                                    </IconButton> :
+                                    tabIndex == 1 ? (
+                                        <Box display="flex">
+                                            <RefreshOutlined sx={{ color: 'action.active', mr: 2 }} />
+                                            <MonetizationOn sx={{ color: 'action.active', mr: 1 }} />
+                                        </Box>
+                                    ) : null
+                            }
+
+
                         </Box>
                         <div style={{ height: '45vh', width: '100%', marginTop: 20 }}>
                             {/*Conferência*/}
@@ -626,68 +665,15 @@ const BillingConference: React.FC = () => {
                 </Box>
             </Dialog>
             {/* Dialog de Confirmação de Faturamento */}
-            <Dialog fullWidth maxWidth={'lg'} open={openBillingConfirm} onClose={() => setOpenBillingConfirm(false)}>
-                <form>
-                    <Box margin={'10px'}>
-                        <DialogTitle>
-                            <span style={{ fontSize: '2vh', fontWeight: 'bold' }}>Confirmação do Faturamento</span>
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText style={{ fontSize: '1.3vh' }}>
-                                <span style={{ fontWeight: 'bold' }}>Confirmação de Conferência de Laudos: </span>
-                                Verifique se todos os laudos foram revisados e estão corretos antes de prosseguir com o faturamento. Ao
-                                confirmar, você estará garantindo que todas as informações estão precisas e prontas para o envio. Deseja
-                                continuar com o faturamento?
-                            </DialogContentText>
-                            <Box height={40} />
-                            <Grid container spacing={2}>
-                                <Grid item xs={8}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="select-label">Unidade</InputLabel>
-                                        <Select labelId="select-label" label="Select">
-                                            <MenuItem value={10}>Ten</MenuItem>
-                                            <MenuItem value={20}>Twenty</MenuItem>
-                                            <MenuItem value={30}>Thirty</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField label="R$ Valor" fullWidth />
-                                </Grid>
-                                <Grid item xs={2}>
-                                    <TextField label="Previsão" type="date" fullWidth InputLabelProps={{ shrink: true }} />
-                                </Grid>
-                                <Grid item xs={10}>
-                                    <TextField label="Observação" fullWidth />
-                                </Grid>
-                            </Grid>
-                        </DialogContent>
-                    </Box>
-                    <Box height={60} />
-                    <DialogActions>
-                        <Button variant="outlined" onClick={() => setOpenBillingConfirm(false)} color="primary" size="large">
-                            Fechar
-                        </Button>
-                        <Box width={5} />
-                        <Button
-                            size="large"
-                            variant="contained"
-                            type="submit"
-                            sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}
-                        >
-                            Salvar
-                        </Button>
-                    </DialogActions>
-                </form>
-            </Dialog>
+            <ConfirmBillingForm open={openBillingConfirm} onClose={() => setOpenBillingConfirm(false)} />
             {/* Dialog de Estorno de Faturamento */}
             <Dialog fullWidth maxWidth={'lg'} open={openBillingReversal} onClose={() => setOpenBillingReversal(false)}>
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
                         handleReversalBilling(
-                            billings.find((billing) => billing.id === unity?.id)?.id || 0,
-                            unity?.id || 0,
+                            billings.find((billing) => billing.id, toString() === unity?.cd_unidade)?.id || 0,
+                            parseInt(unity!.cd_unidade!),
                             valueTotal,
                             obsReversal
                         );
@@ -712,10 +698,10 @@ const BillingConference: React.FC = () => {
                                         <Select
                                             labelId="select-label"
                                             label="Select"
-                                            onChange={(e) => setUnity(unities.find((unity) => unity.id === Number(e.target.value)))}
+                                            onChange={(e) => setUnity(unities.find((unity) => unity.cd_unidade === e.target.value))}
                                         >
                                             {unities.map((unity) => (
-                                                <MenuItem key={unity.id} value={unity.id}>
+                                                <MenuItem key={unity.cd_unidade} value={unity.cd_unidade}>
                                                     {unity.name}
                                                 </MenuItem>
                                             ))}

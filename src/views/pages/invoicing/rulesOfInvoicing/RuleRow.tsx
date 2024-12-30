@@ -1,9 +1,8 @@
 import React from 'react';
 import { Grid, FormControl, InputLabel, Select, MenuItem, TextField, Box, IconButton } from '@mui/material';
 import Delete from '@mui/icons-material/DeleteOutline';
-import { Tag, parseTagList, generateMockTag } from 'types/tag';
-import useAPI from 'hooks/useAPI';
-import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/tableOfValue';
+import { Tag } from 'types/tag';
+import { TableOfValue } from 'types/tableOfValue';
 import { RuleType } from './types/RuleType';
 
 interface RuleRowProps {

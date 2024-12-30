@@ -29,7 +29,7 @@ import { TableOfValue } from 'types/tableOfValue';
 import { parseProcedureCosts, getProcedureCostsMock, ProcedureCost, parseProcedureCost } from 'types/procedures_costs';
 
 import useAPI from 'hooks/useAPI';
-import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
+import { Institute, parseInstitute } from 'types/institute';
 type TableOfValueFormProps = {
     open: boolean;
     handleClose: (refresh: boolean) => void;
@@ -90,7 +90,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         if (tableOfValue) {
             var institute = institutes.filter((element) => element.name == tableOfValue.nickname);
             setDescription(tableOfValue.description);
-            setInstitute(institute[0].id);
+            setInstitute(institute[0].id_institution);
             getProceduresCosts();
         } else {
             setDescription("");
@@ -275,7 +275,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                     sx={selectStyles}
                                 >
                                     {institutes.map((institute) => (
-                                        <MenuItem key={institute.id} value={institute.id}>
+                                        <MenuItem key={institute.id_institution} value={institute.id_institution}>
                                             {institute.name}
                                         </MenuItem>
                                     ))}

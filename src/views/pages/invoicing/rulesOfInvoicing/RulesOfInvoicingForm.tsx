@@ -17,11 +17,11 @@ import {
 } from '@mui/material';
 import AddRuleRow from './AddRuleRow';
 import { RuleBilling, toJSONRuleBilling } from 'types/rules_billing';
-import { Institute, parseInstitute, getMockInstitutes } from 'types/institute';
+import { Institute, parseInstitute } from 'types/institute';
 import UseAPI from 'hooks/useAPI';
 import { parseTableOfValues, TableOfValue } from 'types/tableOfValue';
 import { RuleType, RuleAdittion } from './types/RuleType';
-import { generateMockTag, parseTagList, Tag } from 'types/tag';
+import { parseTagList, Tag } from 'types/tag';
 import RuleRow from './RuleRow';
 import AddRule from './AddRuleRow';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
@@ -96,10 +96,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setDescription(ruleEdit.rulesDescription);
             setInstitution(institutes[0]);
             setUnit(ruleEdit.unity);
-
             setInstitution(institutes[0]);
             setUnit(ruleEdit.unity);
-
             setRules([]);
             setRulesAddition([]);
             if (ruleEdit.id !== null) {
@@ -126,8 +124,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             let billingRuleGoals: RuleType[] = rule.billing_rule_goals.map((e: any) => {
                 let tag = tags.find((tag) => tag.id == e.tag_fk);
                 let table = tableOfValues.find((table) => table.id == e.medical_procedure_cost_fk);
-                console.log('Table: ' + table);
-                console.log('Tag: ' + tag);
+
                 return {
                     type: e.type,
                     value: e.value,
@@ -139,7 +136,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
 
             let priorityBillingRules: RuleAdittion[] = rule.priority_billing_rules.map((e: any) => {
                 let table = tableOfValues.find((table) => table.id == e.medical_procedure_cost_fk);
-                console.log('Table: ' + table);
                 return {
                     levelPriority: e.priority,
                     tableOfValues: table,
@@ -199,6 +195,12 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     };
 
     const deleteRule = async (index: number) => {
+        if (rules[index].id === undefined) {
+            let newArray = [...rules];
+            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+            setRules(newArray);
+            return;
+        }
         const req = await del(`/api/billing-rule-goals/${rules[index].id}`);
         if (req.ok) {
             let newArray = [...rules];
@@ -210,6 +212,12 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     };
 
     const deleteRuleAddition = async (index: number) => {
+        if (rulesAddition[index].id === undefined) {
+            let newArray = [...rulesAddition];
+            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+            setRulesAddition(newArray);
+            return;
+        }
         const req = await del(`/api/priority-billing-rules/${rulesAddition[index].id}`);
         if (req.ok) {
             let newArray = [...rulesAddition];
@@ -415,16 +423,14 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                             label="Unidade"
                                             variant="outlined"
                                             sx={{ mb: 2 }}
-                                            value={unit?.cd_unidade || ''}
+                                            value={unit?.name || ''}
                                             onChange={(event) => {
-                                                const unit: Unity | undefined = unities.find(
-                                                    (unit) => unit.cd_unidade === event.target.value
-                                                );
+                                                const unit: Unity | undefined = unities.find((unit) => unit.name === event.target.value);
                                                 setUnit(unit!);
                                             }}
                                         >
                                             {unities.map((unity) => (
-                                                <MenuItem key={unity.cd_unidade} value={unity.cd_unidade}>
+                                                <MenuItem key={unity.name} value={unity.name}>
                                                     {unity.name}
                                                 </MenuItem>
                                             ))}

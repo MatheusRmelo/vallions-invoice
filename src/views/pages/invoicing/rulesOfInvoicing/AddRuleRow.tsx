@@ -1,8 +1,7 @@
 import React from 'react';
 import { Grid, FormControl, InputLabel, Select, MenuItem, TextField, Box, IconButton } from '@mui/material';
 import Delete from '@mui/icons-material/DeleteOutline';
-import useAPI from 'hooks/useAPI';
-import { TableOfValue, parseTableOfValues, getMockTableOfValues } from 'types/tableOfValue';
+import { TableOfValue } from 'types/tableOfValue';
 import { RuleAdittion } from './types/RuleType';
 
 interface AddRuleProps {

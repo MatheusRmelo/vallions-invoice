@@ -58,7 +58,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             setStartDate(procedureCost.validatyStart ? new Date(procedureCost.validatyStart!).toISOString().split('T')[0] : '');
             setEndDate(procedureCost.validatyEnd ? new Date(procedureCost.validatyEnd!).toISOString().split('T')[0] : '');
             if (institutes.length > 0) {
-                setInstitute(institutes[0].id);
+                setInstitute(institutes[0].id_institution);
             }
             setProcedure(procedureCost.codProcedure);
         } else {
@@ -81,7 +81,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
 
     const getInstituteById = (id: string): Institute | null => {
         let rows = institutes;
-        let filtered = rows.filter((element) => element.id === id);
+        let filtered = rows.filter((element) => element.id_institution === id);
         if (filtered.length === 0) return null;
         return filtered[0];
     }
@@ -196,7 +196,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                                 IconComponent={ArrowDropDownIcon}
                             >
                                 {institutes.map((institute) => (
-                                    <MenuItem key={institute.id} value={institute.id}>
+                                    <MenuItem key={institute.id_institution} value={institute.id_institution}>
                                         {institute.name}
                                     </MenuItem>
                                 ))}

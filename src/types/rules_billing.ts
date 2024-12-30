@@ -1,4 +1,4 @@
-import { Unity, parseUnity } from './unity';
+import { Unity } from './unity';
 
 export type RuleBilling = {
     id: number | null;
@@ -9,11 +9,16 @@ export type RuleBilling = {
 };
 
 export function parseRuleBilling(data: any): RuleBilling {
+    let unity: Unity;
+    unity = {
+        name: data.name
+    };
+
     return {
         id: data.id,
         rulesDescription: data.description,
         unity_fk: data.branch_fk,
-        unity: parseUnity(data.name),
+        unity: unity,
         status: Number(data.status)
     };
 }
