@@ -686,8 +686,8 @@ const BillingConference: React.FC = () => {
                     onSubmit={(e) => {
                         e.preventDefault();
                         handleReversalBilling(
-                            billings.find((billing) => billing.id === unity?.id)?.id || 0,
-                            unity?.id || 0,
+                            billings.find((billing) => billing.id.toString() === unity?.cd_unidade)?.id || 0,
+                            parseInt(unity?.cd_unidade ?? '0'),
                             valueTotal,
                             obsReversal
                         );
@@ -712,10 +712,10 @@ const BillingConference: React.FC = () => {
                                         <Select
                                             labelId="select-label"
                                             label="Select"
-                                            onChange={(e) => setUnity(unities.find((unity) => unity.id === Number(e.target.value)))}
+                                            onChange={(e) => setUnity(unities.find((unity) => unity.cd_unidade === e.target.value))}
                                         >
                                             {unities.map((unity) => (
-                                                <MenuItem key={unity.id} value={unity.id}>
+                                                <MenuItem key={unity.cd_unidade} value={unity.cd_unidade}>
                                                     {unity.name}
                                                 </MenuItem>
                                             ))}
