@@ -11,11 +11,14 @@ import Switch from '@mui/material/Switch';
 import TableOfValueForm from './TableOfValueForm';
 import { TableOfValue, parseTableOfValues } from 'types/tableOfValue';
 import useAPI from 'hooks/useAPI';
+
 const TableOfValues = () => {
     const [open, setOpen] = useState(false);
     const [tableOfValues, setTableOfValues] = useState<TableOfValue[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [tableOfValue, setTableOfValue] = useState<TableOfValue | null>(null);
+    const [searchKey, setSearchKey] = useState('');
+    const [dataRaw, setDataRaw] = useState<TableOfValue[]>([]);
 
     const { get, put } = useAPI();
 
@@ -27,7 +30,9 @@ const TableOfValues = () => {
         const response = await get('/api/medical-procedure-costs');
         if (response.ok) {
             const data = await response.result;
-            setTableOfValues(parseTableOfValues(data));
+            const parsedData = parseTableOfValues(data);
+            setTableOfValues(parsedData);
+            setDataRaw(parsedData);
         } else {
             setError(response.message);
         }
@@ -67,7 +72,6 @@ const TableOfValues = () => {
     const handleOpen = () => {
         /// Limpar os campos do formulário
         setTableOfValue(null);
-
         setOpen(true);
     };
 
@@ -78,13 +82,26 @@ const TableOfValues = () => {
         }
     };
 
+    const handleSearch = (searchKey: string) => {
+        setSearchKey(searchKey);
+        if (searchKey === '') {
+            setTableOfValues(dataRaw);
+        } else {
+            const filtered = dataRaw.filter((element) => element.description.toLowerCase().includes(searchKey.toLowerCase()));
+            setTableOfValues(filtered);
+        }
+    };
 
     return (
         <>
             <MainCard title="Tabela de Valores">
                 <Box display="flex" justifyContent="space-between">
-                    <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
-
+                    <CustomTextField
+                        label="Search"
+                        value={searchKey}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />}
+                    />
                     <Fab size="small" color="primary" aria-label="add" onClick={handleOpen}>
                         <AddIcon />
                     </Fab>
@@ -118,7 +135,6 @@ const TableOfValues = () => {
                                 type: 'actions',
                                 flex: 1,
                                 minWidth: 150,
-
                                 cellClassName: 'actions',
                                 renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
                                 getActions: ({ id }) => {
@@ -139,7 +155,6 @@ const TableOfValues = () => {
                                 type: 'actions',
                                 flex: 1,
                                 minWidth: 150,
-
                                 renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
                                 getActions: ({ id }) => {
                                     let tableOfValue = getTableById(id);

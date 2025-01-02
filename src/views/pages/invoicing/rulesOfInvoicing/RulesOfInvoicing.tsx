@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 import { Box, CircularProgress } from '@mui/material';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
@@ -9,19 +9,21 @@ import AddIcon from '@mui/icons-material/Add';
 import Edit from '@mui/icons-material/Edit';
 import Switch from '@mui/material/Switch';
 import useAPI from 'hooks/useAPI';
-import { RuleBilling, parseRuleBillingList, toJSONRuleBilling } from 'types/rules_billing';
+import { RuleBilling, parseRuleBillingList } from 'types/rules_billing';
 import RulesOfInvoicingForm from './RulesOfInvoicingForm';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 const RulesOfInvoicing = () => {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const { get, put } = useAPI();
-    const [rules, setRules] = React.useState<RuleBilling[]>([]);
-    const [rule, setRule] = React.useState<RuleBilling | undefined>(undefined);
-    const [loading, setLoading] = React.useState(false);
-    const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
-    const [openSucessSnack, setOpenSucessSnack] = React.useState(false);
-    const [messageSnack, setMessageSnack] = React.useState('');
+    const [rules, setRules] = useState<RuleBilling[]>([]);
+    const [rule, setRule] = useState<RuleBilling | undefined>(undefined);
+    const [loading, setLoading] = useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
+    const [searchKey, setSearchKey] = useState('');
+    const [dataRaw, setDataRaw] = useState<RuleBilling[]>([]);
 
     const handleOpen = () => {
         setOpen(true);
@@ -42,8 +44,8 @@ const RulesOfInvoicing = () => {
         if (response.ok) {
             const data = response.result;
             const rules = parseRuleBillingList(data);
-
             setRules(rules);
+            setDataRaw(rules);
         } else {
             setMessageSnack('Erro' + response.message);
             setOpenErrorSnack(true);
@@ -69,7 +71,17 @@ const RulesOfInvoicing = () => {
         }
     };
 
-    React.useEffect(() => {
+    const handleSearch = (searchKey: string) => {
+        setSearchKey(searchKey);
+        if (searchKey === '') {
+            setRules(dataRaw);
+        } else {
+            const filtered = dataRaw.filter((element) => element.rulesDescription.toLowerCase().includes(searchKey.toLowerCase()));
+            setRules(filtered);
+        }
+    };
+
+    useEffect(() => {
         fetchBillingRules();
     }, []);
 
@@ -77,15 +89,18 @@ const RulesOfInvoicing = () => {
         <>
             <MainCard title="Regras de Faturamento">
                 <Box display="flex" justifyContent="space-between">
-                    <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
-
+                    <CustomTextField
+                        label="Search"
+                        value={searchKey}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />}
+                    />
                     <Fab
                         size="small"
                         color="primary"
                         aria-label="add"
                         onClick={() => {
                             setRule(undefined);
-
                             handleOpen();
                         }}
                     >
@@ -151,7 +166,6 @@ const RulesOfInvoicing = () => {
                                             <Edit
                                                 onClick={() => {
                                                     let rule = getRuleById(params.row.id as number);
-                                                    console.log('aqui a rule unity' + rule?.unity.name);
                                                     setRule(rule);
                                                     handleOpen();
                                                 }}
