@@ -2,56 +2,40 @@ export type Billing = {
     id: number;
     unidade: string;
 
-    dateOfBilling: Date;
+    dateOfBilling: string;
     statusOfBilling: string;
     qtn: number;
     valueTotal: number;
     reportsBilling: ReportBilling[];
+    checked: boolean;
 };
 
 export type ReportBilling = {
     id: number;
     namePatient: string;
-    dateOfReport: Date;
+    dateOfReport: string;
     doctorName: string;
     unity: string;
     titleOfReport: string;
     valueReport: number;
+    checked: boolean;
+    status: string | null;
 };
 export function parseReportBilling(data: any): ReportBilling {
+
     return {
         id: data.id,
-        namePatient: data.namePatient,
-        dateOfReport: new Date(data.dateOfReport),
-        titleOfReport: data.titleOfReport,
-        valueReport: data.valueReport,
-        unity: data.unity,
-        doctorName: data.doctor
+        namePatient: `${data.name} - ${Math.random()}`,
+        dateOfReport: data.date_study,
+        titleOfReport: data.title,
+        valueReport: parseFloat(data.price),
+        unity: data.branch,
+        doctorName: '',
+        checked: false,
+        status: null,
     };
 }
 
-export function generateReportBilling(): ReportBilling[] {
-    return [
-        {
-            id: 0,
-            namePatient: 'PACIENTE TESTE',
-            dateOfReport: new Date(),
-            titleOfReport: '',
-            valueReport: 0,
-            unity: 'UNIDADE TESTE',
-            doctorName: 'DOUTOR TESTE'
-        },
-        {
-            id: 1,
-            namePatient: 'PACIENTE TESTE',
-            dateOfReport: new Date(),
-            titleOfReport: '',
-            valueReport: 0,
-            unity: 'UNIDADE TESTE',
-            doctorName: 'DOUTOR TESTE'
-        }
-    ];
-}
 
 export function parseReportBillingList(data: any): ReportBilling[] {
     return data.map((item: any) => parseReportBilling(item));
@@ -60,36 +44,14 @@ export function parseReportBillingList(data: any): ReportBilling[] {
 export function parseBilling(data: any): Billing {
     return {
         id: data.id,
-        dateOfBilling: new Date(data.dateOfStudy),
-        statusOfBilling: data.statusOfStudy,
-        qtn: data.qtn,
-        unidade: data.unity,
-        valueTotal: data.valueTotal,
-        reportsBilling: parseReportBillingList(data.reportsBilling)
+        dateOfBilling: data.month_closing,
+        statusOfBilling: data.status,
+        qtn: 0,
+        unidade: data.branch_name,
+        valueTotal: data.value_total,
+        reportsBilling: [],
+        checked: false,
     };
-}
-
-export function generateBilling(): Billing[] {
-    return [
-        {
-            id: 0,
-            dateOfBilling: new Date(),
-            statusOfBilling: 'Em Aberto',
-            qtn: 1,
-            unidade: 'UNIDADE TESTE',
-            valueTotal: 0,
-            reportsBilling: generateReportBilling()
-        },
-        {
-            id: 1,
-            dateOfBilling: new Date(),
-            statusOfBilling: 'Em Aberto',
-            qtn: 1,
-            unidade: 'UNIDADE TESTE',
-            valueTotal: 0,
-            reportsBilling: generateReportBilling()
-        }
-    ];
 }
 
 export function parseBillingList(data: any): Billing[] {

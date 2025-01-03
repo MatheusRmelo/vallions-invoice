@@ -31,10 +31,14 @@ import { SendOutlined, Search, ExpandMore, ExpandLess, RefreshOutlined, MoneyOut
 import useAPI from 'hooks/useAPI';
 import { MoreVert, DeleteOutline, RemoveRedEyeOutlined } from '@mui/icons-material';
 import { Conference, parseConferenceList, generateConference } from 'types/conference';
-import { Billing, parseBilling, generateBilling } from 'types/billing';
+import { Billing, parseBilling, parseBillingList, parseReportBillingList, ReportBilling } from 'types/billing';
 import { Unity, parseUnityList, generateMockUnity } from 'types/unity';
 import { Institute, parseInstitute } from 'types/institute';
 import ConfirmBillingForm from './ConfirmBillingForm';
+import BillingView from './BillingView';
+import ConferenceView from './ConferenceView';
+import RefundBillingForm from './RefundBillingForm';
+import ReceiptView from './ReceiptView';
 
 
 const BillingConference: React.FC = () => {
@@ -42,33 +46,89 @@ const BillingConference: React.FC = () => {
     const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
     const [tabIndex, setTabIndex] = useState(0);
     const [expandedRowIds, setExpandedRowIds] = useState<number[]>([]);
-    const [conferences, setConferences] = useState<Conference[]>([]);
+    const [conferences, setConferences] = useState<Billing[]>([]);
     const [billings, setBillings] = useState<Billing[]>([]);
-    const mockSelects = ['Teste1', 'Teste2', 'Teste3'];
+    const [receipts, setReceipts] = useState<Billing[]>([]);
+
     const [openDialogAction, setOpenDialogAction] = useState(false);
     const [openBillingReversal, setOpenBillingReversal] = useState(false);
     const [openBillingConfirm, setOpenBillingConfirm] = useState(false);
-    const [unities, setUnities] = useState<Unity[]>([]);
-    const [unity, setUnity] = useState<Unity>();
-    const [valueTotal, setValueTotal] = useState<number>(0);
-    const [obsReversal, setObsReversal] = useState<string>('');
-    const [open, setOpen] = useState(false);
     const [institutes, setInstitutes] = useState<Institute[]>([]);
     const [institute, setInstitute] = useState<string>();
     const [error, setError] = useState<string | null>(null);
+    const [currentBilling, setCurrentBilling] = useState<ReportBilling | null>(null);
+    const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
 
     const isMobile = useMediaQuery(useTheme().breakpoints.down('sm'));
     const { get, put } = useAPI();
 
-    const handleExpandClick = (id: number) => {
+    const handleExpandClick = async (id: number) => {
+        if (tabIndex == 2) {
+            await getDetailReceipt(id);
+        } else {
+            await getDetailBilling(id);
+        }
+
         setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
     };
 
+    const getDetailReceipt = async (id: number) => {
+        const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=3`);
+        if (response.ok) {
+            const reports = parseReportBillingList(response.result);
+            var newArray = [...receipts];
+            for (let i = 0; i < newArray.length; i++) {
+                if (newArray[i].id == id) {
+                    newArray[i].reportsBilling = reports.map((element) => ({ ...element, status: '3' }));
+                    let refunds = await getRefunds(id);
+                    newArray[i].reportsBilling = [...newArray[i].reportsBilling, ...refunds.map((element) => ({ ...element, status: '2' }))];
+
+                }
+            }
+            setReceipts(newArray);
+        } else {
+            console.log('Error');
+        }
+    }
+
+    const getDetailBilling = async (id: number) => {
+        const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=${tabIndex}`);
+        if (response.ok) {
+            const reports = parseReportBillingList(response.result);
+            var newArray = tabIndex == 0 ? [...conferences] : tabIndex == 1 ? [...billings] : [];
+            for (let i = 0; i < newArray.length; i++) {
+                if (newArray[i].id == id) {
+                    newArray[i].reportsBilling = reports;
+                }
+            }
+            if (tabIndex == 0) {
+                setConferences(newArray);
+            } else if (tabIndex == 1) {
+                setBillings(newArray);
+            }
+        } else {
+            console.log('Error');
+        }
+    }
+
+    const getRefunds = async (id: number) => {
+        const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=2`);
+        if (response.ok) {
+            return parseReportBillingList(response.result);
+        }
+
+        return [];
+    }
 
     const getInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
-            setInstitutes(response.result.map((institute: any) => parseInstitute(institute)));
+            var result: Institute[] = response.result.map((institute: any) => parseInstitute(institute));
+            setInstitutes(result);
+            if (result.length > 0) {
+                setInstitute(result[0].id_institution);
+                getBillings();
+            }
         } else {
             setError(response.message);
         }
@@ -78,35 +138,81 @@ const BillingConference: React.FC = () => {
         const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&branches=${institute}`);
 
         if (response.ok) {
-            console.log(response.result);
-            const conference = parseConferenceList(response.result);
+            const billings = parseBillingList(response.result);
+            const conference = billings.filter((element) => element.statusOfBilling == '0');
             setConferences(conference);
+            setBillings(billings);
+            setReceipts(billings);
         } else {
             console.log('Error');
         }
-
-        ///remover em produção
-        setConferences(generateConference());
-        setBillings(generateBilling());
     };
 
-    const fetchUnity = async () => {
+    const getUnities = async () => {
         const response = await get('/api/unities');
 
         if (response.ok) {
             const data = await response.result;
             const unity = data;
-            setUnities(parseUnityList(unity));
+            //setUnities(parseUnityList(unity));
         } else {
             console.log('Error');
         }
-
-        ///remover em produção
-        setUnities([generateMockUnity()]);
     };
+
+    const handleChangeCheckedConference = (idBilling: number) => {
+        var newArray = [...conferences];
+        for (let i = 0; i < newArray.length; i++) {
+            if (newArray[i].id == idBilling) {
+                newArray[i].checked = !newArray[i].checked;
+            }
+        }
+        setConferences(newArray);
+    }
+
+    const handleChangeCheckedBilling = (idBilling: number) => {
+        var newArray = [...billings];
+        for (let i = 0; i < newArray.length; i++) {
+            if (newArray[i].id == idBilling) {
+                newArray[i].checked = !newArray[i].checked;
+            }
+        }
+        setBillings(newArray);
+    }
+
+    const handleChangeCheckedReport = (idBilling: number, idReport: number) => {
+        var newArray = [...conferences];
+        for (let i = 0; i < newArray.length; i++) {
+            if (newArray[i].id == idBilling) {
+                for (let x = 0; x < newArray[i].reportsBilling.length; x++) {
+                    if (newArray[i].reportsBilling[x].id == idReport) {
+                        newArray[i].reportsBilling[x].checked = !newArray[i].reportsBilling[x].checked;
+                    }
+                }
+            }
+        }
+
+        setConferences(newArray);
+    }
+
+    const handleChangeCheckedReportBilling = (idBilling: number, idReport: number) => {
+        var newArray = [...billings];
+        for (let i = 0; i < newArray.length; i++) {
+            if (newArray[i].id == idBilling) {
+                for (let x = 0; x < newArray[i].reportsBilling.length; x++) {
+                    if (newArray[i].reportsBilling[x].id == idReport) {
+                        newArray[i].reportsBilling[x].checked = !newArray[i].reportsBilling[x].checked;
+                    }
+                }
+            }
+        }
+
+        setBillings(newArray);
+    }
 
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setTabIndex(newValue);
+        setExpandedRowIds([]);
     };
 
     const handleReversalBilling = async (id: number, idUnit: number, valueTotal: number, obsReversal: string) => {
@@ -126,12 +232,72 @@ const BillingConference: React.FC = () => {
 
     useEffect(() => {
         getInstitutes();
-        //getBillings();
-        fetchUnity();
+        getUnities();
     }, []);
 
     const handleSearch = () => {
         getBillings();
+        setExpandedRowIds([]);
+    }
+
+    const handleOpenConfirmBilling = () => {
+        var array: ReportBilling[] = [];
+        conferences.forEach((element) => {
+            if (element.checked) {
+                array = [...array, ...element.reportsBilling.filter((element) => element.checked)]
+            }
+        });
+        setCheckedBillings(array);
+        if (array.length > 0) {
+            setCurrentBilling(array[0]);
+            setOpenBillingConfirm(true);
+        }
+    }
+
+    const handleOpenRefundBilling = () => {
+        var array: ReportBilling[] = [];
+        billings.forEach((element) => {
+            if (element.checked) {
+                array = [...array, ...element.reportsBilling.filter((element) => element.checked)]
+            }
+        });
+        setCheckedBillings(array);
+        if (array.length > 0) {
+            setCurrentBilling(array[0]);
+            setOpenBillingReversal(true);
+        }
+    }
+
+    const handleCloseConfirmBilling = (success: boolean) => {
+        if (success) {
+            var newArray = [...checkedBillings];
+            newArray.splice(0);
+            setCheckedBillings(newArray);
+            setExpandedRowIds([]);
+            if (newArray.length > 0) {
+                setCurrentBilling(newArray[0]);
+            } else {
+                getBillings();
+            }
+        }
+
+        setOpenBillingConfirm(false);
+    }
+
+    const handleCloseRefundBilling = (success: boolean) => {
+        if (success) {
+            var newArray = [...checkedBillings];
+            newArray.splice(0);
+            setCheckedBillings(newArray);
+            setExpandedRowIds([]);
+            if (newArray.length > 0) {
+                setCurrentBilling(newArray[0]);
+            } else {
+                getBillings();
+            }
+        }
+
+        setOpenBillingReversal(false);
     }
 
     return (
@@ -158,7 +324,7 @@ const BillingConference: React.FC = () => {
                                     onChange={(e) => setEndDate(e.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={isMobile ? 12 : 1.8}>
+                            {/* <Grid item xs={isMobile ? 12 : 1.8}>
                                 <FormControl fullWidth>
                                     <InputLabel id="filter">Filtro</InputLabel>
                                     <Select fullWidth label="Filtro" variant="outlined" defaultValue="Teste1">
@@ -169,7 +335,7 @@ const BillingConference: React.FC = () => {
                                         ))}
                                     </Select>
                                 </FormControl>
-                            </Grid>
+                            </Grid> */}
 
                             <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
@@ -187,7 +353,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={isMobile ? 12 : 2}>
+                            {/* <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
                                     <InputLabel id="unity">Unidade</InputLabel>
                                     <Select fullWidth label="Unidade" variant="outlined" defaultValue="Teste1">
@@ -210,7 +376,7 @@ const BillingConference: React.FC = () => {
                                         ))}
                                     </Select>
                                 </FormControl>
-                            </Grid>
+                            </Grid> */}
                             <Grid item xs={isMobile ? 12 : 2}>
                                 <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }} onClick={handleSearch}>
                                     <span style={{ fontSize: '1.45vh' }}>Pesquisar</span>
@@ -229,12 +395,12 @@ const BillingConference: React.FC = () => {
                             <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
                             {
                                 tabIndex == 0 ?
-                                    <IconButton onClick={() => setOpenBillingConfirm(true)}>
+                                    <IconButton onClick={() => handleOpenConfirmBilling()}>
                                         <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
                                     </IconButton> :
                                     tabIndex == 1 ? (
                                         <Box display="flex">
-                                            <RefreshOutlined sx={{ color: 'action.active', mr: 2 }} />
+                                            <RefreshOutlined onClick={() => handleOpenRefundBilling()} sx={{ color: 'action.active', mr: 2 }} />
                                             <MonetizationOn sx={{ color: 'action.active', mr: 1 }} />
                                         </Box>
                                     ) : null
@@ -245,378 +411,30 @@ const BillingConference: React.FC = () => {
                         <div style={{ height: '45vh', width: '100%', marginTop: 20 }}>
                             {/*Conferência*/}
                             {tabIndex === 0 && (
-                                <DataGrid
-                                    rows={conferences.map((conference) => {
-                                        return {
-                                            id: conference.id,
-                                            namePatient: conference.namePatient,
-                                            study_description: conference.descriptionStudy,
-                                            dateOfStudy: formatDate(conference.dateOfStudy),
-                                            unity: conference.unity,
-                                            quantity: conference.qtn,
-                                            valueUnit: conference.valueUnity,
-                                            valueTotal: conference.valueTotal
-                                        };
-                                    })}
-                                    columns={[
-                                        {
-                                            field: 'expand',
-                                            headerName: '#',
-                                            width: 100,
-                                            renderCell: (params) => (
-                                                <Box>
-                                                    <IconButton onClick={() => handleExpandClick(params.row.id)}>
-                                                        {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
-                                                    </IconButton>
-                                                    <Checkbox />
-                                                </Box>
-                                            )
-                                        },
-                                        { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2, minWidth: 150 },
-                                        { field: 'study_description', minWidth: 150, headerName: 'Descrição do Estudo', flex: 2 },
-                                        { field: 'dateOfStudy', minWidth: 150, headerName: 'Data do Estudo', flex: 1 },
-                                        { field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1 },
-                                        { field: 'quantity', minWidth: 150, headerName: 'Qtn', flex: 1 },
-                                        { field: 'valueUnit', minWidth: 150, headerName: '$ Valor Laudo', flex: 1 },
-                                        { field: 'valueTotal', minWidth: 150, headerName: '$ Total', flex: 1 }
-                                    ]}
-                                    hideFooter
-                                    getRowId={(row) => row.id}
-                                    slots={{
-                                        row: (props) => {
-                                            const { row } = props;
-                                            return (
-                                                <>
-                                                    <GridRow {...props} />
-                                                    {expandedRowIds.includes(row.id) && (
-                                                        <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
-                                                            <Box height={20} />
-                                                            <Typography variant="h3">Laudos</Typography>
-                                                            <Box height={20} />
-                                                            <div style={{ height: 200, width: '100%' }}>
-                                                                <DataGrid
-                                                                    rows={(
-                                                                        conferences.find((conference) => conference.id === row.id)
-                                                                            ?.reportsConference || []
-                                                                    ).map((report) => {
-                                                                        return {
-                                                                            namePatient: report.namePatient,
-                                                                            reportDate: formatDate(report.dateOfReport),
-                                                                            reportTitle: report.titleOfReport,
-                                                                            reportValue: report.valueReport,
-                                                                            status: report.status
-                                                                        };
-                                                                    })}
-                                                                    columns={[
-                                                                        {
-                                                                            field: 'namePatient',
-                                                                            headerName: 'Nome do Paciente',
-                                                                            minWidth: 150,
-
-                                                                            flex: 2
-                                                                        },
-                                                                        {
-                                                                            field: 'reportDate',
-                                                                            headerName: 'Data do Laudo',
-                                                                            minWidth: 150,
-
-                                                                            flex: 2
-                                                                        },
-                                                                        {
-                                                                            field: 'titleOfReport',
-                                                                            headerName: 'Título do Laudo',
-                                                                            minWidth: 150,
-
-                                                                            flex: 2
-                                                                        },
-                                                                        {
-                                                                            field: 'valueOfReport',
-                                                                            headerName: '$ Valor Laudo',
-                                                                            minWidth: 150,
-
-                                                                            flex: 2
-                                                                        },
-                                                                        {
-                                                                            field: 'status',
-                                                                            headerName: 'Status',
-                                                                            minWidth: 150,
-
-                                                                            flex: 2,
-                                                                            renderCell(params) {
-                                                                                return <Chip label={params.value} />;
-                                                                            }
-                                                                        },
-
-                                                                        {
-                                                                            field: 'action',
-                                                                            headerName: ' ',
-                                                                            minWidth: 150,
-
-                                                                            flex: 1,
-                                                                            renderCell(params) {
-                                                                                return (
-                                                                                    <IconButton onClick={() => setOpen(true)}>
-                                                                                        <MoreVert sx={{ color: 'action.active' }} />
-                                                                                    </IconButton>
-                                                                                );
-                                                                            }
-                                                                        }
-                                                                    ]}
-                                                                    hideFooter
-                                                                    getRowId={(row) => row.namePatient}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </>
-                                            );
-                                        }
-                                    }}
+                                <ConferenceView
+                                    conferences={conferences}
+                                    expandedRowIds={expandedRowIds}
+                                    handleChangeCheckedConference={(id) => handleChangeCheckedConference(id)}
+                                    handleChangeCheckedReport={(idBilling, idReport) => handleChangeCheckedReport(idBilling, idReport)}
+                                    handleExpandClick={(id) => handleExpandClick(id)}
                                 />
                             )}
                             {/*Faturamento*/}
                             {tabIndex === 1 && (
-                                <DataGrid
-                                    rows={billings.map((billing) => {
-                                        return {
-                                            id: billing.id,
-                                            unity: billing.unidade,
-                                            monthOfBilling: formatDate(billing.dateOfBilling),
-                                            statusOfBilling: billing.statusOfBilling,
-                                            QTN: billing.qtn,
-                                            totalValue: billing.valueTotal
-                                        };
-                                    })}
-                                    columns={[
-                                        {
-                                            field: 'expand',
-                                            headerName: '#',
-                                            width: 50,
-                                            renderCell: (params) => (
-                                                <IconButton onClick={() => handleExpandClick(params.row.id)}>
-                                                    {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
-                                                </IconButton>
-                                            )
-                                        },
-                                        { field: 'unity', headerName: 'Unidade', flex: 1 },
-                                        { field: 'monthOfBilling', headerName: 'Mês da Fatura', flex: 1 },
-                                        {
-                                            field: 'statusOfBilling',
-                                            headerName: 'Status da Fatura',
-                                            flex: 2,
-                                            renderCell(params) {
-                                                return <Chip label={params.value} />;
-                                            }
-                                        },
-                                        { field: 'qtn', headerName: 'Qtn', flex: 1 },
-                                        { field: 'quantity', headerName: 'Qtn', flex: 1 },
-                                        { field: 'valueTotal', headerName: '$ Total', flex: 1 }
-                                    ]}
-                                    hideFooter
-                                    getRowId={(row) => row.id}
-                                    slots={{
-                                        row: (props) => {
-                                            const { row } = props;
-                                            return (
-                                                <>
-                                                    <GridRow {...props} />
-                                                    {expandedRowIds.includes(row.id) && (
-                                                        <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
-                                                            <Box height={20} />
-                                                            <Typography variant="h3">Laudos</Typography>
-                                                            <Box height={20} />
-                                                            <div style={{ height: 200, width: '100%' }}>
-                                                                <DataGrid
-                                                                    rows={(
-                                                                        billings.find((billing) => billing.id === row.id)?.reportsBilling ||
-                                                                        []
-                                                                    ).map((report) => {
-                                                                        return {
-                                                                            namePatient: report.namePatient,
-                                                                            reportDate: formatDate(report.dateOfReport),
-                                                                            doctor: report.doctorName,
-                                                                            unity: report.unity,
-                                                                            reportTitle: report.titleOfReport,
-                                                                            reportValue: report.valueReport
-                                                                        };
-                                                                    })}
-                                                                    columns={[
-                                                                        {
-                                                                            field: 'namePatient',
-                                                                            headerName: 'Nome do Paciente',
-                                                                            flex: 2
-                                                                        },
-                                                                        {
-                                                                            field: 'reportDate',
-                                                                            headerName: 'Data do Laudo',
-                                                                            flex: 2
-                                                                        },
-                                                                        {
-                                                                            field: 'doctor',
-                                                                            headerName: 'Médico',
-                                                                            flex: 1
-                                                                        },
-                                                                        {
-                                                                            field: 'unity',
-                                                                            headerName: 'Unidade',
-                                                                            flex: 1
-                                                                        },
-                                                                        {
-                                                                            field: 'reportTitle',
-                                                                            headerName: 'Título do Laudo',
-                                                                            flex: 1
-                                                                        },
-                                                                        {
-                                                                            field: 'reportValue',
-                                                                            headerName: '$ Valor Laudo',
-                                                                            flex: 1
-                                                                        },
-
-                                                                        {
-                                                                            field: 'action',
-                                                                            headerName: 'Remover',
-                                                                            flex: 1,
-                                                                            renderCell(params) {
-                                                                                return (
-                                                                                    <Box>
-                                                                                        <IconButton
-                                                                                            onClick={() => setOpenBillingReversal(true)}
-                                                                                        >
-                                                                                            <DeleteOutline
-                                                                                                sx={{ color: 'action.active' }}
-                                                                                            />
-                                                                                        </IconButton>
-                                                                                        <IconButton
-                                                                                            onClick={() => setOpenBillingConfirm(true)}
-                                                                                        >
-                                                                                            <MoreVert sx={{ color: 'action.active' }} />
-                                                                                        </IconButton>
-                                                                                    </Box>
-                                                                                );
-                                                                            }
-                                                                        }
-                                                                    ]}
-                                                                    hideFooter
-                                                                    getRowId={(row) => row.namePatient}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </>
-                                            );
-                                        }
-                                    }}
+                                <BillingView
+                                    billings={billings}
+                                    expandedRowIds={expandedRowIds}
+                                    handleExpandClick={(id) => handleExpandClick(id)}
+                                    handleChangeCheckedBilling={(id) => handleChangeCheckedBilling(id)}
+                                    handleChangeCheckedReport={(idBilling, idReport) => handleChangeCheckedReportBilling(idBilling, idReport)}
                                 />
                             )}
                             {/*Recebimento*/}
                             {tabIndex === 2 && (
-                                <DataGrid
-                                    rows={conferences.map((conference) => {
-                                        return {
-                                            id: conference.id,
-                                            namePatient: conference.namePatient,
-                                            study_description: conference.descriptionStudy,
-                                            dateOfStudy: formatDate(conference.dateOfStudy),
-                                            unity: conference.unity,
-                                            quantity: conference.qtn,
-                                            valueUnit: conference.valueUnity,
-                                            valueTotal: conference.valueTotal
-                                        };
-                                    })}
-                                    columns={[
-                                        {
-                                            field: 'expand',
-                                            headerName: '#',
-                                            width: 50,
-                                            renderCell: (params) => (
-                                                <IconButton onClick={() => handleExpandClick(params.row.id)}>
-                                                    {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
-                                                </IconButton>
-                                            )
-                                        },
-                                        { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2 },
-                                        { field: 'study_description', headerName: 'Descrição do Estudo', flex: 2 },
-                                        { field: 'dateOfStudy', headerName: 'Data do Estudo', flex: 1 },
-                                        { field: 'unity', headerName: 'Unidade', flex: 1 },
-                                        { field: 'quantity', headerName: 'Qtn', flex: 1 },
-                                        { field: 'valueUnit', headerName: '$ Valor Laudo', flex: 1 },
-                                        { field: 'valueTotal', headerName: '$ Total', flex: 1 }
-                                    ]}
-                                    hideFooter
-                                    getRowId={(row) => row.id}
-                                    slots={{
-                                        row: (props) => {
-                                            const { row } = props;
-                                            return (
-                                                <>
-                                                    <GridRow {...props} />
-                                                    {expandedRowIds.includes(row.id) && (
-                                                        <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
-                                                            <Box height={20} />
-                                                            <Typography variant="h3">Laudos</Typography>
-                                                            <Box height={20} />
-                                                            <div style={{ height: 200, width: '100%' }}>
-                                                                <DataGrid
-                                                                    rows={(
-                                                                        conferences.find((conference) => conference.id === row.id)
-                                                                            ?.reportsConference || []
-                                                                    ).map((report) => {
-                                                                        return {
-                                                                            namePatient: report.namePatient,
-                                                                            reportDate: report.dateOfReport,
-                                                                            reportTitle: report.titleOfReport,
-                                                                            reportValue: report.valueReport,
-                                                                            status: report.status
-                                                                        };
-                                                                    })}
-                                                                    columns={[
-                                                                        {
-                                                                            field: 'namePatient',
-                                                                            headerName: 'Nome do Paciente',
-                                                                            flex: 2
-                                                                        },
-                                                                        {
-                                                                            field: 'reportDate',
-                                                                            headerName: 'Data do Laudo',
-                                                                            flex: 2
-                                                                        },
-                                                                        {
-                                                                            field: 'titleOfReport',
-                                                                            headerName: 'Título do Laudo',
-                                                                            flex: 1
-                                                                        },
-                                                                        {
-                                                                            field: 'valueOfReport',
-                                                                            headerName: '$ Valor Laudo'
-                                                                        },
-                                                                        {
-                                                                            field: 'status',
-                                                                            headerName: 'Status',
-                                                                            flex: 1,
-                                                                            renderCell(params) {
-                                                                                return <Chip label={params.value} />;
-                                                                            }
-                                                                        },
-
-                                                                        {
-                                                                            field: 'action',
-                                                                            headerName: 'Remover',
-                                                                            flex: 1,
-                                                                            renderCell(params) {
-                                                                                return <MoreVert sx={{ color: 'action.active' }} />;
-                                                                            }
-                                                                        }
-                                                                    ]}
-                                                                    hideFooter
-                                                                    getRowId={(row) => row.namePatient}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </>
-                                            );
-                                        }
-                                    }}
+                                <ReceiptView
+                                    billings={receipts}
+                                    expandedRowIds={expandedRowIds}
+                                    handleExpandClick={(id) => handleExpandClick(id)}
                                 />
                             )}
                         </div>
@@ -633,7 +451,7 @@ const BillingConference: React.FC = () => {
                         <Box
                             display="flex"
                             alignItems={'center'}
-                            onClick={() => setOpen(false)}
+                            onClick={() => { }}
                             sx={{
                                 '&:hover': {
                                     cursor: 'pointer',
@@ -649,7 +467,7 @@ const BillingConference: React.FC = () => {
                         <Box
                             display="flex"
                             alignItems={'center'}
-                            onClick={() => setOpen(false)}
+                            onClick={() => { }}
                             sx={{
                                 '&:hover': {
                                     cursor: 'pointer',
@@ -665,75 +483,9 @@ const BillingConference: React.FC = () => {
                 </Box>
             </Dialog>
             {/* Dialog de Confirmação de Faturamento */}
-            <ConfirmBillingForm open={openBillingConfirm} onClose={() => setOpenBillingConfirm(false)} />
+            <ConfirmBillingForm open={openBillingConfirm} billing={currentBilling} onClose={(value) => handleCloseConfirmBilling(value)} />
             {/* Dialog de Estorno de Faturamento */}
-            <Dialog fullWidth maxWidth={'lg'} open={openBillingReversal} onClose={() => setOpenBillingReversal(false)}>
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handleReversalBilling(
-                            billings.find((billing) => billing.id, toString() === unity?.cd_unidade)?.id || 0,
-                            parseInt(unity!.cd_unidade!),
-                            valueTotal,
-                            obsReversal
-                        );
-                    }}
-                >
-                    <Box margin={'10px'}>
-                        <DialogTitle>
-                            <span style={{ fontSize: '2vh', fontWeight: 'bold' }}>Estorno do Faturamento</span>
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText style={{ fontSize: '1.3vh' }}>
-                                <span style={{ fontWeight: 'bold' }}>Atenção: </span>
-                                Você está prestes a estornar este faturamento. Ao realizar esta ação, o valor será revertido, e os dados
-                                voltarão para a conferência. Certifique-se de que esta ação é necessária, pois o estorno não poderá ser
-                                desfeito. Confirme se deseja prosseguir.
-                            </DialogContentText>
-                            <Box height={40} />
-                            <Grid container spacing={2}>
-                                <Grid item xs={8}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="select-label">Unidade</InputLabel>
-                                        <Select
-                                            labelId="select-label"
-                                            label="Select"
-                                            onChange={(e) => setUnity(unities.find((unity) => unity.cd_unidade === e.target.value))}
-                                        >
-                                            {unities.map((unity) => (
-                                                <MenuItem key={unity.cd_unidade} value={unity.cd_unidade}>
-                                                    {unity.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField label="R$ Valor" fullWidth onChange={(e) => setValueTotal(Number(e.target.value))} />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField label="Motivo do Estorno" fullWidth onChange={(e) => setObsReversal(e.target.value)} />
-                                </Grid>
-                            </Grid>
-                        </DialogContent>
-                    </Box>
-                    <Box height={60} />
-                    <DialogActions>
-                        <Button variant="outlined" onClick={() => setOpenBillingReversal(false)} color="primary" size="large">
-                            Fechar
-                        </Button>
-                        <Box width={5} />
-                        <Button
-                            size="large"
-                            variant="contained"
-                            type="submit"
-                            sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}
-                        >
-                            Salvar
-                        </Button>
-                    </DialogActions>
-                </form>
-            </Dialog>
+            <RefundBillingForm open={openBillingReversal} onClose={(value) => handleCloseRefundBilling(value)} billing={currentBilling} />
         </>
     );
 };
