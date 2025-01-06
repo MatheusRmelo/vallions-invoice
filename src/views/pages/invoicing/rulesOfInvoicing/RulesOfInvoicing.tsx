@@ -137,20 +137,17 @@ const RulesOfInvoicing = () => {
                                 {
                                     field: 'rulesDescription',
                                     minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição Regra</strong>,
                                     headerName: 'Descrição Regra',
                                     flex: 1
                                 },
                                 {
                                     field: 'institution',
                                     minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>,
                                     headerName: 'Instituição',
                                     flex: 1
                                 },
                                 {
                                     field: 'unity',
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Unidade</strong>,
                                     minWidth: 150,
                                     headerName: 'Unidade',
                                     flex: 1
@@ -159,7 +156,6 @@ const RulesOfInvoicing = () => {
                                     field: 'actions',
                                     minWidth: 150,
                                     headerName: 'Editar',
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
                                     flex: 1,
                                     renderCell: (params) => (
                                         <Box display="flex" justifyContent="center">
@@ -182,7 +178,6 @@ const RulesOfInvoicing = () => {
                                     field: 'status',
                                     minWidth: 150,
                                     headerName: 'Inativo/Ativo',
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
                                     flex: 1,
                                     renderCell: (params) => (
                                         <Switch

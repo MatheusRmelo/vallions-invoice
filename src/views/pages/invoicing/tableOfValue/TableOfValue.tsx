@@ -113,8 +113,8 @@ const TableOfValues = () => {
                     height="80vh"
                     sx={{
                         '& .MuiDataGrid-root': { border: 'none' },
-                        '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '1.2vh' },
-                        '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '1.5vh' },
+                        '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '12px' },
+                        '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '12px', fontWeight: 'bold' },
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
@@ -131,12 +131,11 @@ const TableOfValues = () => {
                             { field: 'description', minWidth: 150, headerName: 'Descrição do Procedimento', flex: 2 },
                             {
                                 field: 'actions',
-                                headerName: 'actions',
+                                headerName: 'Editar',
                                 type: 'actions',
                                 flex: 1,
                                 minWidth: 150,
                                 cellClassName: 'actions',
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
                                 getActions: ({ id }) => {
                                     return [
                                         <GridActionsCellItem

@@ -159,35 +159,30 @@ const ProcedureView = () => {
                                     headerName: 'ID',
                                     flex: 1,
                                     minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>
                                 },
                                 {
                                     field: 'name',
                                     headerName: 'Descrição do Procedimento',
                                     flex: 1,
                                     minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Procedimento</strong>
                                 },
                                 {
                                     field: 'code',
                                     headerName: 'Código CBHPM',
                                     flex: 1,
                                     minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Código CBHPM</strong>
                                 },
                                 {
                                     field: 'institution_fk',
                                     headerName: 'Instituição',
                                     flex: 1,
                                     minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Instituição</strong>
                                 },
                                 {
                                     field: 'modalities',
                                     headerName: 'Modalidade',
                                     flex: 1,
                                     minWidth: 150,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Modalidade</strong>
                                 },
                                 {
                                     field: 'actions',
@@ -196,7 +191,6 @@ const ProcedureView = () => {
                                     flex: 1,
                                     minWidth: 150,
                                     cellClassName: 'actions',
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
                                     getActions: ({ id }) => {
                                         return [
                                             <GridActionsCellItem
@@ -216,7 +210,6 @@ const ProcedureView = () => {
                                     headerName: 'Inativo/Ativo',
                                     minWidth: 150,
                                     flex: 2,
-                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
                                     getActions: ({ id }) => {
                                         let procedure = getProcedureById(id);
                                         return [
