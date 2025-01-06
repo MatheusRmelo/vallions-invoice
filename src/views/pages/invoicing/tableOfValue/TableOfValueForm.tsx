@@ -47,7 +47,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         institute: null
     });
     const [description, setDescription] = useState('');
-    const [institute, setInstitute] = useState<string>("");
+    const [institute, setInstitute] = useState<string>('');
     const [institutes, setInstitutes] = useState<Institute[]>([]);
     const [importOpen, setImportOpen] = useState(false);
     const [procedureOpen, setProcedureOpen] = useState(false);
@@ -73,7 +73,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         } else {
             setError(response.message);
         }
-    }
+    };
 
     const getInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
@@ -83,7 +83,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         } else {
             setError(response.message);
         }
-
     };
 
     const getTableOfValue = () => {
@@ -93,8 +92,8 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             setInstitute(institute[0].id_institution);
             getProceduresCosts();
         } else {
-            setDescription("");
-            setInstitute("");
+            setDescription('');
+            setInstitute('');
         }
     };
 
@@ -103,7 +102,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         let filtered = rows.filter((element) => element.id == id);
         if (filtered.length === 0) return null;
         return filtered[0];
-    }
+    };
 
     const handleSave = async () => {
         const intituteForeignKeyId = institute;
@@ -153,7 +152,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     const handleClickAddProcedureCost = () => {
         setProcedureCost(null);
         setProcedureOpen(true);
-    }
+    };
 
     const handleCloseProcedureCost = (procedureCost: ProcedureCost | null) => {
         if (tableOfValue != null) {
@@ -161,14 +160,13 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         } else {
             if (procedureCost) {
                 var newArray = [...proceduresCosts];
-                newArray.push(procedureCost!)
+                newArray.push(procedureCost!);
                 setProceduresCosts(newArray);
             }
         }
 
-
         setProcedureOpen(false);
-    }
+    };
 
     const handleUpdateTableOfValue = async () => {
         if (tableOfValue) {
@@ -197,7 +195,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                 setError(response.message);
             }
         }
-    }
+    };
 
     const validate = () => {
         const newErrors = { ...errors };
@@ -354,12 +352,13 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                     headerName: 'Vigência Inicial',
                                     renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Inicial</span>,
                                     flex: 2,
-                                    minWidth: 150,
+                                    minWidth: 150
                                 },
                                 {
                                     field: 'endDate',
                                     headerName: 'Vigência Final',
-                                    flex: 2, minWidth: 150,
+                                    flex: 2,
+                                    minWidth: 150,
                                     renderHeader: () => <span style={{ fontWeight: 'bold' }}>Vigência Final</span>
                                 },
                                 {
@@ -367,7 +366,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                     headerName: 'Cód. Procedimento',
                                     renderHeader: () => <span style={{ fontWeight: 'bold' }}>Cód. Procedimento</span>,
                                     flex: 2,
-                                    minWidth: 150,
+                                    minWidth: 150
                                 },
                                 {
                                     field: 'procedureDescription',
@@ -375,7 +374,9 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                     renderHeader: () => <span style={{ fontWeight: 'bold' }}>Descrição Procedimento</span>,
                                     flex: 3,
                                     minWidth: 150,
-                                    renderCell: (params: GridCellParams) => <span style={{ fontWeight: 'bold' }}>{params.value as string}</span>
+                                    renderCell: (params: GridCellParams) => (
+                                        <span style={{ fontWeight: 'bold' }}>{params.value as string}</span>
+                                    )
                                 },
                                 { field: 'value', headerName: 'Valor Procedimento', flex: 4 },
                                 {
@@ -410,30 +411,27 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                 </DialogContent>
                 <DialogActions>
                     <Button
+                        // variant="outlined"
+                        // sx={{
+                        //     width: '10vh',
+                        //     height: '4vh',
+                        //     fontWeight: 'bold',
+                        //     fontSize: '1.5vh'
+                        // }}
                         variant="outlined"
-                        sx={{
-                            width: '10vh',
-                            height: '4vh',
-                            fontWeight: 'bold',
-                            fontSize: '1.5vh'
-                        }}
-                        onClick={() => handleClose(false)}
                         color="primary"
+                        size="large"
+                        onClick={() => handleClose(false)}
+                        // color="primary"
                     >
                         Fechar
                     </Button>
                     <Box width={5} />
                     <Button
+                        size="large"
                         variant="contained"
                         type="submit"
-                        sx={{
-                            width: '10vh',
-                            height: '4vh',
-                            fontSize: '1.5vh',
-                            fontWeight: 'bold',
-                            color: 'white',
-                            backgroundColor: 'rgba(103, 58, 183, 1)'
-                        }}
+                        sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}
                     >
                         Salvar
                     </Button>
@@ -444,7 +442,8 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     institutes={institutes}
                     open={procedureOpen}
                     tableOfValueId={tableOfValue ? tableOfValue.id.toString() : null}
-                    onClose={handleCloseProcedureCost} />
+                    onClose={handleCloseProcedureCost}
+                />
             </form>
         </Dialog>
     );
