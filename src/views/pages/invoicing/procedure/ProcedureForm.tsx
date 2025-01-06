@@ -222,7 +222,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                                     sx={selectStyles}
                                 >
                                     {institutes.map((institute) => (
-                                        <MenuItem key={institute.name} value={institute.name}>
+                                        <MenuItem key={institute.id_institution} value={institute.id_institution}>
                                             {institute.name}
                                         </MenuItem>
                                     ))}
