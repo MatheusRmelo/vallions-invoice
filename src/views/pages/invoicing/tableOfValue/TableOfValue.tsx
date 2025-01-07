@@ -128,7 +128,7 @@ const TableOfValues = () => {
                         editMode="row"
                         columns={[
                             { field: 'id', headerName: 'ID', minWidth: 150, flex: 2 },
-                            { field: 'description', minWidth: 150, headerName: 'Descrição do Procedimento', flex: 2 },
+                            { field: 'description', minWidth: 150, headerName: 'Tabela de valores', flex: 2 },
                             {
                                 field: 'actions',
                                 headerName: 'Editar',
