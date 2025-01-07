@@ -11,7 +11,8 @@ import {
     Grid,
     Select,
     InputLabel,
-    MenuItem
+    MenuItem,
+    SnackbarCloseReason
 } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CustomTextField from 'ui-component/inputs/procedureFormTextField';
@@ -30,6 +31,7 @@ import { parseProcedureCosts, getProcedureCostsMock, ProcedureCost, parseProcedu
 
 import useAPI from 'hooks/useAPI';
 import { Institute, parseInstitute } from 'types/institute';
+import SnackBarAlert from 'ui-component/SnackBarAlert';
 type TableOfValueFormProps = {
     open: boolean;
     handleClose: (refresh: boolean) => void;
@@ -55,6 +57,9 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     const [procedureCost, setProcedureCost] = useState<ProcedureCost | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<string>('');
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
 
     const { get, post, put, del } = useAPI();
 
@@ -104,6 +109,17 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         return filtered[0];
     };
 
+    const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
+        setMessageSnack(message);
+        severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
+    };
+
+    const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway') return;
+        setOpenSucessSnack(false);
+        setOpenErrorSnack(false);
+    };
+
     const handleSave = async () => {
         const intituteForeignKeyId = institute;
         if (validate() && intituteForeignKeyId !== null) {
@@ -115,7 +131,10 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                 });
                 if (response.ok) {
                     handleClose(true);
+                    handleClickSnack({ message: 'Tabela de valores editado com sucesso!', severity: 'success' });
+
                 } else {
+                    handleClickSnack({ message: response.message ?? 'Error ao salvar as tabela de valores', severity: 'error' });
                     setError('Erro ao salvar os procedimentos');
                 }
             } else {
@@ -143,6 +162,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                         handleClose(true);
                     } else {
                         setError('Erro ao salvar os procedimentos');
+                        handleClickSnack({ message: response.message ?? 'Error ao salvar as tabela de valores', severity: 'error' });
                     }
                 }
             }
@@ -166,21 +186,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         }
 
         setProcedureOpen(false);
-    };
-
-    const handleUpdateTableOfValue = async () => {
-        if (tableOfValue) {
-            const response = await put(`/api/medical-procedure-costs/${tableOfValue.id}`, {
-                description: description,
-                status: tableOfValue.status,
-                institution_fk: institute
-            });
-            if (response.ok) {
-                handleClose(false);
-            } else {
-                setError(response.message);
-            }
-        }
     };
 
     const handleDeleteProcedureCost = async (id: number) => {
@@ -408,6 +413,8 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                             ]}
                         />
                     )}
+                    <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
+                    <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -422,7 +429,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                         color="primary"
                         size="large"
                         onClick={() => handleClose(false)}
-                        // color="primary"
+                    // color="primary"
                     >
                         Fechar
                     </Button>

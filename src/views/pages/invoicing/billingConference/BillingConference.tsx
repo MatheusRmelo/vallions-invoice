@@ -22,7 +22,8 @@ import {
     DialogActions,
     useMediaQuery,
     useTheme,
-    Checkbox
+    Checkbox,
+    SnackbarCloseReason
 } from '@mui/material';
 import { DataGrid, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
@@ -39,6 +40,7 @@ import BillingView from './BillingView';
 import ConferenceView from './ConferenceView';
 import RefundBillingForm from './RefundBillingForm';
 import ReceiptView from './ReceiptView';
+import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 
 const BillingConference: React.FC = () => {
@@ -58,6 +60,9 @@ const BillingConference: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [currentBilling, setCurrentBilling] = useState<ReportBilling | null>(null);
     const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
 
     const isMobile = useMediaQuery(useTheme().breakpoints.down('sm'));
     const { get, put } = useAPI();
@@ -268,6 +273,17 @@ const BillingConference: React.FC = () => {
         }
     }
 
+    const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
+        setMessageSnack(message);
+        severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
+    };
+
+    const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway') return;
+        setOpenSucessSnack(false);
+        setOpenErrorSnack(false);
+    };
+
     const handleCloseConfirmBilling = (success: boolean) => {
         if (success) {
             var newArray = [...checkedBillings];
@@ -278,6 +294,7 @@ const BillingConference: React.FC = () => {
                 setCurrentBilling(newArray[0]);
             } else {
                 getBillings();
+                handleClickSnack({ message: 'successo', severity: 'success' });
             }
         }
 
@@ -294,6 +311,7 @@ const BillingConference: React.FC = () => {
                 setCurrentBilling(newArray[0]);
             } else {
                 getBillings();
+                handleClickSnack({ message: 'successo', severity: 'success' });
             }
         }
 
@@ -303,6 +321,9 @@ const BillingConference: React.FC = () => {
     return (
         <>
             <MainCard title="Conferência de Laudos para Faturamento">
+                <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
+                <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
+
                 <Card>
                     <CardContent>
                         <Grid container spacing={4}>

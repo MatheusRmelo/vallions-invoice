@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { Box } from '@mui/material';
+import { Box, SnackbarCloseReason } from '@mui/material';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import Search from '@mui/icons-material/Search';
 import { DataGrid, GridRowId, GridActionsCellItem } from '@mui/x-data-grid';
@@ -11,6 +11,7 @@ import Switch from '@mui/material/Switch';
 import TableOfValueForm from './TableOfValueForm';
 import { TableOfValue, parseTableOfValues } from 'types/tableOfValue';
 import useAPI from 'hooks/useAPI';
+import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 const TableOfValues = () => {
     const [open, setOpen] = useState(false);
@@ -19,6 +20,9 @@ const TableOfValues = () => {
     const [tableOfValue, setTableOfValue] = useState<TableOfValue | null>(null);
     const [searchKey, setSearchKey] = useState('');
     const [dataRaw, setDataRaw] = useState<TableOfValue[]>([]);
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
 
     const { get, put } = useAPI();
 
@@ -78,8 +82,20 @@ const TableOfValues = () => {
     const handleClose = (refresh = false) => {
         setOpen(false);
         if (refresh) {
+            handleClickSnack({ message: 'successo', severity: 'success' });
             getTableOfValues();
         }
+    };
+
+    const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
+        setMessageSnack(message);
+        severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
+    };
+
+    const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway') return;
+        setOpenSucessSnack(false);
+        setOpenErrorSnack(false);
     };
 
     const handleSearch = (searchKey: string) => {
@@ -95,6 +111,8 @@ const TableOfValues = () => {
     return (
         <>
             <MainCard title="Tabela de Valores">
+                <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
+                <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 <Box display="flex" justifyContent="space-between">
                     <CustomTextField
                         label="Search"

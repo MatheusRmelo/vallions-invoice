@@ -1,7 +1,8 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, SnackbarCloseReason, TextField } from "@mui/material";
 import useAPI from "hooks/useAPI";
 import { useState } from "react";
 import { ReportBilling } from "types/billing";
+import SnackBarAlert from "ui-component/SnackBarAlert";
 
 type Props = {
     open: boolean,
@@ -12,7 +13,22 @@ type Props = {
 const ConfirmBillingForm = ({ open, onClose, billing }: Props) => {
     const [previsionDate, setPrevisionDate] = useState("");
     const [observation, setObservation] = useState("");
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
+
     const { post } = useAPI();
+
+    const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
+        setMessageSnack(message);
+        severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
+    };
+
+    const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway') return;
+        setOpenSucessSnack(false);
+        setOpenErrorSnack(false);
+    };
 
     const handleSave = async () => {
         var response = await post(`/api/billing-confirmations/${billing?.id}/confirmation`, {
@@ -22,7 +38,7 @@ const ConfirmBillingForm = ({ open, onClose, billing }: Props) => {
         if (response.ok) {
             onClose(true);
         } else {
-            console.log(response);
+            handleClickSnack({ message: response.message ?? 'Error ao confirmar faturamento', severity: 'error' });
         }
     }
 
@@ -64,6 +80,8 @@ const ConfirmBillingForm = ({ open, onClose, billing }: Props) => {
                                         <TextField label="Observação" value={observation} onChange={(e) => setObservation(e.target.value)} fullWidth />
                                     </Grid>
                                 </Grid>
+                                <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
+                                <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                             </DialogContent>
                         </Box>
                         <Box height={60} />

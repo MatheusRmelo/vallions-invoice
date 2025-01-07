@@ -1,7 +1,8 @@
-import { Dialog, Box, DialogTitle, DialogContent, DialogContentText, Grid, FormControl, InputLabel, Select, MenuItem, TextField, DialogActions, Button } from "@mui/material";
+import { Dialog, Box, DialogTitle, DialogContent, DialogContentText, Grid, FormControl, InputLabel, Select, MenuItem, TextField, DialogActions, Button, SnackbarCloseReason } from "@mui/material";
 import useAPI from "hooks/useAPI";
 import { useState } from "react";
 import { ReportBilling } from "types/billing";
+import SnackBarAlert from "ui-component/SnackBarAlert";
 
 type Props = {
     open: boolean,
@@ -12,8 +13,23 @@ type Props = {
 
 const RefundBillingForm = ({ open, onClose, billing }: Props) => {
     const [reason, setReason] = useState("");
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
 
     const { post } = useAPI();
+
+
+    const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
+        setMessageSnack(message);
+        severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
+    };
+
+    const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway') return;
+        setOpenSucessSnack(false);
+        setOpenErrorSnack(false);
+    };
 
     const handleSave = async () => {
         const response = await post(`/api/billing-confirmations/${billing?.id}/refund`, {
@@ -22,7 +38,7 @@ const RefundBillingForm = ({ open, onClose, billing }: Props) => {
         if (response.ok) {
             onClose(true);
         } else {
-            console.log(response);
+            handleClickSnack({ message: response.message ?? 'Error ao confirmar faturamento', severity: 'error' });
         }
     }
 
@@ -58,6 +74,8 @@ const RefundBillingForm = ({ open, onClose, billing }: Props) => {
                                     <TextField label="Motivo do Estorno" fullWidth value={reason} onChange={(e) => setReason(e.target.value)} />
                                 </Grid>
                             </Grid>
+                            <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
+                            <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                         </DialogContent>
                     </Box>
                     <Box height={60} />
