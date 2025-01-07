@@ -14,6 +14,7 @@ import { Procedure, parseProcedure } from 'types/procedure';
 import 'react-toastify/dist/ReactToastify.css';
 import useConfig from 'hooks/useConfig';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
+import { ThemeMode } from 'types/config';
 
 const ProcedureView = () => {
     const [open, setOpen] = useState(false);
@@ -27,6 +28,7 @@ const ProcedureView = () => {
     const [messageSnack, setMessageSnack] = useState('');
     const [loading, setLoading] = useState(false);
     const [dataRaw, setDataRaw] = useState<Procedure[]>([]);
+
     useEffect(() => {
         getProcedures();
     }, []);
@@ -197,7 +199,7 @@ const ProcedureView = () => {
                                     getActions: ({ id }) => {
                                         return [
                                             <GridActionsCellItem
-                                                icon={<Edit sx={{ color: 'black' }} />}
+                                                icon={<Edit sx={{ color: ThemeMode.DARK == mode ? 'white' : 'black' }} />}
                                                 label="Editar"
                                                 className="textPrimary"
                                                 onClick={() => handleClickEdit(id)}

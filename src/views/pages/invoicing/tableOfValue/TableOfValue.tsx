@@ -12,6 +12,8 @@ import TableOfValueForm from './TableOfValueForm';
 import { TableOfValue, parseTableOfValues } from 'types/tableOfValue';
 import useAPI from 'hooks/useAPI';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
+import { ThemeMode } from 'types/config';
+import useConfig from 'hooks/useConfig';
 
 const TableOfValues = () => {
     const [open, setOpen] = useState(false);
@@ -23,6 +25,7 @@ const TableOfValues = () => {
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
+    const { mode } = useConfig();
 
     const { get, put } = useAPI();
 
@@ -157,7 +160,7 @@ const TableOfValues = () => {
                                 getActions: ({ id }) => {
                                     return [
                                         <GridActionsCellItem
-                                            icon={<Edit sx={{ color: 'black' }} />}
+                                            icon={<Edit sx={{ color: ThemeMode.DARK == mode ? 'white' : 'black' }} />}
                                             label="Editar"
                                             className="textPrimary"
                                             onClick={() => handleClickEdit(id)}

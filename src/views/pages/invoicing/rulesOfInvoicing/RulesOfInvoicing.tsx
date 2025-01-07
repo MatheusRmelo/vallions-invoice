@@ -12,6 +12,8 @@ import useAPI from 'hooks/useAPI';
 import { RuleBilling, parseRuleBillingList } from 'types/rules_billing';
 import RulesOfInvoicingForm from './RulesOfInvoicingForm';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
+import useConfig from 'hooks/useConfig';
+import { ThemeMode } from 'types/config';
 
 const RulesOfInvoicing = () => {
     const [open, setOpen] = useState(false);
@@ -24,6 +26,7 @@ const RulesOfInvoicing = () => {
     const [messageSnack, setMessageSnack] = useState('');
     const [searchKey, setSearchKey] = useState('');
     const [dataRaw, setDataRaw] = useState<RuleBilling[]>([]);
+    const { mode } = useConfig();
 
     const handleOpen = () => {
         setOpen(true);
@@ -193,7 +196,7 @@ const RulesOfInvoicing = () => {
                                                 style={{
                                                     fontSize: '2.5vh',
                                                     marginBottom: '1vh',
-                                                    color: 'rgba(103, 58, 183, 1)'
+                                                    color: ThemeMode.DARK == mode ? 'white' : 'black'
                                                 }}
                                             />
                                         </Box>
