@@ -30,7 +30,7 @@ export function parseRuleBillingList(data: any): RuleBilling[] {
 export function toJSONRuleBilling(data: RuleBilling): any {
     return {
         description: data.rulesDescription,
-        branch_fk: data.unity,
+        branch_fk: data.unity.cd_unidade,
         status: data.status
     };
 }

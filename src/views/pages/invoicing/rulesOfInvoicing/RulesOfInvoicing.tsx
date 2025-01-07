@@ -57,17 +57,42 @@ const RulesOfInvoicing = () => {
         return rules.find((rule) => rule.id === id);
     };
 
-    const updateStatusRule = async (rule: RuleBilling) => {
-        const reqCore = await put(`/api/billing-rules/${rule.id}/status`, {
-            status: rule.status === 1 ? 0 : 1
-        });
-        if (reqCore.ok) {
-            fetchBillingRules();
-            setMessageSnack('Status da Regra de faturamento atualizada com sucesso');
-            setOpenSucessSnack(true);
-        } else {
-            setMessageSnack('Erro ao atualizar situação regra de faturamento');
-            setOpenErrorSnack(true);
+    // const updateStatusRule = async (rule: RuleBilling) => {
+    //     const reqCore = await put(`/api/billing-rules/${rule.id}/status`, {
+    //         status: rule.status === 1 ? 0 : 1
+    //     });
+    //     if (reqCore.ok) {
+    //         fetchBillingRules();
+    //         setMessageSnack('Status da Regra de faturamento atualizada com sucesso');
+    //         setOpenSucessSnack(true);
+    //     } else {
+    //         setMessageSnack('Erro ao atualizar situação regra de faturamento');
+    //         setOpenErrorSnack(true);
+    //     }
+    // };
+    const updateStatusRule = async (id: number) => {
+        var newArray = [...rules];
+        var found: number = -1;
+        for (let i = 0; i < newArray.length; i++) {
+            var element = newArray[i];
+            if (element.id === id) {
+                newArray[i].status = element.status === 1 ? 0 : 1;
+                found = i;
+            }
+        }
+        if (found !== -1) {
+            setRules(newArray);
+            const reqCore = await put(`/api/billing-rules/${id}/status`, {
+                ...newArray[found],
+                status: newArray[found].status
+            });
+            if (reqCore.ok) {
+                setMessageSnack('Status da Regra de faturamento atualizada com sucesso');
+                setOpenSucessSnack(true);
+            } else {
+                setMessageSnack('Erro ao atualizar situação regra de faturamento');
+                setOpenErrorSnack(true);
+            }
         }
     };
 
@@ -183,7 +208,8 @@ const RulesOfInvoicing = () => {
                                         <Switch
                                             checked={params.value === 1}
                                             onChange={() => {
-                                                updateStatusRule(getRuleById(params.row.id as number) as RuleBilling);
+                                                updateStatusRule(params.row.id as number);
+                                                // updateStatusRule(getRuleById(params.row.id as number) as RuleBilling);
                                             }}
                                             color="primary"
                                             inputProps={{ 'aria-label': 'primary checkbox' }}

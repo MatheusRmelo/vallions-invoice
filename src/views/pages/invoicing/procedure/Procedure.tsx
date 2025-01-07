@@ -96,7 +96,10 @@ const ProcedureView = () => {
             setData(newArray);
             setDataRaw(newArray);
             const req = await put(`/api/billingProcedure/${id.valueOf()}`, {
-                ...newArray[found],
+                name: newArray[found].name,
+                code: newArray[found].code,
+                institution: newArray[found].institution_fk,
+                modality: newArray[found].modalities?.join(','),
                 status: newArray[found].status ? '1' : '0'
             });
 
@@ -158,31 +161,31 @@ const ProcedureView = () => {
                                     field: 'id',
                                     headerName: 'ID',
                                     flex: 1,
-                                    minWidth: 150,
+                                    minWidth: 150
                                 },
                                 {
                                     field: 'name',
                                     headerName: 'Descrição do Procedimento',
                                     flex: 1,
-                                    minWidth: 150,
+                                    minWidth: 150
                                 },
                                 {
                                     field: 'code',
                                     headerName: 'Código CBHPM',
                                     flex: 1,
-                                    minWidth: 150,
+                                    minWidth: 150
                                 },
                                 {
                                     field: 'institution_fk',
                                     headerName: 'Instituição',
                                     flex: 1,
-                                    minWidth: 150,
+                                    minWidth: 150
                                 },
                                 {
                                     field: 'modalities',
                                     headerName: 'Modalidade',
                                     flex: 1,
-                                    minWidth: 150,
+                                    minWidth: 150
                                 },
                                 {
                                     field: 'actions',
