@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, SnackbarCloseReason } from '@mui/material';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import Search from '@mui/icons-material/Search';
 import { DataGrid } from '@mui/x-data-grid';
@@ -32,16 +32,15 @@ const RulesOfInvoicing = () => {
         setOpen(true);
     };
 
-    const handleCloseSnack = () => {
-        setOpenErrorSnack(false);
-        setOpenSucessSnack(false);
-    };
-
-    const handleClose = () => {
+    const handleClose = (refresh: boolean) => {
         setOpen(false);
+        if (refresh) {
+            handleClickSnack({ message: 'Tabela de valores salva com sucesso', severity: 'success' });
+            getBillingRules();
+        }
     };
 
-    const fetchBillingRules = async () => {
+    const getBillingRules = async () => {
         setLoading(true);
         const response = await get('/api/billing-rules');
         if (response.ok) {
@@ -65,7 +64,7 @@ const RulesOfInvoicing = () => {
     //         status: rule.status === 1 ? 0 : 1
     //     });
     //     if (reqCore.ok) {
-    //         fetchBillingRules();
+    //         getBillingRules();
     //         setMessageSnack('Status da Regra de faturamento atualizada com sucesso');
     //         setOpenSucessSnack(true);
     //     } else {
@@ -109,8 +108,19 @@ const RulesOfInvoicing = () => {
         }
     };
 
+    const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
+        setMessageSnack(message);
+        severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
+    };
+
+    const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway') return;
+        setOpenSucessSnack(false);
+        setOpenErrorSnack(false);
+    };
+
     useEffect(() => {
-        fetchBillingRules();
+        getBillingRules();
     }, []);
 
     return (

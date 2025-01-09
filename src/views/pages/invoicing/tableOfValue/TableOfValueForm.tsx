@@ -131,8 +131,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                 });
                 if (response.ok) {
                     handleClose(true);
-                    handleClickSnack({ message: 'Tabela de valores editado com sucesso!', severity: 'success' });
-
+                    //handleClickSnack({ message: 'Tabela de valores editado com sucesso!', severity: 'success' });
                 } else {
                     handleClickSnack({ message: response.message ?? 'Error ao salvar as tabela de valores', severity: 'error' });
                     setError('Erro ao salvar os procedimentos');
@@ -309,12 +308,14 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 marginTop: '20px'
                             }}
                         >
-                            <CloudUpload
-                                onClick={() => {
-                                    setImportOpen(true);
-                                }}
-                                sx={{ color: 'action.active', mr: 2, marginTop: '1px', fontSize: 24 }}
-                            />
+                            {
+                                tableOfValue != null ? <CloudUpload
+                                    onClick={() => {
+                                        setImportOpen(true);
+                                    }}
+                                    sx={{ color: 'action.active', mr: 2, marginTop: '1px', fontSize: 24 }}
+                                /> : <div></div>
+                            }
                             <Fab
                                 color="primary"
                                 onClick={handleClickAddProcedureCost}
@@ -443,7 +444,10 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                         Salvar
                     </Button>
                 </DialogActions>
-                <ImportOfProcedure open={importOpen} handleClose={() => setImportOpen(false)} />
+                <ImportOfProcedure
+                    billingProcedureId={tableOfValue?.id ?? 0}
+                    institutionId={tableOfValue?.institution_fk ?? institute}
+                    open={importOpen} handleClose={() => setImportOpen(false)} />
                 <ProcedureCostForm
                     procedureCost={procedureCost}
                     institutes={institutes}

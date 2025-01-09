@@ -31,7 +31,7 @@ import { Rule } from '@mui/icons-material';
 interface Props {
     open: boolean;
     ruleEdit?: RuleBilling;
-    onClose: () => void;
+    onClose: (success: boolean) => void;
 }
 
 const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
@@ -270,7 +270,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             const reqsRulesPriority = await Promise.all(reqsRulesPriorityRaw);
 
             if (reqsRulesBillings.every((e) => e.ok) && reqsRulesPriority.every((e) => e.ok)) {
-                onClose();
+                onClose(true);
                 setOpenSucessSnack(true);
                 setMessageSnack('Regras de faturamento salvas com sucesso!');
                 setError(undefined);
@@ -344,7 +344,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         <>
             <Dialog
                 open={open}
-                onClose={onClose}
+                onClose={() => onClose(false)}
                 maxWidth={false}
                 fullWidth
                 PaperProps={{
@@ -524,7 +524,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             {/* <AddRuleRow mockInstitutes={mockInstitutes} /> */}
                         </DialogContent>
                         <DialogActions>
-                            <Button variant="outlined" onClick={onClose} color="primary" size="large">
+                            <Button variant="outlined" onClick={() => onClose(false)} color="primary" size="large">
                                 Fechar
                             </Button>
                             <Box width={5} />

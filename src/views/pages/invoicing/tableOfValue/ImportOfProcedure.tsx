@@ -1,26 +1,55 @@
 import React, { useState } from 'react';
-import { Dialog, Divider, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Box } from '@mui/material';
+import { Dialog, Divider, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Box, SnackbarCloseReason } from '@mui/material';
+import useAPI from 'hooks/useAPI';
+import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 interface ImportOfProcedureProps {
     open: boolean;
-    handleClose: () => void;
+    billingProcedureId: number,
+    institutionId: string,
+    handleClose: (success: boolean) => void;
 }
 
-const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, handleClose }) => {
+const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProcedureId, institutionId, handleClose }) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [openSucessSnack, setOpenSucessSnack] = useState(false);
+    const [openErrorSnack, setOpenErrorSnack] = useState(false);
+    const [messageSnack, setMessageSnack] = useState('');
 
-    const handleImport = () => {
-        // Handle import logic here
-        console.log('Importing procedures from', startDate, 'to', endDate);
-        handleClose();
+    const { post } = useAPI();
+
+    const handleImport = async () => {
+        const response = await post('/api/costs-has-procedures/import', {
+            institution: institutionId,
+            billing_procedures_fk: billingProcedureId,
+            initial_effective_date: startDate,
+            final_effective_date: endDate
+        });
+        if (response.ok) {
+            handleClose(true);
+        } else {
+            handleClickSnack({ message: response.message ?? 'Error importar', severity: 'error' });
+        }
     };
+
+    const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
+        setMessageSnack(message);
+        severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
+    };
+
+    const handleCloseSnack = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway') return;
+        setOpenSucessSnack(false);
+        setOpenErrorSnack(false);
+    };
+
 
     return (
         <div>
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={() => handleClose(false)}
                 maxWidth={false}
                 fullWidth
                 PaperProps={{
@@ -71,6 +100,8 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, handleClose
                         />
                         <Box width="18%" />
                     </Box>
+                    <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
+                    <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -81,7 +112,7 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, handleClose
                             fontWeight: 'bold',
                             fontSize: '1.5vh'
                         }}
-                        onClick={handleClose}
+                        onClick={() => handleClose(false)}
                         color="primary"
                     >
                         Fechar

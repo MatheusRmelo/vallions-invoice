@@ -39,7 +39,7 @@ const procedureSchema = z.object({
 
 type ProcedureFormProps = {
     open: boolean;
-    handleClose: () => void;
+    handleClose: (success: boolean) => void;
     procedureEdit?: Procedure | null;
 };
 
@@ -96,7 +96,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
             modality: modality.join(',')
         });
         if (response.ok) {
-            handleClose();
+            handleClose(true);
             handleClickSnack({ message: 'Procedimento cadastrado com sucesso!', severity: 'success' });
         } else {
             handleClickSnack({ message: response.message, severity: 'error' });
@@ -112,7 +112,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
             status: procedureEdit!.status
         });
         if (response.ok) {
-            handleClose();
+            handleClose(true);
             handleClickSnack({ message: 'Procedimento editado com sucesso!', severity: 'success' });
         } else {
             handleClickSnack({ message: response.message, severity: 'error' });
@@ -172,7 +172,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     }, [procedureEdit]);
 
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+        <Dialog open={open} onClose={() => handleClose(false)} maxWidth="md" fullWidth>
             <form onSubmit={handleSubmit}>
                 <DialogTitle sx={{ fontSize: '20px' }}>
                     Procedimentos
@@ -259,7 +259,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                     <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" onClick={handleClose} color="primary" size="large">
+                    <Button variant="outlined" onClick={() => handleClose(false)} color="primary" size="large">
                         Fechar
                     </Button>
                     <Box width={5} />

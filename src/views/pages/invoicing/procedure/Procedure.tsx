@@ -66,7 +66,11 @@ const ProcedureView = () => {
         setOpen(true);
     };
 
-    const handleClose = () => {
+    const handleClose = (refresh: boolean) => {
+        if (refresh) {
+            handleClickSnack({ message: 'Procedimento salvo com sucesso', severity: 'success' });
+            getProcedures();
+        }
         setOpen(false);
     };
 
@@ -122,6 +126,11 @@ const ProcedureView = () => {
         if (reason === 'clickaway') return;
         setOpenErrorSnack(false);
         setOpenSucessSnack(false);
+    };
+
+    const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
+        setMessageSnack(message);
+        severity === 'success' ? setOpenSucessSnack(true) : setOpenErrorSnack(true);
     };
 
     return (

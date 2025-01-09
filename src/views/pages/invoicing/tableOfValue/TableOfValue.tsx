@@ -85,7 +85,7 @@ const TableOfValues = () => {
     const handleClose = (refresh = false) => {
         setOpen(false);
         if (refresh) {
-            handleClickSnack({ message: 'successo', severity: 'success' });
+            handleClickSnack({ message: 'Tabela de valores salva com sucesso', severity: 'success' });
             getTableOfValues();
         }
     };
@@ -149,7 +149,15 @@ const TableOfValues = () => {
                         editMode="row"
                         columns={[
                             { field: 'id', headerName: 'ID', minWidth: 150, flex: 2 },
-                            { field: 'description', minWidth: 150, headerName: 'Tabela de valores', flex: 2 },
+                            {
+                                field: 'description', minWidth: 150, headerName: 'Tabela de valores', flex: 2,
+                                renderHeader: (params) => (
+                                    <Box display={"flex"} flexDirection={"column"}>
+                                        <span style={{ color: 'red', fontSize: '16px', fontWeight: 'bold', lineHeight: 'normal' }}>Descrição Tabela de Valores</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 'bold', lineHeight: 'normal' }}>Tabela de valores</span>
+                                    </Box>
+                                )
+                            },
                             {
                                 field: 'actions',
                                 headerName: 'Editar',
@@ -157,6 +165,7 @@ const TableOfValues = () => {
                                 flex: 1,
                                 minWidth: 150,
                                 cellClassName: 'actions',
+                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
                                 getActions: ({ id }) => {
                                     return [
                                         <GridActionsCellItem
