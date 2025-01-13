@@ -151,12 +151,7 @@ const TableOfValues = () => {
                             { field: 'id', headerName: 'ID', minWidth: 150, flex: 2 },
                             {
                                 field: 'description', minWidth: 150, headerName: 'Tabela de valores', flex: 2,
-                                renderHeader: (params) => (
-                                    <Box display={"flex"} flexDirection={"column"}>
-                                        <span style={{ color: 'red', fontSize: '16px', fontWeight: 'bold', lineHeight: 'normal' }}>Descrição Tabela de Valores</span>
-                                        <span style={{ fontSize: '12px', fontWeight: 'bold', lineHeight: 'normal' }}>Tabela de valores</span>
-                                    </Box>
-                                )
+                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição Tabela de Valores</strong>,
                             },
                             {
                                 field: 'actions',

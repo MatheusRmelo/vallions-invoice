@@ -219,6 +219,10 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         return !Object.values(newErrors).some((error) => error !== null);
     };
 
+    function formatNumberToBrazilian(num: number) {
+        return num.toFixed(2).replace('.', ',');
+    }
+
     return (
         <Dialog
             open={open}
@@ -346,11 +350,11 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 })
                                 .map((procedureCost) => ({
                                     id: procedureCost.id,
-                                    initDate: procedureCost.validatyStart,
-                                    endDate: procedureCost.validatyEnd,
+                                    initDate: procedureCost.validatyStart == null ? '' : new Date(procedureCost.validatyStart!).toISOString().substring(0, 10),
+                                    endDate: procedureCost.validatyEnd == null ? '' : new Date(procedureCost.validatyEnd!).toISOString().substring(0, 10),
                                     procedureCode: procedureCost.codProcedure,
                                     procedureDescription: procedureCost.descriptionProcedure,
-                                    value: procedureCost.valueProcedure
+                                    value: procedureCost.valueProcedure == null ? '' : formatNumberToBrazilian(parseFloat(procedureCost.valueProcedure.toString()))
                                 }))}
                             columns={[
                                 {

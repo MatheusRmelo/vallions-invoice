@@ -177,13 +177,10 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         console.log(newRules);
         setRulesAddition(newRules);
     };
-    const fetchUnity = async () => {
-        //mock
+    const getUnities = async () => {
         const response = await get(`/api/branchAccessUsersIntitution?institution=${institution?.id_institution}`);
-        console.log(response);
         if (response.ok) {
             const unities = parseUnityList(response.result);
-            console.log(unities);
             setUnities(unities);
         } else {
             setError('Não foi possível carregar as unidades.' + response.message);
@@ -233,14 +230,23 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     }, [error]);
 
     useEffect(() => {
-        if (institution) fetchUnity();
+        if (institution) getUnities();
     }, [institution]);
 
+
+    const getUnityByName = (name: string) => {
+        let rows = unities;
+        let filtered = rows.filter((element) => element.name === name.valueOf());
+        if (filtered.length === 0) return null;
+        return filtered[0];
+    };
+
     const saveRules = async () => {
+        var newUnity = getUnityByName(unit!.name);
         const rulesBilling: RuleBilling = {
             id: null,
             rulesDescription: description,
-            unity: unit!,
+            unity: newUnity!,
             status: 1
         };
         const reqCore = await post('/api/billing-rules', toJSONRuleBilling(rulesBilling));
@@ -403,7 +409,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                                     (institute) => institute.id_institution === event.target.value
                                                 );
                                                 setInstitution(institute);
-                                                fetchUnity();
+                                                getUnities();
                                             }}
                                         >
                                             {institutes.map((institution) => (
@@ -440,7 +446,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             </Grid>
                             <Box mt={'6vh'} />
                             <Box display={'flex'} justifyContent={'space-between'}>
-                                <Box display={'flex'} flexDirection={'column'}>
+                                <Box display={'flex'} flexDirection={'column'} marginRight={"16px"}>
                                     <span style={{ fontWeight: 'bold', fontSize: '1.5vh' }}>DEFINA AS REGRAS</span>
                                     <Box height={'0.8vh'} />
                                     <span style={{ fontSize: '1.2vh', color: 'grey' }}>
@@ -455,7 +461,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         height: '3.5vh',
                                         fontWeight: 'bold',
                                         fontSize: '1.5vh',
-                                        backgroundColor: 'rgba(103, 58, 183, 1)'
+                                        backgroundColor: 'rgba(103, 58, 183, 1)',
+                                        minWidth: '15vh'
                                     }}
                                     onClick={handleClickAddRule}
                                 >
@@ -482,7 +489,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             {/* Mocado remove dps */}
                             <Box mt={'6vh'} />
                             <Box display={'flex'} justifyContent={'space-between'}>
-                                <Box display={'flex'} flexDirection={'column'}>
+                                <Box display={'flex'} flexDirection={'column'} marginRight={"16px"}>
                                     <span style={{ fontWeight: 'bold', fontSize: '1.5vh' }}>REGRAS ADICIONAIS</span>
                                     <Box height={'0.8vh'} />
                                     <span style={{ fontSize: '1.2vh', color: 'grey' }}>
@@ -497,7 +504,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         height: '3.5vh',
                                         fontWeight: 'bold',
                                         fontSize: '1.5vh',
-                                        backgroundColor: 'rgba(103, 58, 183, 1)'
+                                        backgroundColor: 'rgba(103, 58, 183, 1)', minWidth: '15vh'
                                     }}
                                     onClick={handleClickAddRulesAditional}
                                 >
