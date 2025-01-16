@@ -43,11 +43,19 @@ const BillingView = ({
                         </Box>
                     )
                 },
-                { field: 'unity', headerName: 'Unidade', flex: 1, minWidth: 150, },
-                { field: 'monthOfBilling', headerName: 'Mês da Fatura', flex: 1, minWidth: 150, },
+                {
+                    field: 'unity', headerName: 'Unidade', flex: 1, minWidth: 150,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Unidade</strong>,
+                },
+                {
+                    field: 'monthOfBilling', headerName: 'Mês da Fatura',
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Mês da Fatura</strong>,
+                    flex: 1, minWidth: 150,
+                },
                 {
                     field: 'statusOfBilling',
                     headerName: 'Status da Fatura',
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Status da Fatura</strong>,
                     flex: 2, minWidth: 150,
                     renderCell(params) {
                         return <Chip
@@ -56,8 +64,14 @@ const BillingView = ({
                             label={params.value == 0 ? 'Fatura em aberto' : ''} />;
                     }
                 },
-                { field: 'quantity', headerName: 'Qtn', flex: 1, minWidth: 150, },
-                { field: 'valueTotal', headerName: '$ Total', flex: 1, minWidth: 150, }
+                {
+                    field: 'quantity', headerName: 'Qtn', flex: 1, minWidth: 150,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Qtn</strong>,
+                },
+                {
+                    field: 'valueTotal', headerName: '$ Total', flex: 1, minWidth: 150,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Total</strong>,
+                }
             ]}
             hideFooter
             getRowId={(row) => row.id}
@@ -95,12 +109,14 @@ const BillingView = ({
                                                     headerName: '#',
                                                     minWidth: 64,
                                                     width: 64,
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>ID</strong>,
                                                 },
                                                 {
                                                     field: 'namePatient',
                                                     headerName: 'Nome do Paciente',
                                                     flex: 2,
                                                     minWidth: 150,
+                                                    renderHeader: () => (<strong style={{ fontSize: '12px' }}>Nome do Paciente</strong>),
                                                     renderCell: (params) => (
                                                         <Box>
                                                             <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedReport(row.id, params.row.id)} />
@@ -111,12 +127,14 @@ const BillingView = ({
                                                 {
                                                     field: 'reportDate',
                                                     headerName: 'Data do Laudo',
+                                                    renderHeader: () => (<strong style={{ fontSize: '12px' }}>Data do Laudo</strong>),
                                                     flex: 2,
                                                     minWidth: 150,
                                                 },
                                                 {
                                                     field: 'status',
                                                     headerName: 'Status',
+                                                    renderHeader: () => (<strong style={{ fontSize: '12px' }}>Status</strong>),
                                                     flex: 1,
                                                     minWidth: 150,
                                                     renderCell(params) {
@@ -129,18 +147,21 @@ const BillingView = ({
                                                 {
                                                     field: 'unity',
                                                     headerName: 'Unidade',
+                                                    renderHeader: () => (<strong style={{ fontSize: '12px' }}>Unidade</strong>),
                                                     flex: 1,
                                                     minWidth: 150,
                                                 },
                                                 {
                                                     field: 'reportTitle',
                                                     headerName: 'Título do Laudo',
+                                                    renderHeader: () => (<strong style={{ fontSize: '12px' }}>Título do Laudo</strong>),
                                                     flex: 1,
                                                     minWidth: 150,
                                                 },
                                                 {
                                                     field: 'reportValue',
                                                     headerName: '$ Valor Laudo',
+                                                    renderHeader: () => (<strong style={{ fontSize: '12px' }}>$ Valor Laudo</strong>),
                                                     flex: 1,
                                                     minWidth: 150,
                                                 },
@@ -148,6 +169,7 @@ const BillingView = ({
                                                 {
                                                     field: 'action',
                                                     headerName: 'Remover',
+                                                    renderHeader: () => (<strong style={{ fontSize: '12px' }}>Remover</strong>),
                                                     flex: 1,
                                                     minWidth: 150,
                                                     renderCell(params) {
