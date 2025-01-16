@@ -233,7 +233,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         if (institution) getUnities();
     }, [institution]);
 
-
     const getUnityByName = (name: string) => {
         let rows = unities;
         let filtered = rows.filter((element) => element.name === name.valueOf());
@@ -340,13 +339,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     };
 
     return (
-        // <form
-        //     onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-        //         console.log('submit');
-        //         event.preventDefault();
-        //         saveRules();
-        //     }}
-        // >
         <>
             <Dialog
                 open={open}
@@ -355,7 +347,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        width: '60%',
+                        width: { xs: '100%', md: '60%' },
                         height: 'auto',
                         padding: '20px',
                         margin: 0,
@@ -379,10 +371,10 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             </DialogContentText>
                             <Box mt={'6vh'} />
                             <Grid container spacing={2}>
-                                <Grid item xs={2}>
+                                <Grid item xs={12} md={2}>
                                     <TextField value={idRules} fullWidth id="idRules" label="ID Regra" variant="outlined" sx={{ mb: 2 }} />
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={12} md={4}>
                                     <TextField
                                         fullWidth
                                         id="rulesDescription"
@@ -393,10 +385,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
-                                <Grid item xs={3}>
+                                <Grid item xs={12} md={3}>
                                     <FormControl fullWidth>
                                         <InputLabel id="institute-label">Instituição</InputLabel>
-
                                         <Select
                                             fullWidth
                                             id="institution"
@@ -420,7 +411,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={3}>
+                                <Grid item xs={12} md={3}>
                                     <FormControl fullWidth>
                                         <InputLabel id="unity-label">Unidade</InputLabel>
                                         <Select
@@ -445,8 +436,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                 </Grid>
                             </Grid>
                             <Box mt={'6vh'} />
-                            <Box display={'flex'} justifyContent={'space-between'}>
-                                <Box display={'flex'} flexDirection={'column'} marginRight={"16px"}>
+                            <Box display={'flex'} justifyContent={'space-between'} flexDirection={{ xs: 'column', md: 'row' }}>
+                                <Box display={'flex'} flexDirection={'column'} marginRight={{ md: '16px' }} mb={{ xs: '16px', md: 0 }}>
                                     <span style={{ fontWeight: 'bold', fontSize: '1.5vh' }}>DEFINA AS REGRAS</span>
                                     <Box height={'0.8vh'} />
                                     <span style={{ fontSize: '1.2vh', color: 'grey' }}>
@@ -457,12 +448,14 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                 <Button
                                     variant="contained"
                                     sx={{
-                                        width: '15vh',
+                                        width: '18vh',
                                         height: '3.5vh',
                                         fontWeight: 'bold',
-                                        fontSize: '1.5vh',
+                                        margin: '0',
+                                        padding: '0',
+                                        fontSize: '1.7vh',
                                         backgroundColor: 'rgba(103, 58, 183, 1)',
-                                        minWidth: '15vh'
+                                        minWidth: '10vh'
                                     }}
                                     onClick={handleClickAddRule}
                                 >
@@ -488,8 +481,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
 
                             {/* Mocado remove dps */}
                             <Box mt={'6vh'} />
-                            <Box display={'flex'} justifyContent={'space-between'}>
-                                <Box display={'flex'} flexDirection={'column'} marginRight={"16px"}>
+                            <Box display={'flex'} justifyContent={'space-between'} flexDirection={{ xs: 'column', md: 'row' }}>
+                                <Box display={'flex'} flexDirection={'column'} marginRight={{ md: '16px' }} mb={{ xs: '16px', md: 0 }}>
                                     <span style={{ fontWeight: 'bold', fontSize: '1.5vh' }}>REGRAS ADICIONAIS</span>
                                     <Box height={'0.8vh'} />
                                     <span style={{ fontSize: '1.2vh', color: 'grey' }}>
@@ -500,11 +493,14 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                 <Button
                                     variant="contained"
                                     sx={{
-                                        width: '15vh',
+                                        width: '18vh',
                                         height: '3.5vh',
                                         fontWeight: 'bold',
-                                        fontSize: '1.5vh',
-                                        backgroundColor: 'rgba(103, 58, 183, 1)', minWidth: '15vh'
+                                        margin: '0',
+                                        padding: '0',
+                                        fontSize: '1.7vh',
+                                        backgroundColor: 'rgba(103, 58, 183, 1)',
+                                        minWidth: '10vh'
                                     }}
                                     onClick={handleClickAddRulesAditional}
                                 >
@@ -552,7 +548,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
             <SnackBarAlert open={openSucessSnack} message={messageSnack} severity="success" onClose={handleCloseSnack} />
         </>
-        // </form>
     );
 };
 
