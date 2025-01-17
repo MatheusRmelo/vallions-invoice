@@ -27,7 +27,7 @@ import { DataGrid, GridCellParams } from '@mui/x-data-grid';
 import ImportOfProcedure from './ImportOfProcedure';
 import ProcedureCostForm from './ProcedureCostForm';
 import { TableOfValue } from 'types/tableOfValue';
-import { parseProcedureCosts, getProcedureCostsMock, ProcedureCost, parseProcedureCost } from 'types/procedures_costs';
+import { ProcedureCost, parseProcedureCost } from 'types/procedures_costs';
 
 import useAPI from 'hooks/useAPI';
 import { Institute, parseInstitute } from 'types/institute';
@@ -55,6 +55,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     const [procedureOpen, setProcedureOpen] = useState(false);
     const [proceduresCosts, setProceduresCosts] = useState<ProcedureCost[]>([]);
     const [procedureCost, setProcedureCost] = useState<ProcedureCost | null>(null);
+    const [activeIndex, setActiveIndex] = useState<number>(-1);
     const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<string>('');
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
@@ -75,6 +76,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         const response = await get(`/api/costs-has-procedures?medicalProcedureCost=${tableOfValue?.id}`);
         if (response.ok) {
             setProceduresCosts(response.result.map(parseProcedureCost));
+            console.log(response.result.map(parseProcedureCost));
         } else {
             setError(response.message);
         }
@@ -99,6 +101,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         } else {
             setDescription('');
             setInstitute('');
+            setProceduresCosts([]);
         }
     };
 
@@ -123,6 +126,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     const handleSave = async () => {
         const intituteForeignKeyId = institute;
         if (validate() && intituteForeignKeyId !== null) {
+            var medicalProcedureId = null;
             if (tableOfValue != null) {
                 const response = await put(`/api/medical-procedure-costs/${tableOfValue.id}`, {
                     description: description,
@@ -130,11 +134,9 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     institution_fk: intituteForeignKeyId
                 });
                 if (response.ok) {
-                    handleClose(true);
-                    //handleClickSnack({ message: 'Tabela de valores editado com sucesso!', severity: 'success' });
+                    medicalProcedureId = tableOfValue.id;
                 } else {
                     handleClickSnack({ message: response.message ?? 'Error ao salvar as tabela de valores', severity: 'error' });
-                    setError('Erro ao salvar os procedimentos');
                 }
             } else {
                 /// Salvando a tabela de valores
@@ -144,44 +146,61 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     institution_fk: intituteForeignKeyId
                 });
                 if (response.ok) {
-                    /// Vinculando os custos dos procedimentos a tabela de valores
-                    const results = proceduresCosts.map(async (procedureCost) => {
-                        return post('/api/costs-has-procedures', {
-                            medical_procedure_cost_fk: response.result.id,
+                    medicalProcedureId = response.result.id;
+                } else {
+                    handleClickSnack({ message: response.message ?? 'Error ao salvar as tabela de valores', severity: 'error' });
+
+                }
+            }
+
+            if (medicalProcedureId != null) {
+                const results = proceduresCosts.map(async (procedureCost) => {
+                    if (procedureCost.id != 0 && procedureCost.id != null) {
+                        return put(`/api/costs-has-procedures/${procedureCost!.id}`, {
+                            medical_procedure_cost_fk: medicalProcedureId!,
                             billing_procedures_fk: procedureCost.codProcedure,
                             price: procedureCost.valueProcedure,
                             initial_effective_date: procedureCost.validatyStart,
                             final_effective_date: procedureCost.validatyEnd
                         });
-                    });
-
-                    const responseCost = await Promise.all(results);
-
-                    if (responseCost.every((res) => res.ok)) {
-                        handleClose(true);
-                    } else {
-                        setError('Erro ao salvar os procedimentos');
-                        handleClickSnack({ message: response.message ?? 'Error ao salvar as tabela de valores', severity: 'error' });
                     }
+                    return post('/api/costs-has-procedures', {
+                        medical_procedure_cost_fk: medicalProcedureId!,
+                        billing_procedures_fk: procedureCost.codProcedure,
+                        price: procedureCost.valueProcedure,
+                        initial_effective_date: procedureCost.validatyStart,
+                        final_effective_date: procedureCost.validatyEnd
+                    });
+                });
+
+                const responseCost = await Promise.all(results);
+
+                if (responseCost.every((res) => res.ok)) {
+                    handleClose(true);
+                } else {
+                    handleClickSnack({ message: 'Erro ao salvar os procedimentos', severity: 'error' });
                 }
             }
+
+
         }
     };
 
     const handleClickAddProcedureCost = () => {
         setProcedureCost(null);
+        setActiveIndex(-1);
         setProcedureOpen(true);
     };
 
     const handleCloseProcedureCost = (procedureCost: ProcedureCost | null) => {
-        if (tableOfValue != null) {
-            getProceduresCosts();
-        } else {
-            if (procedureCost) {
-                var newArray = [...proceduresCosts];
+        if (procedureCost != null) {
+            var newArray = [...proceduresCosts];
+            if (activeIndex >= 0) {
+                newArray[activeIndex] = procedureCost;
+            } else {
                 newArray.push(procedureCost!);
-                setProceduresCosts(newArray);
             }
+            setProceduresCosts(newArray);
         }
 
         setProcedureOpen(false);
@@ -190,9 +209,9 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     const handleDeleteProcedureCost = async (id: number) => {
         if (tableOfValue == null) {
             let newArray = [...proceduresCosts];
-            setProceduresCosts(newArray.filter((element) => element.id != id));
+            setProceduresCosts(newArray.splice(id));
         } else {
-            const response = await del(`/api/costs-has-procedures/${id}`);
+            const response = await del(`/api/costs-has-procedures/${proceduresCosts[id].id}`);
             if (response.ok) {
                 getProceduresCosts();
             } else {
@@ -200,6 +219,22 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             }
         }
     };
+
+    const handleCloseImportOpen = (result: ProcedureCost[] | null) => {
+        if (result != null) {
+            var newArray = [...proceduresCosts];
+            result.forEach((procedure) => {
+                var exists = newArray.filter((element) => procedure.descriptionProcedure == element.descriptionProcedure);
+                if (exists.length == 0) {
+                    procedure.id = 0;
+                    newArray.push(procedure);
+                }
+            });
+
+            setProceduresCosts(newArray);
+        }
+        setImportOpen(false);
+    }
 
     const validate = () => {
         const newErrors = { ...errors };
@@ -312,14 +347,12 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 marginTop: '20px'
                             }}
                         >
-                            {
-                                tableOfValue != null ? <CloudUpload
-                                    onClick={() => {
-                                        setImportOpen(true);
-                                    }}
-                                    sx={{ color: 'action.active', mr: 2, marginTop: '1px', fontSize: 24 }}
-                                /> : <div></div>
-                            }
+                            <CloudUpload
+                                onClick={() => {
+                                    setImportOpen(true);
+                                }}
+                                sx={{ color: 'action.active', mr: 2, marginTop: '1px', fontSize: 24 }}
+                            />
                             <Fab
                                 color="primary"
                                 onClick={handleClickAddProcedureCost}
@@ -348,8 +381,8 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                         procedureCost.codProcedure.toLowerCase().includes(filter.toLowerCase())
                                     );
                                 })
-                                .map((procedureCost) => ({
-                                    id: procedureCost.id,
+                                .map((procedureCost, index) => ({
+                                    id: index,
                                     initDate: procedureCost.validatyStart == null ? '' : new Date(procedureCost.validatyStart!).toISOString().substring(0, 10),
                                     endDate: procedureCost.validatyEnd == null ? '' : new Date(procedureCost.validatyEnd!).toISOString().substring(0, 10),
                                     procedureCode: procedureCost.codProcedure,
@@ -397,19 +430,21 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                     cellClassName: 'actions',
                                     type: 'actions',
                                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Ações</strong>,
-                                    getActions: ({ id }) => {
+                                    getActions: (params) => {
+                                        let index = params.row.id;
                                         return [
                                             <Edit
                                                 color="primary"
                                                 onClick={() => {
-                                                    setProcedureCost(getProcedureCostById(id.valueOf() as number));
+                                                    setProcedureCost(proceduresCosts[index]);
+                                                    setActiveIndex(index);
                                                     setProcedureOpen(true);
                                                 }}
                                             />,
                                             <Delete
                                                 color="error"
                                                 onClick={() => {
-                                                    handleDeleteProcedureCost(id.valueOf() as number);
+                                                    handleDeleteProcedureCost(index);
                                                 }}
                                             />
                                         ];
@@ -423,13 +458,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        // variant="outlined"
-                        // sx={{
-                        //     width: '10vh',
-                        //     height: '4vh',
-                        //     fontWeight: 'bold',
-                        //     fontSize: '1.5vh'
-                        // }}
                         variant="outlined"
                         color="primary"
                         size="large"
@@ -451,7 +479,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                 <ImportOfProcedure
                     billingProcedureId={tableOfValue?.id ?? 0}
                     institutionId={tableOfValue?.institution_fk ?? institute}
-                    open={importOpen} handleClose={() => setImportOpen(false)} />
+                    open={importOpen} handleClose={handleCloseImportOpen} />
                 <ProcedureCostForm
                     procedureCost={procedureCost}
                     institutes={institutes}

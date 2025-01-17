@@ -374,13 +374,13 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
 
-                            {/* <Grid item xs={isMobile ? 12 : 2}>
+                            <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
                                     <InputLabel id="unity">Unidade</InputLabel>
                                     <Select fullWidth label="Unidade" variant="outlined" defaultValue="Teste1">
-                                        {mockSelects.map((institution) => (
-                                            <MenuItem key={institution} value={institution}>
-                                                {institution}
+                                        {institutes.map((institution) => (
+                                            <MenuItem key={institution.id_institution} value={institution.id_institution}>
+                                                {institution.name}
                                             </MenuItem>
                                         ))}
                                     </Select>
@@ -390,14 +390,14 @@ const BillingConference: React.FC = () => {
                                 <FormControl fullWidth>
                                     <InputLabel id="doctor">Médico</InputLabel>
                                     <Select fullWidth label="Médico" variant="outlined" defaultValue="Teste1">
-                                        {mockSelects.map((institution) => (
-                                            <MenuItem key={institution} value={institution}>
-                                                {institution}
+                                        {institutes.map((institution) => (
+                                            <MenuItem key={institution.id_institution} value={institution.id_institution}>
+                                                {institution.name}
                                             </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
-                            </Grid> */}
+                            </Grid>
                             <Grid item xs={isMobile ? 12 : 2}>
                                 <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }} onClick={handleSearch}>
                                     <span style={{ fontSize: '1.45vh' }}>Pesquisar</span>

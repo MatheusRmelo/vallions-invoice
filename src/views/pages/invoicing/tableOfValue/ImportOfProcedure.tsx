@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Dialog, Divider, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Box, SnackbarCloseReason } from '@mui/material';
 import useAPI from 'hooks/useAPI';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
+import { parseProcedureCost, ProcedureCost } from 'types/procedures_costs';
 
 interface ImportOfProcedureProps {
     open: boolean;
     billingProcedureId: number,
     institutionId: string,
-    handleClose: (success: boolean) => void;
+    handleClose: (result: ProcedureCost[] | null) => void;
 }
 
 const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProcedureId, institutionId, handleClose }) => {
@@ -17,17 +18,12 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
 
-    const { post } = useAPI();
+    const { get } = useAPI();
 
     const handleImport = async () => {
-        const response = await post('/api/costs-has-procedures/import', {
-            institution: institutionId,
-            billing_procedures_fk: billingProcedureId,
-            initial_effective_date: startDate,
-            final_effective_date: endDate
-        });
+        const response = await get(`/api/procedures-by-date?institution=1&initial_effective_date=${startDate}&final_effective_date=${endDate}`);
         if (response.ok) {
-            handleClose(true);
+            handleClose(response.result.map(parseProcedureCost));
         } else {
             handleClickSnack({ message: response.message ?? 'Error importar', severity: 'error' });
         }
@@ -49,7 +45,7 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
         <div>
             <Dialog
                 open={open}
-                onClose={() => handleClose(false)}
+                onClose={() => handleClose(null)}
                 maxWidth={false}
                 fullWidth
                 PaperProps={{
@@ -112,7 +108,7 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                             fontWeight: 'bold',
                             fontSize: '1.5vh'
                         }}
-                        onClick={() => handleClose(false)}
+                        onClick={() => handleClose(null)}
                         color="primary"
                     >
                         Fechar

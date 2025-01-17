@@ -93,48 +93,30 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
         return filtered[0];
     }
 
-    const handleCreateProcedureCost = async () => {
-        if (tableOfValueId == null) {
+    const handleSaveProcedureCost = async () => {
+
+        if (procedureCost != null) {
+            onClose({
+                ...procedureCost,
+                codProcedure: procedure,
+                descriptionProcedure: getProcedureById(procedure)?.name ?? null,
+                validatyStart: startDate,
+                validatyEnd: endDate,
+                valueProcedure: parseFloat(value),
+            });
+            return;
+        } else {
             onClose({
                 codProcedure: procedure,
                 descriptionProcedure: getProcedureById(procedure)?.name ?? null,
-                id: Math.floor(Math.random() * 10000),
+                id: 0,
                 validatyStart: startDate,
                 validatyEnd: endDate,
                 valueProcedure: parseFloat(value),
             });
             return;
         }
-        const response = await post('/api/costs-has-procedures', {
-            price: parseFloat(value),
-            billing_procedures_fk: procedure,
-            medical_procedure_cost_fk: tableOfValueId,
-            initial_effective_date: startDate,
-            final_effective_date: endDate
-        });
-        if (response.ok) {
-            onClose(response.result);
-        } else {
-            setOpenErrorSnack(true);
-            setMessageSnack(response.message);
-        }
     };
-
-    const handleEditProcedureCost = async () => {
-        const response = await put(`/api/costs-has-procedures/${procedureCost!.id}`, {
-            price: value,
-            billing_procedures_fk: procedure,
-            medical_procedure_cost_fk: tableOfValueId,
-            initial_effective_date: startDate,
-            final_effective_date: endDate
-        });
-        if (response.ok) {
-            onClose(null);
-        } else {
-            setOpenErrorSnack(true);
-            setMessageSnack(response.message);
-        }
-    }
 
     return (
         <Dialog
@@ -251,7 +233,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 <Button
                     variant="contained"
                     type="submit"
-                    onClick={procedureCost ? handleEditProcedureCost : handleCreateProcedureCost}
+                    onClick={handleSaveProcedureCost}
                     sx={{
                         width: '10vh',
                         height: '4vh',
