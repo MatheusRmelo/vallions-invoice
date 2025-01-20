@@ -383,8 +383,8 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 })
                                 .map((procedureCost, index) => ({
                                     id: index,
-                                    initDate: procedureCost.validatyStart == null ? '' : new Date(procedureCost.validatyStart!).toISOString().substring(0, 10),
-                                    endDate: procedureCost.validatyEnd == null ? '' : new Date(procedureCost.validatyEnd!).toISOString().substring(0, 10),
+                                    initDate: procedureCost.validatyStart == null ? '' : new Date(procedureCost.validatyStart!).toISOString().substring(0, 7),
+                                    endDate: procedureCost.validatyEnd == null ? '' : new Date(procedureCost.validatyEnd!).toISOString().substring(0, 7),
                                     procedureCode: procedureCost.codProcedure,
                                     procedureDescription: procedureCost.descriptionProcedure,
                                     value: procedureCost.valueProcedure == null ? '' : formatNumberToBrazilian(parseFloat(procedureCost.valueProcedure.toString()))
