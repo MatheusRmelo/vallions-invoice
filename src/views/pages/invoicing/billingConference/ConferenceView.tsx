@@ -40,13 +40,35 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                         </Box>
                     )
                 },
-                { field: 'namePatient', headerName: 'Nome do Paciente', flex: 2, minWidth: 150 },
-                { field: 'study_description', minWidth: 150, headerName: 'Descrição do Estudo', flex: 2 },
-                { field: 'dateOfStudy', minWidth: 150, headerName: 'Data do Estudo', flex: 1 },
-                { field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1 },
-                { field: 'quantity', minWidth: 150, headerName: 'Qtn', flex: 1 },
-                { field: 'valueUnit', minWidth: 150, headerName: '$ Valor Laudo', flex: 1 },
-                { field: 'valueTotal', minWidth: 150, headerName: '$ Total', flex: 1 }
+                {
+                    field: 'namePatient', headerName: 'Nome do Paciente', flex: 2, minWidth: 150
+                    , renderHeader: () => <strong style={{ fontSize: '12px' }}>Nome do Paciente</strong>,
+
+                },
+                {
+                    field: 'study_description', minWidth: 150, headerName: 'Descrição do Estudo', flex: 2,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Estudo</strong>,
+                },
+                {
+                    field: 'dateOfStudy', minWidth: 150, headerName: 'Data do Estudo', flex: 1,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Data do Estudo</strong>
+                },
+                {
+                    field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Unidade</strong>
+                },
+                {
+                    field: 'quantity', minWidth: 150, headerName: 'Qtn', flex: 1,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Qtn</strong>
+                },
+                {
+                    field: 'valueUnit', minWidth: 150, headerName: '$ Valor Laudo', flex: 1,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Valor Laudo</strong>
+                },
+                {
+                    field: 'valueTotal', minWidth: 150, headerName: '$ Total', flex: 1,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Total</strong>
+                }
             ]}
             hideFooter
             getRowId={(row) => row.id}

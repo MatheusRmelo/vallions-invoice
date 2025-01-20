@@ -38,11 +38,19 @@ const ReceiptView = ({
                         </Box>
                     )
                 },
-                { field: 'unity', headerName: 'Unidade', flex: 1, minWidth: 150, },
-                { field: 'monthOfBilling', headerName: 'Mês da Fatura', flex: 1, minWidth: 150, },
+                {
+                    field: 'unity', headerName: 'Unidade', flex: 1, minWidth: 150,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Unidade</strong>
+
+                },
+                {
+                    field: 'monthOfBilling', headerName: 'Mês da Fatura', flex: 1, minWidth: 150,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Mês da Fatura</strong>
+                },
                 {
                     field: 'statusOfBilling',
                     headerName: 'Status da Fatura',
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Status da Fatura</strong>,
                     flex: 2, minWidth: 150,
                     renderCell(params) {
                         return <Chip
@@ -51,8 +59,14 @@ const ReceiptView = ({
                             label={params.value == 0 ? 'Fatura em aberto' : ''} />;
                     }
                 },
-                { field: 'quantity', headerName: 'Qtn', flex: 1, minWidth: 150, },
-                { field: 'valueTotal', headerName: '$ Total', flex: 1, minWidth: 150, }
+                {
+                    field: 'quantity', headerName: 'Qtn', flex: 1, minWidth: 150,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Qtn</strong>
+                },
+                {
+                    field: 'valueTotal', headerName: '$ Total', flex: 1, minWidth: 150,
+                    renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Total</strong>
+                }
             ]}
             hideFooter
             getRowId={(row) => row.id}

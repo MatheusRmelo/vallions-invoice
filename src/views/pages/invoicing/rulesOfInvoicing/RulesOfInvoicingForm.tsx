@@ -453,7 +453,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         fontWeight: 'bold',
                                         margin: '0',
                                         padding: '0',
-                                        fontSize: '1.7vh',
+                                        fontSize: '1.5vh',
                                         backgroundColor: 'rgba(103, 58, 183, 1)',
                                         minWidth: '10vh'
                                     }}
@@ -498,7 +498,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         fontWeight: 'bold',
                                         margin: '0',
                                         padding: '0',
-                                        fontSize: '1.7vh',
+                                        fontSize: '1.5vh',
                                         backgroundColor: 'rgba(103, 58, 183, 1)',
                                         minWidth: '10vh'
                                     }}
