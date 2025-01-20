@@ -47,7 +47,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     const [description, setDescription] = useState('');
     const [code, setCode] = useState('');
     const [institutes, setInstitutes] = useState<Institute[]>([]);
-    const [institute, setInstitute] = useState<string[]>([]);
+    const [institute, setInstitute] = useState<string>('');
     const [modality, setModality] = useState<string[]>([]);
 
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
@@ -68,6 +68,11 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
             setInstitutes(response.result.map((institute: any) => parseInstitute(institute)));
+            let instituteFind = response.result.find((e: Institute) => institute === e.id_institution);
+            console.log(instituteFind);
+            if (instituteFind) {
+                setInstitute([instituteFind.id_institution]);
+            }
         } else {
             setError(response.message);
         }
@@ -85,14 +90,14 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     };
 
     const handleCreateProcedure = async () => {
-        const idsInstitute = institutes
-            .filter((instituteCheck) => institute.includes(instituteCheck.name))
-            .map((institute) => institute.id_institution);
-
+        // const idsInstitute = institutes
+        //     .filter((instituteCheck) => institute.includes(instituteCheck.name))
+        //     .map((institute) => institute.id_institution);
+        // console.log(institute);
         const response = await post('/api/billingProcedure', {
             name: description,
             code: code,
-            institution: idsInstitute.join(','),
+            institution: institute.join(','),
             modality: modality.join(',')
         });
         if (response.ok) {
@@ -107,7 +112,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         const response = await put(`/api/billingProcedure/${procedureEdit!.id}`, {
             name: description,
             code: code,
-            institution: institute.join(','),
+            institution: institutes.find((institute) => institute.id_institution === institute)?.name || '',
             modality: modality.join(','),
             status: procedureEdit!.status
         });
@@ -121,9 +126,11 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
 
     const handleReceiveProcedure = () => {
         if (procedureEdit) {
+            console.log('aquiii');
             setDescription(procedureEdit.name);
             setCode(procedureEdit.code);
-            setInstitute(procedureEdit.institution_fk?.split('') || []);
+            console.table(procedureEdit.institutions_fk);
+            setInstitute(procedureEdit.institution_name?.split('') || procedureEdit.institutions_fk.split('') || []);
             console.log(procedureEdit);
             setModality(procedureEdit.modalities || []);
         } else {
@@ -168,8 +175,10 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
     }, []);
 
     useEffect(() => {
-        handleReceiveProcedure();
-    }, [procedureEdit]);
+        if (open) {
+            handleReceiveProcedure();
+        }
+    }, [procedureEdit, open]);
 
     return (
         <Dialog open={open} onClose={() => handleClose(false)} maxWidth="md" fullWidth>

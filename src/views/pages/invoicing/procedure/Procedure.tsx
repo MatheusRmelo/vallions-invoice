@@ -104,7 +104,7 @@ const ProcedureView = () => {
             const req = await put(`/api/billingProcedure/${id.valueOf()}`, {
                 name: newArray[found].name,
                 code: newArray[found].code,
-                institution: newArray[found].institution_fk,
+                institution: newArray[found].institutions_fk,
                 modality: newArray[found].modalities?.join(','),
                 status: newArray[found].status ? '1' : '0'
             });
