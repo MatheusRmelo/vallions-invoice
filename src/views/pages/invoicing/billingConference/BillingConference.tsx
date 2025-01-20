@@ -57,6 +57,8 @@ const BillingConference: React.FC = () => {
     const [openBillingConfirm, setOpenBillingConfirm] = useState(false);
     const [institutes, setInstitutes] = useState<Institute[]>([]);
     const [institute, setInstitute] = useState<string>();
+    const [unity, setUnity] = useState<string>();
+    const [unities, setUnities] = useState<Unity[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [currentBilling, setCurrentBilling] = useState<ReportBilling | null>(null);
     const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
@@ -75,6 +77,16 @@ const BillingConference: React.FC = () => {
         }
 
         setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
+    };
+
+    const getUnities = async () => {
+        const response = await get(`/api/branchAccessUsersIntitution?institution=${institute}`);
+        if (response.ok) {
+            const unities = parseUnityList(response.result);
+            setUnities(unities);
+        } else {
+            setError('Não foi possível carregar as unidades.' + response.message);
+        }
     };
 
     const getDetailReceipt = async (id: number) => {
@@ -140,7 +152,7 @@ const BillingConference: React.FC = () => {
     };
 
     const getBillings = async () => {
-        const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&branches=${institute}`);
+        const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branches=${unity}`);
 
         if (response.ok) {
             const billings = parseBillingList(response.result);
@@ -148,18 +160,6 @@ const BillingConference: React.FC = () => {
             setConferences(conference);
             setBillings(billings);
             setReceipts(billings);
-        } else {
-            console.log('Error');
-        }
-    };
-
-    const getUnities = async () => {
-        const response = await get('/api/unities');
-
-        if (response.ok) {
-            const data = await response.result;
-            const unity = data;
-            //setUnities(parseUnityList(unity));
         } else {
             console.log('Error');
         }
@@ -237,7 +237,6 @@ const BillingConference: React.FC = () => {
 
     useEffect(() => {
         getInstitutes();
-        getUnities();
     }, []);
 
     const handleSearch = () => {
@@ -318,6 +317,10 @@ const BillingConference: React.FC = () => {
         setOpenBillingReversal(false);
     }
 
+    useEffect(() => {
+        if (institute) getUnities();
+    }, [institute]);
+
     return (
         <>
             <MainCard title="Conferência de Laudos para Faturamento">
@@ -377,10 +380,11 @@ const BillingConference: React.FC = () => {
                             <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
                                     <InputLabel id="unity">Unidade</InputLabel>
-                                    <Select fullWidth label="Unidade" variant="outlined" defaultValue="Teste1">
-                                        {institutes.map((institution) => (
-                                            <MenuItem key={institution.id_institution} value={institution.id_institution}>
-                                                {institution.name}
+                                    <Select fullWidth label="Unidade" variant="outlined" value={unity}
+                                        onChange={(e) => setUnity(e.target.value as string)}>
+                                        {unities.map((unity) => (
+                                            <MenuItem key={unity.cd_unidade} value={unity.cd_unidade}>
+                                                {unity.name}
                                             </MenuItem>
                                         ))}
                                     </Select>
