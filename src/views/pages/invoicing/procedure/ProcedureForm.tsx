@@ -33,7 +33,7 @@ const procedureSchema = z.object({
         .refine((value) => !(typeof value === 'string' && value.trim() === ''), {
             message: 'Código CBHPM é obrigatório'
         }),
-    institute: z.array(z.string()).nonempty('Pelo menos uma instituição é obrigatória'),
+    institute: z.string().nonempty('Pelo menos uma instituição é obrigatória'),
     modality: z.array(z.string()).nonempty('Pelo menos uma modalidade é obrigatória')
 });
 
@@ -148,7 +148,6 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         // const instituteToApi = institute.join(',');
         const formData = { description, code, institute, modality };
         const result = procedureSchema.safeParse(formData);
-        console.log(result);
         if (!result.success) {
             const newErrors = result.error.format();
             setErrors({
