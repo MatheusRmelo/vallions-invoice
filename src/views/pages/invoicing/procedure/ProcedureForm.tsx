@@ -68,11 +68,6 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
             setInstitutes(response.result.map((institute: any) => parseInstitute(institute)));
-            let instituteFind = response.result.find((e: Institute) => institute === e.id_institution);
-            console.log(instituteFind);
-            if (instituteFind) {
-                setInstitute([instituteFind.id_institution]);
-            }
         } else {
             setError(response.message);
         }
@@ -97,7 +92,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         const response = await post('/api/billingProcedure', {
             name: description,
             code: code,
-            institution: institute.join(','),
+            institution: institute,
             modality: modality.join(',')
         });
         if (response.ok) {
@@ -112,7 +107,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
         const response = await put(`/api/billingProcedure/${procedureEdit!.id}`, {
             name: description,
             code: code,
-            institution: institutes.find((institute) => institute.id_institution === institute)?.name || '',
+            institution: institute,
             modality: modality.join(','),
             status: procedureEdit!.status
         });
@@ -126,20 +121,26 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
 
     const handleReceiveProcedure = () => {
         if (procedureEdit) {
-            console.log('aquiii');
             setDescription(procedureEdit.name);
             setCode(procedureEdit.code);
-            console.table(procedureEdit.institutions_fk);
-            setInstitute(procedureEdit.institution_name?.split('') || procedureEdit.institutions_fk.split('') || []);
-            console.log(procedureEdit);
+            var newInstitute = getInstituteByName(procedureEdit.institution_name);
+            setInstitute(newInstitute != null ? newInstitute.id_institution : '');
             setModality(procedureEdit.modalities || []);
         } else {
             setDescription('');
             setCode('');
-            setInstitute([]);
+            setInstitute('');
             setModality([]);
         }
     };
+
+    const getInstituteByName = (name: string) => {
+        var newArray = institutes.filter((element) => element.name == name);
+        if (newArray.length > 0) {
+            return newArray[0];
+        }
+        return null;
+    }
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -222,10 +223,9 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                                 <Select
                                     labelId="institute-label"
                                     id="institute-select"
-                                    multiple
-                                    value={Array.isArray(institute) ? institute : []}
+                                    value={institute}
                                     label="Instituição"
-                                    onChange={(e) => setInstitute(e.target.value as string[])}
+                                    onChange={(e) => setInstitute(e.target.value as string)}
                                     fullWidth
                                     IconComponent={ArrowDropDownIcon}
                                     sx={selectStyles}

@@ -52,7 +52,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
     const [openSucessSnack, setOpenSucessSnack] = React.useState(false);
     const [messageSnack, setMessageSnack] = React.useState('');
-    const fetchInstitutes = async () => {
+
+    const getInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
             const institutes = response.result.map((institute: any) => parseInstitute(institute));
@@ -62,7 +63,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         }
     };
 
-    const fetchTags = async () => {
+    const getTags = async () => {
         const response = await get('/api/tags');
         if (response.ok) {
             const tags = parseTagList(response.result);
@@ -72,7 +73,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         }
     };
 
-    const fetchTableOfValues = async () => {
+    const getTableOfValues = async () => {
         const response = await get('/api/medical-procedure-costs');
         if (response.ok) {
             const tableOfValues = parseTableOfValues(response.result);
@@ -84,9 +85,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
 
     /// Init State
     useEffect(() => {
-        fetchInstitutes();
-        fetchTags();
-        fetchTableOfValues();
+        getInstitutes();
+        getTags();
+        getTableOfValues();
     }, []);
 
     // use Effect para ser executado ao abrir o dialog
@@ -101,7 +102,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setRules([]);
             setRulesAddition([]);
             if (ruleEdit.id !== null) {
-                fetchDetailsRule(ruleEdit.id);
+                getDetailsRule(ruleEdit.id);
             }
         }
     }, [ruleEdit]);
@@ -117,7 +118,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
         }
     }, [open]);
 
-    const fetchDetailsRule = async (id: Number) => {
+    const getDetailsRule = async (id: Number) => {
         const response = await get(`/api/billing-rules/${id}`);
         if (response.ok) {
             const rule = response.result;
@@ -174,7 +175,6 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             id: undefined
         });
 
-        console.log(newRules);
         setRulesAddition(newRules);
     };
     const getUnities = async () => {
@@ -248,7 +248,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             unity: newUnity!,
             status: 1
         };
-        const reqCore = await post('/api/billing-rules', toJSONRuleBilling(rulesBilling));
+
+        const reqCore = ruleEdit ? await put(`/api/billing-rules/${ruleEdit.id}`, toJSONRuleBilling(rulesBilling)) : await post('/api/billing-rules', toJSONRuleBilling(rulesBilling));
         const reqId = reqCore.result.id;
         setIdRules(reqId);
         if (reqCore.ok) {
