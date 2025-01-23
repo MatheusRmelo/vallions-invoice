@@ -42,6 +42,8 @@ const RulesOfInvoicing = () => {
 
     const getBillingRules = async () => {
         setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
         const response = await get('/api/billing-rules');
         if (response.ok) {
             const data = response.result;

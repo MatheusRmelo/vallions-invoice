@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { Box, SnackbarCloseReason } from '@mui/material';
+import { Box, SnackbarCloseReason, CircularProgress } from '@mui/material';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import Search from '@mui/icons-material/Search';
 import { DataGrid, GridRowId, GridActionsCellItem } from '@mui/x-data-grid';
@@ -14,7 +14,6 @@ import useAPI from 'hooks/useAPI';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 import { ThemeMode } from 'types/config';
 import useConfig from 'hooks/useConfig';
-
 const TableOfValues = () => {
     const [open, setOpen] = useState(false);
     const [tableOfValues, setTableOfValues] = useState<TableOfValue[]>([]);
@@ -26,6 +25,7 @@ const TableOfValues = () => {
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
     const { mode } = useConfig();
+    const [loading, setLoading] = useState(false);
 
     const { get, put } = useAPI();
 
@@ -34,6 +34,7 @@ const TableOfValues = () => {
     }, []);
 
     const getTableOfValues = async () => {
+        setLoading(true);
         const response = await get('/api/medical-procedure-costs');
         if (response.ok) {
             const data = await response.result;
@@ -43,6 +44,8 @@ const TableOfValues = () => {
         } else {
             setError(response.message);
         }
+
+        setLoading(false);
     };
 
     const getTableById = (id: GridRowId) => {
@@ -139,56 +142,65 @@ const TableOfValues = () => {
                         '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
                     }}
                 >
-                    <DataGrid
-                        disableRowSelectionOnClick
-                        rows={tableOfValues.map((tableOfValue) => ({
-                            id: tableOfValue.id,
-                            description: tableOfValue.description,
-                            status: tableOfValue.status
-                        }))}
-                        editMode="row"
-                        columns={[
-                            { field: 'id', headerName: 'ID', minWidth: 150, flex: 2 },
-                            {
-                                field: 'description', minWidth: 150, headerName: 'Tabela de valores', flex: 2,
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição Tabela de Valores</strong>,
-                            },
-                            {
-                                field: 'actions',
-                                headerName: 'Editar',
-                                type: 'actions',
-                                flex: 1,
-                                minWidth: 150,
-                                cellClassName: 'actions',
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
-                                getActions: ({ id }) => {
-                                    return [
-                                        <GridActionsCellItem
-                                            icon={<Edit sx={{ color: ThemeMode.DARK == mode ? 'white' : 'black' }} />}
-                                            label="Editar"
-                                            className="textPrimary"
-                                            onClick={() => handleClickEdit(id)}
-                                            color="inherit"
-                                        />
-                                    ];
+                    {loading ? (
+                        <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : (
+                        <DataGrid
+                            disableRowSelectionOnClick
+                            rows={tableOfValues.map((tableOfValue) => ({
+                                id: tableOfValue.id,
+                                description: tableOfValue.description,
+                                status: tableOfValue.status
+                            }))}
+                            editMode="row"
+                            columns={[
+                                { field: 'id', headerName: 'ID', minWidth: 150, flex: 2 },
+                                {
+                                    field: 'description',
+                                    minWidth: 150,
+                                    headerName: 'Tabela de valores',
+                                    flex: 2,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição Tabela de Valores</strong>
+                                },
+                                {
+                                    field: 'actions',
+                                    headerName: 'Editar',
+                                    type: 'actions',
+                                    flex: 1,
+                                    minWidth: 150,
+                                    cellClassName: 'actions',
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Editar</strong>,
+                                    getActions: ({ id }) => {
+                                        return [
+                                            <GridActionsCellItem
+                                                icon={<Edit sx={{ color: ThemeMode.DARK == mode ? 'white' : 'black' }} />}
+                                                label="Editar"
+                                                className="textPrimary"
+                                                onClick={() => handleClickEdit(id)}
+                                                color="inherit"
+                                            />
+                                        ];
+                                    }
+                                },
+                                {
+                                    field: 'status',
+                                    headerName: 'Inativo/Ativo',
+                                    type: 'actions',
+                                    flex: 1,
+                                    minWidth: 150,
+                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
+                                    getActions: ({ id }) => {
+                                        let tableOfValue = getTableById(id);
+                                        return [
+                                            <Switch checked={tableOfValue?.status ?? false} onChange={(value) => handleChangeStatus(id)} />
+                                        ];
+                                    }
                                 }
-                            },
-                            {
-                                field: 'status',
-                                headerName: 'Inativo/Ativo',
-                                type: 'actions',
-                                flex: 1,
-                                minWidth: 150,
-                                renderHeader: () => <strong style={{ fontSize: '12px' }}>Inativo/Ativo</strong>,
-                                getActions: ({ id }) => {
-                                    let tableOfValue = getTableById(id);
-                                    return [
-                                        <Switch checked={tableOfValue?.status ?? false} onChange={(value) => handleChangeStatus(id)} />
-                                    ];
-                                }
-                            }
-                        ]}
-                    />
+                            ]}
+                        />
+                    )}
                 </Box>
                 <TableOfValueForm open={open} handleClose={(refresh) => handleClose(refresh)} tableOfValue={tableOfValue} />
             </MainCard>

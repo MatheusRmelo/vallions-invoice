@@ -248,28 +248,47 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             unity: newUnity!,
             status: 1
         };
-
-        const reqCore = ruleEdit ? await put(`/api/billing-rules/${ruleEdit.id}`, toJSONRuleBilling(rulesBilling)) : await post('/api/billing-rules', toJSONRuleBilling(rulesBilling));
+        console.table(rulesBilling);
+        console.log(ruleEdit ? 'edit' : 'new');
+        const reqCore = ruleEdit
+            ? await put(`/api/billing-rules/${ruleEdit.id}`, toJSONRuleBilling(rulesBilling))
+            : await post('/api/billing-rules', toJSONRuleBilling(rulesBilling));
         const reqId = reqCore.result.id;
         setIdRules(reqId);
         if (reqCore.ok) {
             const reqsRulesBillingsRaw = rules.map((e) =>
-                post('/api/billing-rule-goals', {
-                    type: e.type,
-                    value: e.value,
-                    medical_procedure_cost_fk: e.tableOfValues?.id,
-                    billing_rule_fk: reqId,
-                    tag_fk: e.tag?.id
-                })
+                ruleEdit && e.id
+                    ? put(`/api/billing-rule-goals/${e.id}`, {
+                          type: e.type,
+                          value: e.value,
+                          medical_procedure_cost_fk: e.tableOfValues?.id,
+                          billing_rule_fk: reqId,
+                          tag_fk: e.tag?.id
+                      })
+                    : post('/api/billing-rule-goals', {
+                          type: e.type,
+                          value: e.value,
+                          medical_procedure_cost_fk: e.tableOfValues?.id,
+                          billing_rule_fk: reqId,
+                          tag_fk: e.tag?.id
+                      })
             );
             const reqsRulesPriorityRaw = rulesAddition.map((e) =>
-                post('/api/priority-billing-rules', {
-                    priority: e.levelPriority,
-                    type: e.type,
-                    value: e.value,
-                    medical_procedure_cost_fk: e.tableOfValues?.id,
-                    billing_rule_fk: reqId
-                })
+                ruleEdit && e.id
+                    ? put(`/api/priority-billing-rules/${e.id}`, {
+                          priority: e.levelPriority,
+                          type: e.type,
+                          value: e.value,
+                          medical_procedure_cost_fk: e.tableOfValues?.id,
+                          billing_rule_fk: reqId
+                      })
+                    : post('/api/priority-billing-rules', {
+                          priority: e.levelPriority,
+                          type: e.type,
+                          value: e.value,
+                          medical_procedure_cost_fk: e.tableOfValues?.id,
+                          billing_rule_fk: reqId
+                      })
             );
             console.log(reqsRulesBillingsRaw);
             const reqsRulesBillings = await Promise.all(reqsRulesBillingsRaw);
