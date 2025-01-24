@@ -8,7 +8,7 @@ interface ImportOfProcedureProps {
     open: boolean;
     billingProcedureId: number,
     institutionId: string,
-    handleClose: (result: ProcedureCost[] | null) => void;
+    handleClose: (result: ProcedureCost[] | null, startDate: string | null, endDate: string | null) => void;
 }
 
 const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProcedureId, institutionId, handleClose }) => {
@@ -23,7 +23,7 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
     const handleImport = async () => {
         const response = await get(`/api/procedures-by-date?institution=1&initial_effective_date=${startDate}&final_effective_date=${endDate}`);
         if (response.ok) {
-            handleClose(response.result.map(parseProcedureCost));
+            handleClose(response.result.map(parseProcedureCost), startDate, endDate);
         } else {
             handleClickSnack({ message: response.message ?? 'Error importar', severity: 'error' });
         }
@@ -45,7 +45,7 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
         <div>
             <Dialog
                 open={open}
-                onClose={() => handleClose(null)}
+                onClose={() => handleClose(null, null, null)}
                 maxWidth={false}
                 fullWidth
                 PaperProps={{
@@ -108,7 +108,7 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                             fontWeight: 'bold',
                             fontSize: '1.5vh'
                         }}
-                        onClick={() => handleClose(null)}
+                        onClick={() => handleClose(null, null, null)}
                         color="primary"
                     >
                         Fechar

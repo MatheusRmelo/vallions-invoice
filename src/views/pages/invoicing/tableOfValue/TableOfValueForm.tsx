@@ -220,13 +220,16 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         }
     };
 
-    const handleCloseImportOpen = (result: ProcedureCost[] | null) => {
+    const handleCloseImportOpen = (result: ProcedureCost[] | null, startDate: string | null, endDate: string | null) => {
         if (result != null) {
             var newArray = [...proceduresCosts];
             result.forEach((procedure) => {
                 var exists = newArray.filter((element) => procedure.descriptionProcedure == element.descriptionProcedure);
                 if (exists.length == 0) {
                     procedure.id = 0;
+                    procedure.valueProcedure = 0;
+                    procedure.validatyStart = startDate
+                    procedure.validatyEnd = endDate;
                     newArray.push(procedure);
                 }
             });
