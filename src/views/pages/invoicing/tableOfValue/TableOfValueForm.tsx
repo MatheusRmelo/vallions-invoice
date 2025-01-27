@@ -228,8 +228,8 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                 if (exists.length == 0) {
                     procedure.id = 0;
                     procedure.valueProcedure = 0;
-                    procedure.validatyStart = startDate
-                    procedure.validatyEnd = endDate;
+                    procedure.validatyStart = new Date(`${startDate} 00:00:00`).toISOString();
+                    procedure.validatyEnd = new Date(`${endDate} 00:00:00`).toISOString();
                     newArray.push(procedure);
                 }
             });
@@ -237,6 +237,15 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         }
         setImportOpen(false);
     }
+
+    const formatDate = (date: Date) => {
+        const day = String(date.getDate()).padStart(2, '0'); // Adiciona zero se necessário
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // +1 porque os meses começam em 0
+        const year = date.getFullYear();
+        const formattedDate = `${day}/${month}/${year}`;
+        return formattedDate;
+    }
+
 
     const validate = () => {
         const newErrors = { ...errors };
@@ -386,8 +395,8 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 .map((procedureCost, index) => {
                                     return {
                                         id: index,
-                                        initDate: procedureCost.validatyStart == null ? '' : procedureCost.validatyStart!,
-                                        endDate: procedureCost.validatyEnd == null ? '' : procedureCost.validatyEnd!,
+                                        initDate: procedureCost.validatyStart == null ? '' : formatDate(new Date(procedureCost.validatyStart!)),
+                                        endDate: procedureCost.validatyEnd == null ? '' : formatDate(new Date(procedureCost.validatyEnd!)),
                                         procedureCode: procedureCost.codProcedure,
                                         procedureDescription: procedureCost.descriptionProcedure,
                                         value: procedureCost.valueProcedure == null ? '' : formatNumberToBrazilian(parseFloat(procedureCost.valueProcedure.toString()))
