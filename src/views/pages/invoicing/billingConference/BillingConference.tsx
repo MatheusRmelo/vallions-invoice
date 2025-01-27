@@ -23,7 +23,8 @@ import {
     useMediaQuery,
     useTheme,
     Checkbox,
-    SnackbarCloseReason
+    SnackbarCloseReason,
+    CircularProgress
 } from '@mui/material';
 import { DataGrid, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
@@ -41,6 +42,7 @@ import ConferenceView from './ConferenceView';
 import RefundBillingForm from './RefundBillingForm';
 import ReceiptView from './ReceiptView';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
+import { Doctor, parseDoctor } from 'types/doctor';
 
 
 const BillingConference: React.FC = () => {
@@ -51,7 +53,7 @@ const BillingConference: React.FC = () => {
     const [conferences, setConferences] = useState<Billing[]>([]);
     const [billings, setBillings] = useState<Billing[]>([]);
     const [receipts, setReceipts] = useState<Billing[]>([]);
-
+    const [loading, setLoading] = useState(false);
     const [openDialogAction, setOpenDialogAction] = useState(false);
     const [openBillingReversal, setOpenBillingReversal] = useState(false);
     const [openBillingConfirm, setOpenBillingConfirm] = useState(false);
@@ -59,6 +61,8 @@ const BillingConference: React.FC = () => {
     const [institute, setInstitute] = useState<string>();
     const [unity, setUnity] = useState<string>();
     const [unities, setUnities] = useState<Unity[]>([]);
+    const [doctor, setDoctor] = useState<string>();
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [currentBilling, setCurrentBilling] = useState<ReportBilling | null>(null);
     const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
@@ -67,7 +71,7 @@ const BillingConference: React.FC = () => {
     const [messageSnack, setMessageSnack] = useState('');
 
     const isMobile = useMediaQuery(useTheme().breakpoints.down('sm'));
-    const { get, put } = useAPI();
+    const { get, put, post } = useAPI();
 
     const handleExpandClick = async (id: number) => {
         if (tabIndex == 2) {
@@ -86,6 +90,15 @@ const BillingConference: React.FC = () => {
             setUnities(unities);
         } else {
             setError('Não foi possível carregar as unidades.' + response.message);
+        }
+    };
+
+    const getDoctors = async () => {
+        const response = await post(`/api/referenceAccess`, {});
+        if (response.ok) {
+            setDoctors([...response.result.map((element: any) => parseDoctor(element))]);
+        } else {
+            setError('Não foi possível carregar os médicos.' + response.message);
         }
     };
 
@@ -152,8 +165,8 @@ const BillingConference: React.FC = () => {
     };
 
     const getBillings = async () => {
-        const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branches=${unity}`);
-
+        setLoading(true);
+        const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branches=${unity}${doctor ? `&reference=${doctor}` : ''}`);
         if (response.ok) {
             const billings = parseBillingList(response.result);
             const conference = billings.filter((element) => element.statusOfBilling == '0');
@@ -163,6 +176,7 @@ const BillingConference: React.FC = () => {
         } else {
             console.log('Error');
         }
+        setLoading(false);
     };
 
     const handleChangeCheckedConference = (idBilling: number) => {
@@ -237,6 +251,7 @@ const BillingConference: React.FC = () => {
 
     useEffect(() => {
         getInstitutes();
+        getDoctors();
     }, []);
 
     const handleSearch = () => {
@@ -393,17 +408,18 @@ const BillingConference: React.FC = () => {
                             <Grid item xs={isMobile ? 12 : 2}>
                                 <FormControl fullWidth>
                                     <InputLabel id="doctor">Médico</InputLabel>
-                                    <Select fullWidth label="Médico" variant="outlined" defaultValue="Teste1">
-                                        {institutes.map((institution) => (
-                                            <MenuItem key={institution.id_institution} value={institution.id_institution}>
-                                                {institution.name}
+                                    <Select fullWidth label="Médico" variant="outlined" value={doctor}
+                                        onChange={(e) => setDoctor(e.target.value as string)}>
+                                        {doctors.map((doctor) => (
+                                            <MenuItem key={doctor.id_physician} value={doctor.id_physician}>
+                                                {doctor.name}
                                             </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 2}>
-                                <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }} onClick={handleSearch}>
+                                <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }} onClick={handleSearch} disabled={!(startDate && endDate && institute && unity)}>
                                     <span style={{ fontSize: '1.45vh' }}>Pesquisar</span>
                                 </Button>
                             </Grid>
@@ -433,36 +449,42 @@ const BillingConference: React.FC = () => {
 
 
                         </Box>
-                        <div style={{ height: '45vh', width: '100%', marginTop: 20 }}>
-                            {/*Conferência*/}
-                            {tabIndex === 0 && (
-                                <ConferenceView
-                                    conferences={conferences}
-                                    expandedRowIds={expandedRowIds}
-                                    handleChangeCheckedConference={(id) => handleChangeCheckedConference(id)}
-                                    handleChangeCheckedReport={(idBilling, idReport) => handleChangeCheckedReport(idBilling, idReport)}
-                                    handleExpandClick={(id) => handleExpandClick(id)}
-                                />
-                            )}
-                            {/*Faturamento*/}
-                            {tabIndex === 1 && (
-                                <BillingView
-                                    billings={billings}
-                                    expandedRowIds={expandedRowIds}
-                                    handleExpandClick={(id) => handleExpandClick(id)}
-                                    handleChangeCheckedBilling={(id) => handleChangeCheckedBilling(id)}
-                                    handleChangeCheckedReport={(idBilling, idReport) => handleChangeCheckedReportBilling(idBilling, idReport)}
-                                />
-                            )}
-                            {/*Recebimento*/}
-                            {tabIndex === 2 && (
-                                <ReceiptView
-                                    billings={receipts}
-                                    expandedRowIds={expandedRowIds}
-                                    handleExpandClick={(id) => handleExpandClick(id)}
-                                />
-                            )}
-                        </div>
+                        {
+                            loading ? <div style={{ height: '45vh', width: '100%', marginTop: 20 }}>
+                                <CircularProgress />
+                            </div> :
+                                <div style={{ height: '45vh', width: '100%', marginTop: 20 }}>
+                                    {/*Conferência*/}
+                                    {tabIndex === 0 && (
+                                        <ConferenceView
+                                            conferences={conferences}
+                                            expandedRowIds={expandedRowIds}
+                                            handleChangeCheckedConference={(id) => handleChangeCheckedConference(id)}
+                                            handleChangeCheckedReport={(idBilling, idReport) => handleChangeCheckedReport(idBilling, idReport)}
+                                            handleExpandClick={(id) => handleExpandClick(id)}
+                                        />
+                                    )}
+                                    {/*Faturamento*/}
+                                    {tabIndex === 1 && (
+                                        <BillingView
+                                            billings={billings}
+                                            expandedRowIds={expandedRowIds}
+                                            handleExpandClick={(id) => handleExpandClick(id)}
+                                            handleChangeCheckedBilling={(id) => handleChangeCheckedBilling(id)}
+                                            handleChangeCheckedReport={(idBilling, idReport) => handleChangeCheckedReportBilling(idBilling, idReport)}
+                                        />
+                                    )}
+                                    {/*Recebimento*/}
+                                    {tabIndex === 2 && (
+                                        <ReceiptView
+                                            billings={receipts}
+                                            expandedRowIds={expandedRowIds}
+                                            handleExpandClick={(id) => handleExpandClick(id)}
+                                        />
+                                    )}
+                                </div>
+                        }
+
                     </CardContent>
                 </Card>
             </MainCard>

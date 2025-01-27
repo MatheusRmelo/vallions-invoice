@@ -259,36 +259,36 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             const reqsRulesBillingsRaw = rules.map((e) =>
                 ruleEdit && e.id
                     ? put(`/api/billing-rule-goals/${e.id}`, {
-                          type: e.type,
-                          value: e.value,
-                          medical_procedure_cost_fk: e.tableOfValues?.id,
-                          billing_rule_fk: reqId,
-                          tag_fk: e.tag?.id
-                      })
+                        type: e.type,
+                        value: e.value,
+                        medical_procedure_cost_fk: e.tableOfValues?.id,
+                        billing_rule_fk: reqId,
+                        tag_fk: e.tag?.id
+                    })
                     : post('/api/billing-rule-goals', {
-                          type: e.type,
-                          value: e.value,
-                          medical_procedure_cost_fk: e.tableOfValues?.id,
-                          billing_rule_fk: reqId,
-                          tag_fk: e.tag?.id
-                      })
+                        type: e.type,
+                        value: e.value,
+                        medical_procedure_cost_fk: e.tableOfValues?.id,
+                        billing_rule_fk: reqId,
+                        tag_fk: e.tag?.id
+                    })
             );
             const reqsRulesPriorityRaw = rulesAddition.map((e) =>
                 ruleEdit && e.id
                     ? put(`/api/priority-billing-rules/${e.id}`, {
-                          priority: e.levelPriority,
-                          type: e.type,
-                          value: e.value,
-                          medical_procedure_cost_fk: e.tableOfValues?.id,
-                          billing_rule_fk: reqId
-                      })
+                        priority: e.levelPriority,
+                        type: e.type,
+                        value: e.value,
+                        medical_procedure_cost_fk: e.tableOfValues?.id,
+                        billing_rule_fk: reqId
+                    })
                     : post('/api/priority-billing-rules', {
-                          priority: e.levelPriority,
-                          type: e.type,
-                          value: e.value,
-                          medical_procedure_cost_fk: e.tableOfValues?.id,
-                          billing_rule_fk: reqId
-                      })
+                        priority: e.levelPriority,
+                        type: e.type,
+                        value: e.value,
+                        medical_procedure_cost_fk: e.tableOfValues?.id,
+                        billing_rule_fk: reqId
+                    })
             );
             console.log(reqsRulesBillingsRaw);
             const reqsRulesBillings = await Promise.all(reqsRulesBillingsRaw);
@@ -391,9 +391,13 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             </DialogContentText>
                             <Box mt={'6vh'} />
                             <Grid container spacing={2}>
-                                <Grid item xs={12} md={2}>
-                                    <TextField value={idRules} fullWidth id="idRules" label="ID Regra" variant="outlined" sx={{ mb: 2 }} />
-                                </Grid>
+                                {
+                                    ruleEdit != null ?
+                                        <Grid item xs={12} md={2}>
+                                            <TextField value={idRules} fullWidth id="idRules" label="ID Regra" variant="outlined" sx={{ mb: 2 }} />
+                                        </Grid> : <></>
+                                }
+
                                 <Grid item xs={12} md={4}>
                                     <TextField
                                         fullWidth

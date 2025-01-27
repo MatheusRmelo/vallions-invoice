@@ -44,7 +44,6 @@ const ProcedureView = () => {
                 ...procedure,
                 modalities: modalities[index].result.modalities.map((modality: any) => modality.modality)
             }));
-            console.log(procedures);
 
             setData(procedures);
             setDataRaw(procedures);
@@ -187,7 +186,7 @@ const ProcedureView = () => {
                                     minWidth: 150
                                 },
                                 {
-                                    field: 'institution_fk',
+                                    field: 'institution_name',
                                     headerName: 'Instituição',
                                     flex: 1,
                                     minWidth: 150
