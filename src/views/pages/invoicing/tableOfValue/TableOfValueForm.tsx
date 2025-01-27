@@ -233,7 +233,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     newArray.push(procedure);
                 }
             });
-
             setProceduresCosts(newArray);
         }
         setImportOpen(false);
@@ -384,14 +383,16 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                         procedureCost.codProcedure.toLowerCase().includes(filter.toLowerCase())
                                     );
                                 })
-                                .map((procedureCost, index) => ({
-                                    id: index,
-                                    initDate: procedureCost.validatyStart == null ? '' : new Date(procedureCost.validatyStart!).toISOString().substring(0, 7),
-                                    endDate: procedureCost.validatyEnd == null ? '' : new Date(procedureCost.validatyEnd!).toISOString().substring(0, 7),
-                                    procedureCode: procedureCost.codProcedure,
-                                    procedureDescription: procedureCost.descriptionProcedure,
-                                    value: procedureCost.valueProcedure == null ? '' : formatNumberToBrazilian(parseFloat(procedureCost.valueProcedure.toString()))
-                                }))}
+                                .map((procedureCost, index) => {
+                                    return {
+                                        id: index,
+                                        initDate: procedureCost.validatyStart == null ? '' : procedureCost.validatyStart!,
+                                        endDate: procedureCost.validatyEnd == null ? '' : procedureCost.validatyEnd!,
+                                        procedureCode: procedureCost.codProcedure,
+                                        procedureDescription: procedureCost.descriptionProcedure,
+                                        value: procedureCost.valueProcedure == null ? '' : formatNumberToBrazilian(parseFloat(procedureCost.valueProcedure.toString()))
+                                    };
+                                })}
                             columns={[
                                 {
                                     field: 'initDate',
