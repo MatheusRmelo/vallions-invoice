@@ -140,7 +140,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
             return newArray[0];
         }
         return null;
-    }
+    };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

@@ -15,6 +15,7 @@ import {
     InputLabel,
     MenuItem
 } from '@mui/material';
+import { z } from 'zod';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { ProcedureCost } from 'types/procedures_costs';
 import { Institute } from 'types/institute';
@@ -22,14 +23,22 @@ import useAPI from 'hooks/useAPI';
 import { parseProcedure, Procedure } from 'types/procedure';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 
-
 type Props = {
-    open: boolean,
-    procedureCost: ProcedureCost | null,
-    institutes: Institute[],
-    tableOfValueId: string | null,
-    onClose: (procedureCost: ProcedureCost | null) => void,
-}
+    open: boolean;
+    procedureCost: ProcedureCost | null;
+    institutes: Institute[];
+    tableOfValueId: string | null;
+    onClose: (procedureCost: ProcedureCost | null) => void;
+};
+
+const procedureCostSchema = z.object({
+    id: z.number(),
+    codProcedure: z.string(),
+    descriptionProcedure: z.string(),
+    validatyStart: z.string(),
+    validatyEnd: z.string(),
+    valueProcedure: z.number()
+});
 
 const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, institutes, tableOfValueId }) => {
     const [startDate, setStartDate] = useState('');
@@ -67,7 +76,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             setEndDate('');
             setProcedure('');
         }
-    }
+    };
 
     const getProcedures = async () => {
         const response = await get(`/api/billingProcedure?institution=${institute}`);
@@ -84,16 +93,21 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
         let filtered = rows.filter((element) => element.id_institution === id);
         if (filtered.length === 0) return null;
         return filtered[0];
-    }
+    };
 
     const getProcedureById = (id: string): Procedure | null => {
         let rows = procedures;
         let filtered = rows.filter((element) => element.id.toString() == id);
         if (filtered.length === 0) return null;
         return filtered[0];
-    }
+    };
 
     const handleSaveProcedureCost = async () => {
+        if (!startDate || !endDate || !procedure || !value || !institute) {
+            setOpenErrorSnack(true);
+            setMessageSnack('Preencha todos os campos obrigatórios');
+            return;
+        }
 
         if (procedureCost != null) {
             onClose({
@@ -102,7 +116,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 descriptionProcedure: getProcedureById(procedure)?.name ?? null,
                 validatyStart: startDate,
                 validatyEnd: endDate,
-                valueProcedure: parseFloat(value),
+                valueProcedure: parseFloat(value)
             });
             return;
         } else {
@@ -112,7 +126,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 id: 0,
                 validatyStart: startDate,
                 validatyEnd: endDate,
-                valueProcedure: parseFloat(value),
+                valueProcedure: parseFloat(value)
             });
             return;
         }
@@ -213,7 +227,6 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                     </Grid>
                 </Grid>
                 <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={() => setOpenErrorSnack(false)} />
-
             </DialogContent>
             <DialogActions>
                 <Button
