@@ -169,7 +169,7 @@ const RulesOfInvoicing = () => {
                             rows={rules.map((rule) => ({
                                 id: rule.id,
                                 rulesDescription: rule.rulesDescription,
-                                institution: rule.id,
+                                institution: rule.institution_name,
                                 unity: rule.unity.name,
                                 status: rule.status
                             }))}
