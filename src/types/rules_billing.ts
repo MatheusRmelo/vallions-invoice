@@ -6,7 +6,7 @@ export type RuleBilling = {
     unity: Unity;
     unity_fk?: number;
     status: number;
-    institution_name: string;
+    institution_name?: string;
 };
 
 export function parseRuleBilling(data: any): RuleBilling {
