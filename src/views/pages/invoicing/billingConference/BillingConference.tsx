@@ -32,7 +32,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { SendOutlined, Search, ExpandMore, ExpandLess, RefreshOutlined, MoneyOutlined, MonetizationOn } from '@mui/icons-material';
 import useAPI from 'hooks/useAPI';
 import { MoreVert, DeleteOutline, RemoveRedEyeOutlined } from '@mui/icons-material';
-import { Conference, parseConferenceList, generateConference } from 'types/conference';
+import { Conference, parseConferenceList, ReportConference } from 'types/conference';
 import { Billing, parseBilling, parseBillingList, parseReportBillingList, ReportBilling } from 'types/billing';
 import { Unity, parseUnityList, generateMockUnity } from 'types/unity';
 import { Institute, parseInstitute } from 'types/institute';
@@ -49,8 +49,8 @@ const BillingConference: React.FC = () => {
     const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
     const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
     const [tabIndex, setTabIndex] = useState(0);
-    const [expandedRowIds, setExpandedRowIds] = useState<number[]>([]);
-    const [conferences, setConferences] = useState<Billing[]>([]);
+    const [expandedRowIds, setExpandedRowIds] = useState<string[]>([]);
+    const [conferences, setConferences] = useState<Conference[]>([]);
     const [billings, setBillings] = useState<Billing[]>([]);
     const [receipts, setReceipts] = useState<Billing[]>([]);
     const [loading, setLoading] = useState(false);
@@ -63,9 +63,12 @@ const BillingConference: React.FC = () => {
     const [unities, setUnities] = useState<Unity[]>([]);
     const [doctor, setDoctor] = useState<string>();
     const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [filter, setFilter] = useState<string>();
+
     const [error, setError] = useState<string | null>(null);
     const [currentBilling, setCurrentBilling] = useState<ReportBilling | null>(null);
     const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
+
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
@@ -73,11 +76,9 @@ const BillingConference: React.FC = () => {
     const isMobile = useMediaQuery(useTheme().breakpoints.down('sm'));
     const { get, put, post } = useAPI();
 
-    const handleExpandClick = async (id: number) => {
+    const handleExpandClick = async (id: string) => {
         if (tabIndex == 2) {
-            await getDetailReceipt(id);
-        } else {
-            await getDetailBilling(id);
+            await getDetailReceipt(parseInt(id));
         }
 
         setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
@@ -125,15 +126,13 @@ const BillingConference: React.FC = () => {
         const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=${tabIndex}`);
         if (response.ok) {
             const reports = parseReportBillingList(response.result);
-            var newArray = tabIndex == 0 ? [...conferences] : tabIndex == 1 ? [...billings] : [];
+            var newArray = tabIndex == 1 ? [...billings] : [];
             for (let i = 0; i < newArray.length; i++) {
                 if (newArray[i].id == id) {
                     newArray[i].reportsBilling = reports;
                 }
             }
-            if (tabIndex == 0) {
-                setConferences(newArray);
-            } else if (tabIndex == 1) {
+            if (tabIndex == 1) {
                 setBillings(newArray);
             }
         } else {
@@ -164,13 +163,22 @@ const BillingConference: React.FC = () => {
         }
     };
 
+    const getConferences = async () => {
+        setLoading(true);
+        const response = await get(`/api/billing-confirmations/conference?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branch=${unity}${doctor ? `&reference=${doctor}` : ''}${filter ? `&filter=${filter}` : ''}`);
+        if (response.ok) {
+            setConferences(parseConferenceList(response.result));
+        } else {
+            console.log('Error');
+        }
+        setLoading(false);
+    };
+
     const getBillings = async () => {
         setLoading(true);
         const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branches=${unity}${doctor ? `&reference=${doctor}` : ''}`);
         if (response.ok) {
             const billings = parseBillingList(response.result);
-            const conference = billings.filter((element) => element.statusOfBilling == '0');
-            setConferences(conference);
             setBillings(billings);
             setReceipts(billings);
         } else {
@@ -179,10 +187,10 @@ const BillingConference: React.FC = () => {
         setLoading(false);
     };
 
-    const handleChangeCheckedConference = (idBilling: number) => {
+    const handleChangeCheckedConference = (idBilling: string) => {
         var newArray = [...conferences];
         for (let i = 0; i < newArray.length; i++) {
-            if (newArray[i].id == idBilling) {
+            if (`${newArray[i].id}${newArray[i].price}${newArray[i].patient_name}` == idBilling) {
                 newArray[i].checked = !newArray[i].checked;
             }
         }
@@ -203,11 +211,11 @@ const BillingConference: React.FC = () => {
         var newArray = [...conferences];
         for (let i = 0; i < newArray.length; i++) {
             if (newArray[i].id == idBilling) {
-                for (let x = 0; x < newArray[i].reportsBilling.length; x++) {
-                    if (newArray[i].reportsBilling[x].id == idReport) {
-                        newArray[i].reportsBilling[x].checked = !newArray[i].reportsBilling[x].checked;
-                    }
-                }
+                // for (let x = 0; x < newArray[i].reportsBilling.length; x++) {
+                //     if (newArray[i].reportsBilling[x].id == idReport) {
+                //         newArray[i].reportsBilling[x].checked = !newArray[i].reportsBilling[x].checked;
+                //     }
+                // }
             }
         }
 
@@ -256,21 +264,22 @@ const BillingConference: React.FC = () => {
 
     const handleSearch = () => {
         getBillings();
+        getConferences();
         setExpandedRowIds([]);
     }
 
     const handleOpenConfirmBilling = () => {
-        var array: ReportBilling[] = [];
-        conferences.forEach((element) => {
-            if (element.checked) {
-                array = [...array, ...element.reportsBilling.filter((element) => element.checked)]
-            }
-        });
-        setCheckedBillings(array);
-        if (array.length > 0) {
-            setCurrentBilling(array[0]);
-            setOpenBillingConfirm(true);
-        }
+        // var array: ReportConference[] = [];
+        // conferences.forEach((element) => {
+        //      if (element.checked) {
+        //          array = [...array, ...element.reports_finished.filter((element) => element.checked)]
+        //      }
+        // });
+        // setCheckedBillings(array);
+        // if (array.length > 0) {
+        //     setCurrentBilling(array[0]);
+        //     setOpenBillingConfirm(true);
+        // }
     }
 
     const handleOpenRefundBilling = () => {
@@ -345,7 +354,7 @@ const BillingConference: React.FC = () => {
                 <Card>
                     <CardContent>
                         <Grid container spacing={4}>
-                            <Grid item xs={isMobile ? 6 : 2}>
+                            <Grid item xs={isMobile ? 6 : 1.5}>
                                 <TextField
                                     label="Data Início"
                                     type="date"
@@ -354,7 +363,7 @@ const BillingConference: React.FC = () => {
                                     onChange={(e) => setStartDate(e.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={isMobile ? 6 : 2}>
+                            <Grid item xs={isMobile ? 6 : 1.5}>
                                 <TextField
                                     label="Data Fim"
                                     type="date"
@@ -363,20 +372,20 @@ const BillingConference: React.FC = () => {
                                     onChange={(e) => setEndDate(e.target.value)}
                                 />
                             </Grid>
-                            {/* <Grid item xs={isMobile ? 12 : 1.8}>
+                            <Grid item xs={isMobile ? 12 : 1.5}>
                                 <FormControl fullWidth>
                                     <InputLabel id="filter">Filtro</InputLabel>
-                                    <Select fullWidth label="Filtro" variant="outlined" defaultValue="Teste1">
-                                        {mockSelects.map((institution) => (
-                                            <MenuItem key={institution} value={institution}>
-                                                {institution}
+                                    <Select fullWidth label="Filtro" variant="outlined" value={filter} onChange={(e) => setFilter(e.target.value)}>
+                                        {['Data Laudo', 'Data Estudo'].map((value) => (
+                                            <MenuItem key={value} value={value}>
+                                                {value}
                                             </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
-                            </Grid> */}
+                            </Grid>
 
-                            <Grid item xs={isMobile ? 12 : 2}>
+                            <Grid item xs={isMobile ? 12 : 1.5}>
                                 <FormControl fullWidth>
                                     <InputLabel id="institute">Instituição</InputLabel>
                                     <Select fullWidth label="Instituição" variant="outlined"
@@ -392,7 +401,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={isMobile ? 12 : 2}>
+                            <Grid item xs={isMobile ? 12 : 1.5}>
                                 <FormControl fullWidth>
                                     <InputLabel id="unity">Unidade</InputLabel>
                                     <Select fullWidth label="Unidade" variant="outlined" value={unity}
@@ -405,7 +414,7 @@ const BillingConference: React.FC = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={isMobile ? 12 : 2}>
+                            <Grid item xs={isMobile ? 12 : 1.5}>
                                 <FormControl fullWidth>
                                     <InputLabel id="doctor">Médico</InputLabel>
                                     <Select fullWidth label="Médico" variant="outlined" value={doctor}
@@ -419,7 +428,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 2}>
-                                <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }} onClick={handleSearch} disabled={!(startDate && endDate && institute && unity)}>
+                                <Button variant="contained" color="primary" fullWidth style={{ height: '90%' }} onClick={handleSearch} disabled={!(startDate && endDate)}>
                                     <span style={{ fontSize: '1.45vh' }}>Pesquisar</span>
                                 </Button>
                             </Grid>

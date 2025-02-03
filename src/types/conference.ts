@@ -1,53 +1,28 @@
 export type Conference = {
-    id: number;
-    namePatient: string;
-    descriptionStudy: string;
-    dateOfStudy: Date;
-    unity: string;
-    qtn: number;
-    valueUnity: number;
-    valueTotal: number;
-    reportsConference: ReportConference[];
+    id: number,
+    patient_name: string,
+    branch_name: string,
+    price: string,
+    reports_finished_count: string,
+    reports_finished: ReportConference[],
+    checked: boolean,
 };
 
 export type ReportConference = {
-    id: number;
-    namePatient: string;
-    dateOfReport: Date;
-    titleOfReport: string;
-    valueReport: number;
-    status: string;
+    study_fk: string,
+    title: string,
+    status: string,
+    date_report: string,
+    checked: boolean,
 };
 export function parseReportConference(data: any): ReportConference {
     return {
-        id: data.id,
-        namePatient: data.namePatient,
-        dateOfReport: new Date(data.dateOfReport),
-        titleOfReport: data.titleOfReport,
-        valueReport: data.valueReport,
-        status: data.status
+        study_fk: data.study_fk,
+        title: data.title,
+        status: data.status,
+        date_report: data.date_report,
+        checked: false,
     };
-}
-
-export function generateReportConference(): ReportConference[] {
-    return [
-        {
-            id: 0,
-            namePatient: 'PACIENTE TESTE',
-            dateOfReport: new Date(),
-            titleOfReport: '',
-            valueReport: 0,
-            status: 'Em Aberto'
-        },
-        {
-            id: 1,
-            namePatient: 'PACIENTE TESTE',
-            dateOfReport: new Date(),
-            titleOfReport: '',
-            valueReport: 0,
-            status: 'Em Aberto'
-        }
-    ];
 }
 
 export function parseReportConferenceList(data: any): ReportConference[] {
@@ -57,42 +32,13 @@ export function parseReportConferenceList(data: any): ReportConference[] {
 export function parseConference(data: any): Conference {
     return {
         id: data.id,
-        namePatient: data.namePatient,
-        descriptionStudy: data.descriptionStudy,
-        dateOfStudy: new Date(data.dateOfStudy),
-        unity: data.unity,
-        qtn: data.qtn,
-        valueUnity: data.valueUnity,
-        valueTotal: data.valueTotal,
-        reportsConference: parseReportConferenceList(data.reportsConference)
+        patient_name: data.patient_name,
+        branch_name: data.branch_name,
+        price: data.price,
+        reports_finished_count: data.reports_finished_count,
+        reports_finished: parseReportConferenceList(data.reports_finished),
+        checked: false,
     };
-}
-
-export function generateConference(): Conference[] {
-    return [
-        {
-            id: 0,
-            namePatient: 'PACIENTE TESTE',
-            descriptionStudy: 'DESCRIÇÃO TESTE',
-            dateOfStudy: new Date(),
-            unity: 'UNIDADE TESTE',
-            qtn: 1,
-            valueUnity: 0,
-            valueTotal: 0,
-            reportsConference: generateReportConference()
-        },
-        {
-            id: 1,
-            namePatient: 'PACIENTE TESTE',
-            descriptionStudy: 'DESCRIÇÃO TESTE',
-            dateOfStudy: new Date(),
-            unity: 'UNIDADE TESTE',
-            qtn: 1,
-            valueUnity: 0,
-            valueTotal: 0,
-            reportsConference: generateReportConference()
-        }
-    ];
 }
 
 export function parseConferenceList(data: any): Conference[] {

@@ -6,8 +6,8 @@ import { Billing } from "types/billing";
 
 type Props = {
     billings: Billing[],
-    expandedRowIds: number[],
-    handleExpandClick: (id: number) => void,
+    expandedRowIds: string[],
+    handleExpandClick: (id: string) => void,
 }
 const ReceiptView = ({
     billings,
@@ -32,8 +32,8 @@ const ReceiptView = ({
                     width: 100,
                     renderCell: (params) => (
                         <Box>
-                            <IconButton onClick={() => handleExpandClick(params.row.id)}>
-                                {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
+                            <IconButton onClick={() => handleExpandClick(params.row.id.toString())}>
+                                {expandedRowIds.includes(params.row.id.toString()) ? <ExpandLess /> : <ExpandMore />}
                             </IconButton>
                         </Box>
                     )

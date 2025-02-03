@@ -61,8 +61,8 @@ const MainLayout = () => {
             {menu}
 
             {/* main content */}
-            <MainContentStyled {...{ borderRadius, menuOrientation, open: drawerOpen, theme }}>
-                <Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>
+            <MainContentStyled {...{ borderRadius, menuOrientation, open: drawerOpen, theme }} >
+                <Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })} style={{ marginTop: '40px' }}>
                     {/* breadcrumb */}
                     <Breadcrumbs />
                     <Outlet />

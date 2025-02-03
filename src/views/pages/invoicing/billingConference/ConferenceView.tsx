@@ -1,28 +1,29 @@
 import { ExpandLess, ExpandMore, MoreVert } from "@mui/icons-material";
 import { Box, IconButton, Checkbox, Typography, Chip } from "@mui/material";
 import { DataGrid, GridRow } from "@mui/x-data-grid";
-import { Billing } from "types/billing";
+import { Conference } from "types/conference";
 
 type Props = {
-    conferences: Billing[],
-    expandedRowIds: number[],
-    handleExpandClick: (id: number) => void,
-    handleChangeCheckedConference: (id: number) => void,
+    conferences: Conference[],
+    expandedRowIds: string[],
+    handleExpandClick: (id: string) => void,
+    handleChangeCheckedConference: (id: string) => void,
     handleChangeCheckedReport: (idBilling: number, idReport: number) => void,
 }
 const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handleChangeCheckedConference, handleChangeCheckedReport }: Props) => {
+    console.log(expandedRowIds);
     return (
         <DataGrid
             rows={conferences.map((conference) => {
                 return {
-                    id: conference.id,
-                    namePatient: '',
+                    id: `${conference.id}${conference.price}${conference.patient_name}`,
+                    namePatient: conference.patient_name,
                     study_description: '',
-                    dateOfStudy: conference.dateOfBilling,
-                    unity: conference.unidade,
-                    quantity: '',
-                    valueUnit: '',
-                    valueTotal: conference.valueTotal,
+                    dateOfStudy: '',
+                    unity: conference.branch_name,
+                    quantity: conference.reports_finished_count,
+                    valueUnit: Number(conference.price).toLocaleString(),
+                    valueTotal: (Number(conference.reports_finished_count) * Number(conference.price)).toLocaleString(),
                     checked: conference.checked,
                 };
             })}
@@ -86,16 +87,15 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                     <div style={{ height: 200, width: '100%' }}>
                                         <DataGrid
                                             rows={(
-                                                conferences.find((conference) => conference.id === row.id)
-                                                    ?.reportsBilling || []
+                                                conferences.find((conference) => `${conference.id}${conference.price}${conference.patient_name}` === row.id)
+                                                    ?.reports_finished || []
                                             ).map((report) => {
                                                 return {
-                                                    id: report.id,
-                                                    namePatient: report.namePatient,
-                                                    reportDate: report.dateOfReport,
-                                                    reportTitle: report.titleOfReport,
-                                                    reportValue: report.valueReport,
-                                                    status: '0',
+                                                    id: report.study_fk,
+                                                    reportDate: report.date_report,
+                                                    reportTitle: report.title,
+                                                    reportValue: 'Não encontrado',
+                                                    status: report.status,
                                                     checked: report.checked,
                                                 };
                                             })}
@@ -103,20 +103,8 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                                 {
                                                     field: 'id',
                                                     headerName: '#',
-                                                    minWidth: 64,
-                                                    width: 64,
-                                                },
-                                                {
-                                                    field: 'namePatient',
-                                                    headerName: 'Nome do Paciente',
-                                                    minWidth: 150,
-                                                    flex: 2,
-                                                    renderCell: (params) => (
-                                                        <Box>
-                                                            <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedReport(row.id, params.row.id)} />
-                                                            {(params.value as string).split("-")[0]}
-                                                        </Box>
-                                                    )
+                                                    minWidth: 120,
+                                                    width: 120,
                                                 },
                                                 {
                                                     field: 'reportDate',
@@ -149,7 +137,7 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                                         return <Chip
                                                             variant='outlined'
                                                             color={params.value == 0 ? 'error' : 'success'}
-                                                            label={params.value == 0 ? 'Em aberto' : ''} />;
+                                                            label={params.value == 0 ? 'Em aberto' : params.value == '1' ? 'Faturado' : ''} />;
                                                     }
                                                 },
 
@@ -169,7 +157,7 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                                 }
                                             ]}
                                             hideFooter
-                                            getRowId={(row) => row.namePatient}
+                                            getRowId={(row) => row.id}
                                         />
                                     </div>
                                 </div>

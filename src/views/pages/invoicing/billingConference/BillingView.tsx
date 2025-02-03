@@ -5,8 +5,8 @@ import { Billing } from "types/billing";
 
 type Props = {
     billings: Billing[],
-    expandedRowIds: number[],
-    handleExpandClick: (id: number) => void,
+    expandedRowIds: string[],
+    handleExpandClick: (id: string) => void,
     handleChangeCheckedBilling: (id: number) => void,
     handleChangeCheckedReport: (idBilling: number, idReport: number) => void,
 }
@@ -36,8 +36,8 @@ const BillingView = ({
                     width: 100,
                     renderCell: (params) => (
                         <Box>
-                            <IconButton onClick={() => handleExpandClick(params.row.id)}>
-                                {expandedRowIds.includes(params.row.id) ? <ExpandLess /> : <ExpandMore />}
+                            <IconButton onClick={() => handleExpandClick(params.row.id.toString())}>
+                                {expandedRowIds.includes(params.row.id.toString()) ? <ExpandLess /> : <ExpandMore />}
                             </IconButton>
                             <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedBilling(params.row.id)} />
                         </Box>
