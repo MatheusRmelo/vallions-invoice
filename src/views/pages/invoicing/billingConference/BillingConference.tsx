@@ -43,6 +43,7 @@ import RefundBillingForm from './RefundBillingForm';
 import ReceiptView from './ReceiptView';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 import { Doctor, parseDoctor } from 'types/doctor';
+import CompetenceConferenceForm from './CompetenceConferenceForm';
 
 
 const BillingConference: React.FC = () => {
@@ -57,6 +58,8 @@ const BillingConference: React.FC = () => {
     const [openDialogAction, setOpenDialogAction] = useState(false);
     const [openBillingReversal, setOpenBillingReversal] = useState(false);
     const [openBillingConfirm, setOpenBillingConfirm] = useState(false);
+    const [openCompetenceConference, setOpenCompetenceConference] = useState(false);
+
     const [institutes, setInstitutes] = useState<Institute[]>([]);
     const [institute, setInstitute] = useState<string>();
     const [unity, setUnity] = useState<string>();
@@ -68,6 +71,8 @@ const BillingConference: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [currentBilling, setCurrentBilling] = useState<ReportBilling | null>(null);
     const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
+    const [currentConference, setCurrentConference] = useState<Conference | null>(null);
+    const [checkedConferences, setCheckedConferences] = useState<Conference[]>([]);
 
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
@@ -165,7 +170,7 @@ const BillingConference: React.FC = () => {
 
     const getConferences = async () => {
         setLoading(true);
-        const response = await get(`/api/billing-confirmations/conference?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branch=${unity}${doctor ? `&reference=${doctor}` : ''}${filter ? `&filter=${filter}` : ''}`);
+        const response = await get(`/api/conference?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branch=${unity}${doctor ? `&reference=${doctor}` : ''}${filter ? `&filter=${filter}` : ''}`);
         if (response.ok) {
             setConferences(parseConferenceList(response.result));
         } else {
@@ -268,18 +273,14 @@ const BillingConference: React.FC = () => {
         setExpandedRowIds([]);
     }
 
-    const handleOpenConfirmBilling = () => {
-        // var array: ReportConference[] = [];
-        // conferences.forEach((element) => {
-        //      if (element.checked) {
-        //          array = [...array, ...element.reports_finished.filter((element) => element.checked)]
-        //      }
-        // });
-        // setCheckedBillings(array);
-        // if (array.length > 0) {
-        //     setCurrentBilling(array[0]);
-        //     setOpenBillingConfirm(true);
-        // }
+    const handleOpenConferenceChecked = () => {
+        var array: Conference[] = [...conferences.filter((element) => element.checked)];
+
+        setCheckedConferences(array);
+        if (array.length > 0) {
+            setCurrentConference(array[0]);
+            setOpenCompetenceConference(true);
+        }
     }
 
     const handleOpenRefundBilling = () => {
@@ -340,6 +341,31 @@ const BillingConference: React.FC = () => {
 
         setOpenBillingReversal(false);
     }
+
+    const handleCloseCompetenceConference = (success: boolean) => {
+        if (success) {
+            var newArray = [...checkedConferences];
+            newArray.splice(0);
+            setCheckedConferences(newArray);
+            setExpandedRowIds([]);
+            if (newArray.length > 0) {
+                setCurrentConference(newArray[0]);
+            } else {
+                setTabIndex(1);
+                getBillings();
+                handleClickSnack({ message: 'successo', severity: 'success' });
+                setOpenCompetenceConference(false);
+            }
+        } else {
+            setOpenCompetenceConference(false);
+        }
+    }
+
+    const getUnityById = (id: string) => {
+        let filtered = unities.filter((element) => element.cd_unidade === id);
+        if (filtered.length === 0) return undefined;
+        return filtered[0];
+    };
 
     useEffect(() => {
         if (institute) getUnities();
@@ -445,7 +471,7 @@ const BillingConference: React.FC = () => {
                             <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
                             {
                                 tabIndex == 0 ?
-                                    <IconButton onClick={() => handleOpenConfirmBilling()}>
+                                    <IconButton onClick={() => handleOpenConferenceChecked()}>
                                         <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
                                     </IconButton> :
                                     tabIndex == 1 ? (
@@ -542,6 +568,11 @@ const BillingConference: React.FC = () => {
             <ConfirmBillingForm open={openBillingConfirm} billing={currentBilling} onClose={(value) => handleCloseConfirmBilling(value)} />
             {/* Dialog de Estorno de Faturamento */}
             <RefundBillingForm open={openBillingReversal} onClose={(value) => handleCloseRefundBilling(value)} billing={currentBilling} />
+            {/* Dialog de Competência de faturamento */}
+            <CompetenceConferenceForm open={openCompetenceConference} onClose={(value) => handleCloseCompetenceConference(value)}
+                price={Number(currentConference?.price ?? 0)}
+                unity={getUnityById(unity ?? '')}
+            />
         </>
     );
 };
