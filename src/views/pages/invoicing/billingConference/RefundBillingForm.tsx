@@ -1,17 +1,19 @@
 import { Dialog, Box, DialogTitle, DialogContent, DialogContentText, Grid, FormControl, InputLabel, Select, MenuItem, TextField, DialogActions, Button, SnackbarCloseReason } from "@mui/material";
 import useAPI from "hooks/useAPI";
 import { useState } from "react";
-import { ReportBilling } from "types/billing";
+import { Billing, ReportBilling } from "types/billing";
+import { Unity } from "types/unity";
 import SnackBarAlert from "ui-component/SnackBarAlert";
 
 type Props = {
     open: boolean,
     onClose: (success: boolean) => void,
-    billing: ReportBilling | null,
+    billing: Billing | null,
+    unity?: Unity,
 }
 
 
-const RefundBillingForm = ({ open, onClose, billing }: Props) => {
+const RefundBillingForm = ({ open, onClose, billing, unity }: Props) => {
     const [reason, setReason] = useState("");
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
@@ -62,13 +64,13 @@ const RefundBillingForm = ({ open, onClose, billing }: Props) => {
                                 <Grid item xs={8}>
                                     <FormControl fullWidth>
                                         <InputLabel id="select-label">Unidade</InputLabel>
-                                        <Select labelId="select-label" label="Select" value={billing?.unity} disabled>
-                                            <MenuItem value={billing?.unity}>{billing?.unity}</MenuItem>
+                                        <Select labelId="select-label" label="Select" value={unity?.cd_unidade} disabled>
+                                            <MenuItem value={unity?.cd_unidade}>{unity?.name}</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <TextField label="R$ Valor" fullWidth value={billing?.valueReport} disabled />
+                                    <TextField label="R$ Valor" fullWidth value={billing?.valueTotal} disabled />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField label="Motivo do Estorno" fullWidth value={reason} onChange={(e) => setReason(e.target.value)} />

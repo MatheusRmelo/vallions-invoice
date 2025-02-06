@@ -1,13 +1,13 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, SnackbarCloseReason, TextField } from "@mui/material";
 import useAPI from "hooks/useAPI";
 import { useState } from "react";
-import { ReportBilling } from "types/billing";
+import { Billing } from "types/billing";
 import SnackBarAlert from "ui-component/SnackBarAlert";
 
 type Props = {
     open: boolean,
     onClose: (success: boolean) => void,
-    billing: ReportBilling | null,
+    billing: Billing | null,
 }
 
 const ConfirmBillingForm = ({ open, onClose, billing }: Props) => {
@@ -64,13 +64,13 @@ const ConfirmBillingForm = ({ open, onClose, billing }: Props) => {
                                     <Grid item xs={8}>
                                         <FormControl fullWidth>
                                             <InputLabel id="select-label">Unidade</InputLabel>
-                                            <Select labelId="select-label" label="Select" value={billing?.unity} disabled>
+                                            {/* <Select labelId="select-label" label="Select" value={billing?.unity} disabled>
                                                 <MenuItem value={billing?.unity}>{billing?.unity}</MenuItem>
-                                            </Select>
+                                            </Select> */}
                                         </FormControl>
                                     </Grid>
                                     <Grid item xs={4}>
-                                        <TextField label="R$ Valor" value={billing?.valueReport} fullWidth disabled />
+                                        <TextField label="R$ Valor" value={billing?.valueTotal} fullWidth disabled />
                                     </Grid>
                                     <Grid item xs={2}>
                                         <TextField label="Previsão" value={previsionDate} onChange={(e) => setPrevisionDate(e.target.value)}

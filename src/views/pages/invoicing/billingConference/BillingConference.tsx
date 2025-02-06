@@ -69,8 +69,8 @@ const BillingConference: React.FC = () => {
     const [filter, setFilter] = useState<string>();
 
     const [error, setError] = useState<string | null>(null);
-    const [currentBilling, setCurrentBilling] = useState<ReportBilling | null>(null);
-    const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
+    const [currentBilling, setCurrentBilling] = useState<Billing | null>(null);
+    const [checkedBillings, setCheckedBillings] = useState<Billing[]>([]);
     const [currentConference, setCurrentConference] = useState<Conference | null>(null);
     const [checkedConferences, setCheckedConferences] = useState<Conference[]>([]);
 
@@ -81,11 +81,13 @@ const BillingConference: React.FC = () => {
     const isMobile = useMediaQuery(useTheme().breakpoints.down('sm'));
     const { get, put, post } = useAPI();
 
-    const handleExpandClick = async (id: string) => {
+    const handleExpandClick = async (id: string, status = "0") => {
+        if (tabIndex == 1) {
+            await getDetailBilling(parseInt(id), status);
+        }
         if (tabIndex == 2) {
             await getDetailReceipt(parseInt(id));
         }
-
         setExpandedRowIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
     };
 
@@ -100,7 +102,7 @@ const BillingConference: React.FC = () => {
     };
 
     const getDoctors = async () => {
-        const response = await post(`/api/referenceAccess`, {});
+        const response = await post(`/api/physicianAccess`, {});
         if (response.ok) {
             setDoctors([...response.result.map((element: any) => parseDoctor(element))]);
         } else {
@@ -127,8 +129,8 @@ const BillingConference: React.FC = () => {
         }
     }
 
-    const getDetailBilling = async (id: number) => {
-        const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=${tabIndex}`);
+    const getDetailBilling = async (id: number, status: string) => {
+        const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=${status}${doctor ? `&physician=${doctor}` : ''}${filter ? `&type_date=${filter == 'Data Laudo' ? 1 : 2}` : ''}`);
         if (response.ok) {
             const reports = parseReportBillingList(response.result);
             var newArray = tabIndex == 1 ? [...billings] : [];
@@ -170,7 +172,7 @@ const BillingConference: React.FC = () => {
 
     const getConferences = async () => {
         setLoading(true);
-        const response = await get(`/api/conference?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branch=${unity}${doctor ? `&reference=${doctor}` : ''}${filter ? `&filter=${filter}` : ''}`);
+        const response = await get(`/api/conference?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branch=${unity}${doctor ? `&physician=${doctor}` : ''}${filter ? `&type_date=${filter == 'Data Laudo' ? 1 : 2}` : ''}`);
         if (response.ok) {
             setConferences(parseConferenceList(response.result));
         } else {
@@ -181,11 +183,10 @@ const BillingConference: React.FC = () => {
 
     const getBillings = async () => {
         setLoading(true);
-        const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branches=${unity}${doctor ? `&reference=${doctor}` : ''}`);
+        const response = await get(`/api/billings?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branches=${unity}${doctor ? `&physician=${doctor}` : ''}${filter ? `&type_date=${filter == 'Data Laudo' ? 1 : 2}` : ''}`);
         if (response.ok) {
             const billings = parseBillingList(response.result);
             setBillings(billings);
-            setReceipts(billings);
         } else {
             console.log('Error');
         }
@@ -284,12 +285,8 @@ const BillingConference: React.FC = () => {
     }
 
     const handleOpenRefundBilling = () => {
-        var array: ReportBilling[] = [];
-        billings.forEach((element) => {
-            if (element.checked) {
-                array = [...array, ...element.reportsBilling.filter((element) => element.checked)]
-            }
-        });
+        var array: Billing[] = [...billings.filter((element) => element.checked)];
+
         setCheckedBillings(array);
         if (array.length > 0) {
             setCurrentBilling(array[0]);
@@ -504,7 +501,7 @@ const BillingConference: React.FC = () => {
                                         <BillingView
                                             billings={billings}
                                             expandedRowIds={expandedRowIds}
-                                            handleExpandClick={(id) => handleExpandClick(id)}
+                                            handleExpandClick={(id, status) => handleExpandClick(id, status)}
                                             handleChangeCheckedBilling={(id) => handleChangeCheckedBilling(id)}
                                             handleChangeCheckedReport={(idBilling, idReport) => handleChangeCheckedReportBilling(idBilling, idReport)}
                                         />
@@ -567,7 +564,7 @@ const BillingConference: React.FC = () => {
             {/* Dialog de Confirmação de Faturamento */}
             <ConfirmBillingForm open={openBillingConfirm} billing={currentBilling} onClose={(value) => handleCloseConfirmBilling(value)} />
             {/* Dialog de Estorno de Faturamento */}
-            <RefundBillingForm open={openBillingReversal} onClose={(value) => handleCloseRefundBilling(value)} billing={currentBilling} />
+            <RefundBillingForm open={openBillingReversal} onClose={(value) => handleCloseRefundBilling(value)} billing={currentBilling} unity={getUnityById(unity ?? '')} />
             {/* Dialog de Competência de faturamento */}
             <CompetenceConferenceForm open={openCompetenceConference} onClose={(value) => handleCloseCompetenceConference(value)}
                 price={Number(currentConference?.price ?? 0)}

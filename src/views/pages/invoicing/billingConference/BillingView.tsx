@@ -6,7 +6,7 @@ import { Billing } from "types/billing";
 type Props = {
     billings: Billing[],
     expandedRowIds: string[],
-    handleExpandClick: (id: string) => void,
+    handleExpandClick: (id: string, status: string) => void,
     handleChangeCheckedBilling: (id: number) => void,
     handleChangeCheckedReport: (idBilling: number, idReport: number) => void,
 }
@@ -25,7 +25,7 @@ const BillingView = ({
                     monthOfBilling: billing.dateOfBilling,
                     statusOfBilling: billing.statusOfBilling,
                     quantity: '',
-                    totalValue: billing.valueTotal,
+                    totalValue: Number(billing.valueTotal).toLocaleString(),
                     checked: billing.checked,
                 };
             })}
@@ -36,7 +36,7 @@ const BillingView = ({
                     width: 100,
                     renderCell: (params) => (
                         <Box>
-                            <IconButton onClick={() => handleExpandClick(params.row.id.toString())}>
+                            <IconButton onClick={() => handleExpandClick(params.row.id.toString(), params.row.statusOfBilling)}>
                                 {expandedRowIds.includes(params.row.id.toString()) ? <ExpandLess /> : <ExpandMore />}
                             </IconButton>
                             <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedBilling(params.row.id)} />
@@ -60,8 +60,8 @@ const BillingView = ({
                     renderCell(params) {
                         return <Chip
                             variant='outlined'
-                            color={params.value == 0 ? 'primary' : 'success'}
-                            label={params.value == 0 ? 'Fatura em aberto' : ''} />;
+                            color={params.value == 0 ? 'primary' : params.value == 1 ? 'success' : params.value == 2 ? 'error' : 'info'}
+                            label={params.value == 0 ? 'Aguardando faturamento' : params.value == 1 ? 'Faturado' : params.value == 2 ? 'Estornado' : 'Conferência'} />;
                     }
                 },
                 {
@@ -69,7 +69,7 @@ const BillingView = ({
                     renderHeader: () => <strong style={{ fontSize: '12px' }}>Qtn</strong>,
                 },
                 {
-                    field: 'valueTotal', headerName: '$ Total', flex: 1, minWidth: 150,
+                    field: 'totalValue', headerName: '$ Total', flex: 1, minWidth: 150,
                     renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Total</strong>,
                 }
             ]}
@@ -81,7 +81,7 @@ const BillingView = ({
                     return (
                         <>
                             <GridRow {...props} />
-                            {expandedRowIds.includes(row.id) && (
+                            {expandedRowIds.includes(row.id.toString()) && (
                                 <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
                                     <Box height={20} />
                                     <Typography variant="h3">Laudos</Typography>
