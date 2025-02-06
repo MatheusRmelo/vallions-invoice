@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance } from 'axios';
 import { APIResponse } from '../types/apiresponse';
 
 function useAPI() {
@@ -22,7 +22,7 @@ function useAPI() {
             };
         } catch (err: any) {
             return {
-                message: err.toString(),
+                message: err?.response?.data?.message ?? err.toString(),
                 ok: false,
                 result: null
             };
@@ -43,7 +43,7 @@ function useAPI() {
             };
         } catch (err: any) {
             return {
-                message: err.toString(),
+                message: err?.response?.data?.message ?? err.toString(),
                 ok: false,
                 result: null
             };
@@ -64,7 +64,7 @@ function useAPI() {
             };
         } catch (err: any) {
             return {
-                message: err.toString(),
+                message: err?.response?.data?.message ?? err.toString(),
                 ok: false,
                 result: null
             };
@@ -85,7 +85,7 @@ function useAPI() {
             };
         } catch (err: any) {
             return {
-                message: err.toString(),
+                message: err?.response?.data?.message ?? err.toString(),
                 ok: false,
                 result: null
             };

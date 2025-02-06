@@ -8,7 +8,7 @@ import SnackBarAlert from "ui-component/SnackBarAlert";
 type Props = {
     open: boolean,
     onClose: (success: boolean) => void,
-    billing: Billing | null,
+    billing: ReportBilling | null,
     unity?: Unity,
 }
 
@@ -70,7 +70,7 @@ const RefundBillingForm = ({ open, onClose, billing, unity }: Props) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <TextField label="R$ Valor" fullWidth value={billing?.valueTotal} disabled />
+                                    <TextField label="R$ Valor" fullWidth value={billing?.valueReport} disabled />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField label="Motivo do Estorno" fullWidth value={reason} onChange={(e) => setReason(e.target.value)} />

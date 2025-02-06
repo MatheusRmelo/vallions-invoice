@@ -1,13 +1,13 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, SnackbarCloseReason, TextField } from "@mui/material";
 import useAPI from "hooks/useAPI";
 import { useState } from "react";
-import { Billing } from "types/billing";
+import { Billing, ReportBilling } from "types/billing";
 import SnackBarAlert from "ui-component/SnackBarAlert";
 
 type Props = {
     open: boolean,
     onClose: (success: boolean) => void,
-    billing: Billing | null,
+    billing: ReportBilling | null,
 }
 
 const ConfirmBillingForm = ({ open, onClose, billing }: Props) => {
@@ -70,7 +70,7 @@ const ConfirmBillingForm = ({ open, onClose, billing }: Props) => {
                                         </FormControl>
                                     </Grid>
                                     <Grid item xs={4}>
-                                        <TextField label="R$ Valor" value={billing?.valueTotal} fullWidth disabled />
+                                        <TextField label="R$ Valor" value={billing?.valueReport} fullWidth disabled />
                                     </Grid>
                                     <Grid item xs={2}>
                                         <TextField label="Previsão" value={previsionDate} onChange={(e) => setPrevisionDate(e.target.value)}

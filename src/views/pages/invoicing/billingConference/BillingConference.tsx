@@ -69,8 +69,8 @@ const BillingConference: React.FC = () => {
     const [filter, setFilter] = useState<string>();
 
     const [error, setError] = useState<string | null>(null);
-    const [currentBilling, setCurrentBilling] = useState<Billing | null>(null);
-    const [checkedBillings, setCheckedBillings] = useState<Billing[]>([]);
+    const [currentBilling, setCurrentBilling] = useState<ReportBilling | null>(null);
+    const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
     const [currentConference, setCurrentConference] = useState<Conference | null>(null);
     const [checkedConferences, setCheckedConferences] = useState<Conference[]>([]);
 
@@ -97,16 +97,16 @@ const BillingConference: React.FC = () => {
             const unities = parseUnityList(response.result);
             setUnities(unities);
         } else {
-            setError('Não foi possível carregar as unidades.' + response.message);
+            handleClickSnack({ message: response.message ?? `Não foi possível carregar as unidades.`, severity: 'error' });
         }
     };
 
     const getDoctors = async () => {
-        const response = await post(`/api/physicianAccess`, {});
+        const response = await post(`/api/referenceAccess`, {});
         if (response.ok) {
             setDoctors([...response.result.map((element: any) => parseDoctor(element))]);
         } else {
-            setError('Não foi possível carregar os médicos.' + response.message);
+            handleClickSnack({ message: response.message ?? `Não foi possível carregar os médicos.`, severity: 'error' });
         }
     };
 
@@ -125,7 +125,7 @@ const BillingConference: React.FC = () => {
             }
             setReceipts(newArray);
         } else {
-            console.log('Error');
+            handleClickSnack({ message: response.message ?? `Error ao buscar detalhes da receita ${id}`, severity: 'error' });
         }
     }
 
@@ -143,7 +143,7 @@ const BillingConference: React.FC = () => {
                 setBillings(newArray);
             }
         } else {
-            console.log('Error');
+            handleClickSnack({ message: response.message ?? `Error ao buscar detalhes do fatumento ${id}`, severity: 'error' });
         }
     }
 
@@ -166,7 +166,7 @@ const BillingConference: React.FC = () => {
                 getBillings();
             }
         } else {
-            setError(response.message);
+            handleClickSnack({ message: response.message ?? 'Error ao buscar instituições', severity: 'error' });
         }
     };
 
@@ -176,7 +176,7 @@ const BillingConference: React.FC = () => {
         if (response.ok) {
             setConferences(parseConferenceList(response.result));
         } else {
-            console.log('Error');
+            handleClickSnack({ message: response.message ?? 'Error ao buscar conferências', severity: 'error' });
         }
         setLoading(false);
     };
@@ -188,7 +188,7 @@ const BillingConference: React.FC = () => {
             const billings = parseBillingList(response.result);
             setBillings(billings);
         } else {
-            console.log('Error');
+            handleClickSnack({ message: response.message ?? 'Error ao buscar faturamentos', severity: 'error' });
         }
         setLoading(false);
     };
@@ -197,6 +197,12 @@ const BillingConference: React.FC = () => {
         var newArray = [...conferences];
         for (let i = 0; i < newArray.length; i++) {
             if (`${newArray[i].id}${newArray[i].price}${newArray[i].patient_name}` == idBilling) {
+                if (!newArray[i].checked) {
+                    if (newArray[i].reports_finished.length == 0) {
+                        handleClickSnack({ message: 'Não é possível faturar, pois não foi encontrado o ReportID', severity: 'error' });
+                        return;
+                    }
+                }
                 newArray[i].checked = !newArray[i].checked;
             }
         }
@@ -285,8 +291,12 @@ const BillingConference: React.FC = () => {
     }
 
     const handleOpenRefundBilling = () => {
-        var array: Billing[] = [...billings.filter((element) => element.checked)];
-
+        var array: ReportBilling[] = [];
+        billings.forEach((element) => {
+            if (element.checked) {
+                array = [...array, ...element.reportsBilling.filter((element) => element.checked)]
+            }
+        });
         setCheckedBillings(array);
         if (array.length > 0) {
             setCurrentBilling(array[0]);
@@ -569,6 +579,7 @@ const BillingConference: React.FC = () => {
             <CompetenceConferenceForm open={openCompetenceConference} onClose={(value) => handleCloseCompetenceConference(value)}
                 price={Number(currentConference?.price ?? 0)}
                 unity={getUnityById(unity ?? '')}
+                conference={currentConference}
             />
         </>
     );

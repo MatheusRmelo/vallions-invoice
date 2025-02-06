@@ -9,6 +9,7 @@ export type Conference = {
 };
 
 export type ReportConference = {
+    id: number,
     study_fk: string,
     title: string,
     status: string,
@@ -17,6 +18,7 @@ export type ReportConference = {
 };
 export function parseReportConference(data: any): ReportConference {
     return {
+        id: data.id,
         study_fk: data.study_fk,
         title: data.title,
         status: data.status,
