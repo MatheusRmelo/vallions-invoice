@@ -76,7 +76,7 @@ const ReceiptView = ({
                     return (
                         <>
                             <GridRow {...props} />
-                            {expandedRowIds.includes(row.id) && (
+                            {expandedRowIds.includes(row.id.toString()) && (
                                 <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
                                     <Box height={20} />
                                     <Typography variant="h3">Laudos</Typography>
@@ -129,8 +129,8 @@ const ReceiptView = ({
                                                     renderCell(params) {
                                                         return <Chip
                                                             variant='outlined'
-                                                            color={params.value == 2 ? 'error' : 'success'}
-                                                            label={params.value == 2 ? 'Estornado' : 'Recebido'} />;
+                                                            color={params.value == 2 ? 'error' : params.value == 1 ? 'success' : 'info'}
+                                                            label={params.value == 2 ? 'Estornado' : params.value == 1 ? 'Recebido' : ''} />;
                                                     }
                                                 },
                                                 {

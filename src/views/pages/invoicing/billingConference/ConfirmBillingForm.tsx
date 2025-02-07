@@ -64,9 +64,9 @@ const ConfirmBillingForm = ({ open, onClose, billing }: Props) => {
                                     <Grid item xs={8}>
                                         <FormControl fullWidth>
                                             <InputLabel id="select-label">Unidade</InputLabel>
-                                            {/* <Select labelId="select-label" label="Select" value={billing?.unity} disabled>
+                                            <Select labelId="select-label" label="Select" value={billing?.unity} disabled>
                                                 <MenuItem value={billing?.unity}>{billing?.unity}</MenuItem>
-                                            </Select> */}
+                                            </Select>
                                         </FormControl>
                                     </Grid>
                                     <Grid item xs={4}>

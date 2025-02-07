@@ -111,16 +111,13 @@ const BillingConference: React.FC = () => {
     };
 
     const getDetailReceipt = async (id: number) => {
-        const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=3`);
+        const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=1`);
         if (response.ok) {
             const reports = parseReportBillingList(response.result);
             var newArray = [...receipts];
             for (let i = 0; i < newArray.length; i++) {
                 if (newArray[i].id == id) {
-                    newArray[i].reportsBilling = reports.map((element) => ({ ...element, status: '3' }));
-                    let refunds = await getRefunds(id);
-                    newArray[i].reportsBilling = [...newArray[i].reportsBilling, ...refunds.map((element) => ({ ...element, status: '2' }))];
-
+                    newArray[i].reportsBilling = reports.map((element) => ({ ...element, status: '1' }));
                 }
             }
             setReceipts(newArray);
@@ -133,15 +130,14 @@ const BillingConference: React.FC = () => {
         const response = await get(`/api/billing-confirmations?billing=${id}&branches=${institute}&status=${status}${doctor ? `&physician=${doctor}` : ''}${filter ? `&type_date=${filter == 'Data Laudo' ? 1 : 2}` : ''}`);
         if (response.ok) {
             const reports = parseReportBillingList(response.result);
-            var newArray = tabIndex == 1 ? [...billings] : [];
+            var newArray = [...billings];
             for (let i = 0; i < newArray.length; i++) {
                 if (newArray[i].id == id) {
-                    newArray[i].reportsBilling = reports;
+                    newArray[i].reportsBilling = reports.map((element) => ({ ...element, status: '0' }));;
                 }
             }
-            if (tabIndex == 1) {
-                setBillings(newArray);
-            }
+
+            setBillings(newArray);
         } else {
             handleClickSnack({ message: response.message ?? `Error ao buscar detalhes do fatumento ${id}`, severity: 'error' });
         }
@@ -163,7 +159,6 @@ const BillingConference: React.FC = () => {
             setInstitutes(result);
             if (result.length > 0) {
                 setInstitute(result[0].id_institution);
-                getBillings();
             }
         } else {
             handleClickSnack({ message: response.message ?? 'Error ao buscar instituições', severity: 'error' });
@@ -187,6 +182,7 @@ const BillingConference: React.FC = () => {
         if (response.ok) {
             const billings = parseBillingList(response.result);
             setBillings(billings);
+            setReceipts(billings);
         } else {
             handleClickSnack({ message: response.message ?? 'Error ao buscar faturamentos', severity: 'error' });
         }
@@ -293,14 +289,28 @@ const BillingConference: React.FC = () => {
     const handleOpenRefundBilling = () => {
         var array: ReportBilling[] = [];
         billings.forEach((element) => {
-            if (element.checked) {
-                array = [...array, ...element.reportsBilling.filter((element) => element.checked)]
-            }
+            //if (element.checked) {
+            array = [...array, ...element.reportsBilling.filter((element) => element.checked)]
+            //}
         });
         setCheckedBillings(array);
         if (array.length > 0) {
             setCurrentBilling(array[0]);
             setOpenBillingReversal(true);
+        }
+    }
+
+    const handleOpenConfirmBilling = () => {
+        var array: ReportBilling[] = [];
+        billings.forEach((element) => {
+            //if (element.checked) {
+            array = [...array, ...element.reportsBilling.filter((element) => element.checked)]
+            //}
+        });
+        setCheckedBillings(array);
+        if (array.length > 0) {
+            setCurrentBilling(array[0]);
+            setOpenBillingConfirm(true);
         }
     }
 
@@ -484,7 +494,7 @@ const BillingConference: React.FC = () => {
                                     tabIndex == 1 ? (
                                         <Box display="flex">
                                             <RefreshOutlined onClick={() => handleOpenRefundBilling()} sx={{ color: 'action.active', mr: 2 }} />
-                                            <MonetizationOn sx={{ color: 'action.active', mr: 1 }} />
+                                            <MonetizationOn onClick={() => handleOpenConfirmBilling()} sx={{ color: 'action.active', mr: 1 }} />
                                         </Box>
                                     ) : null
                             }

@@ -39,7 +39,7 @@ const BillingView = ({
                             <IconButton onClick={() => handleExpandClick(params.row.id.toString(), params.row.statusOfBilling)}>
                                 {expandedRowIds.includes(params.row.id.toString()) ? <ExpandLess /> : <ExpandMore />}
                             </IconButton>
-                            <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedBilling(params.row.id)} />
+                            {/* <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedBilling(params.row.id)} /> */}
                         </Box>
                     )
                 },
@@ -96,7 +96,7 @@ const BillingView = ({
                                                     id: report.id,
                                                     namePatient: report.namePatient,
                                                     reportDate: report.dateOfReport,
-                                                    status: '1',
+                                                    status: report.status,
                                                     unity: report.unity,
                                                     reportTitle: report.titleOfReport,
                                                     reportValue: report.valueReport,
@@ -140,8 +140,8 @@ const BillingView = ({
                                                     renderCell(params) {
                                                         return <Chip
                                                             variant='outlined'
-                                                            color={params.value == 1 ? 'success' : 'success'}
-                                                            label={params.value == 1 ? 'Faturado' : ''} />;
+                                                            color={params.value == 0 ? 'primary' : params.value == 1 ? 'success' : params.value == 2 ? 'error' : 'info'}
+                                                            label={params.value == 0 ? 'Aguardando faturamento' : params.value == 1 ? 'Faturado' : params.value == 2 ? 'Estornado' : 'Conferência'} />;
                                                     }
                                                 },
                                                 {
