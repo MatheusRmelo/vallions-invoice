@@ -134,7 +134,7 @@ const ProcedureView = () => {
 
     return (
         <>
-            <MainCard title="Cadastro de Procedimentos">
+            <MainCard title="Cadastro de Procedimentos" sx={{ bgcolor: 'background.default' }}>
                 <Box display="flex" justifyContent="space-between">
                     <CustomTextField
                         label="Search"

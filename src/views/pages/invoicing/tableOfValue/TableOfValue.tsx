@@ -116,7 +116,7 @@ const TableOfValues = () => {
 
     return (
         <>
-            <MainCard title="Tabela de Valores">
+            <MainCard title="Tabela de Valores" sx={{ bgcolor: 'background.default' }}>
                 <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
                 <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 <Box display="flex" justifyContent="space-between">

@@ -127,7 +127,7 @@ const RulesOfInvoicing = () => {
 
     return (
         <>
-            <MainCard title="Regras de Faturamento">
+            <MainCard title="Regras de Faturamento" sx={{ bgcolor: 'background.default' }}>
                 <Box display="flex" justifyContent="space-between">
                     <CustomTextField
                         label="Search"
