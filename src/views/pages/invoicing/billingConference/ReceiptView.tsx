@@ -103,6 +103,7 @@ const ReceiptView = ({
                                                     headerName: '#',
                                                     minWidth: 64,
                                                     width: 64,
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>#</strong>
                                                 },
                                                 {
                                                     field: 'namePatient',
@@ -120,6 +121,7 @@ const ReceiptView = ({
                                                     headerName: 'Data do Laudo',
                                                     flex: 2,
                                                     minWidth: 150,
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Data do Laudo</strong>
                                                 },
                                                 {
                                                     field: 'status',
@@ -138,18 +140,21 @@ const ReceiptView = ({
                                                     headerName: 'Unidade',
                                                     flex: 1,
                                                     minWidth: 150,
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Unidade</strong>
                                                 },
                                                 {
                                                     field: 'reportTitle',
                                                     headerName: 'Título do Laudo',
                                                     flex: 1,
                                                     minWidth: 150,
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Título do Laudo</strong>
                                                 },
                                                 {
                                                     field: 'reportValue',
                                                     headerName: '$ Valor Laudo',
                                                     flex: 1,
                                                     minWidth: 150,
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Valor Laudo</strong>
                                                 },
                                             ]}
                                             hideFooter

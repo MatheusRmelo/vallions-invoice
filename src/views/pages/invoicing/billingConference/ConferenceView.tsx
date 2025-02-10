@@ -105,26 +105,27 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                                     headerName: '#',
                                                     minWidth: 120,
                                                     width: 120,
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>#</strong>,
                                                 },
                                                 {
                                                     field: 'reportDate',
                                                     headerName: 'Data do Laudo',
                                                     minWidth: 150,
-
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Data do Laudo</strong>,
                                                     flex: 2
                                                 },
                                                 {
                                                     field: 'reportTitle',
                                                     headerName: 'Título do Laudo',
                                                     minWidth: 150,
-
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>Título do Laudo</strong>,
                                                     flex: 2
                                                 },
                                                 {
                                                     field: 'reportValue',
                                                     headerName: '$ Valor Laudo',
                                                     minWidth: 150,
-
+                                                    renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Valor Laudo</strong>,
                                                     flex: 2
                                                 },
                                                 {
