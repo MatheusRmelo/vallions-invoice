@@ -224,11 +224,11 @@ const BillingConference: React.FC = () => {
         var newArray = [...conferences];
         for (let i = 0; i < newArray.length; i++) {
             if (newArray[i].id == idBilling) {
-                // for (let x = 0; x < newArray[i].reportsBilling.length; x++) {
-                //     if (newArray[i].reportsBilling[x].id == idReport) {
-                //         newArray[i].reportsBilling[x].checked = !newArray[i].reportsBilling[x].checked;
-                //     }
-                // }
+                for (let x = 0; x < newArray[i].reports_finished.length; x++) {
+                    if (newArray[i].reports_finished[x].id == idReport) {
+                        newArray[i].reports_finished[x].checked = !newArray[i].reports_finished[x].checked;
+                    }
+                }
             }
         }
 
@@ -579,7 +579,7 @@ const BillingConference: React.FC = () => {
                         <Box
                             display="flex"
                             alignItems={'center'}
-                            onClick={() => {}}
+                            onClick={() => { }}
                             sx={{
                                 '&:hover': {
                                     cursor: 'pointer',
@@ -595,7 +595,7 @@ const BillingConference: React.FC = () => {
                         <Box
                             display="flex"
                             alignItems={'center'}
-                            onClick={() => {}}
+                            onClick={() => { }}
                             sx={{
                                 '&:hover': {
                                     cursor: 'pointer',

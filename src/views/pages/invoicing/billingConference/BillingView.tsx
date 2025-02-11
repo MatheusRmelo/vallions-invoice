@@ -1,6 +1,7 @@
-import { ExpandLess, ExpandMore, DeleteOutline, MoreVert } from "@mui/icons-material";
-import { IconButton, Chip, Box, Typography, Checkbox } from "@mui/material";
+import { ExpandLess, ExpandMore, DeleteOutline, MoreVert, RemoveRedEyeOutlined } from "@mui/icons-material";
+import { IconButton, Chip, Box, Typography, Checkbox, Menu, MenuItem } from "@mui/material";
 import { DataGrid, GridRow } from "@mui/x-data-grid";
+import { useState } from "react";
 import { Billing } from "types/billing";
 
 type Props = {
@@ -39,7 +40,7 @@ const BillingView = ({
                             <IconButton onClick={() => handleExpandClick(params.row.id.toString(), params.row.statusOfBilling)}>
                                 {expandedRowIds.includes(params.row.id.toString()) ? <ExpandLess /> : <ExpandMore />}
                             </IconButton>
-                            {/* <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedBilling(params.row.id)} /> */}
+                            <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedBilling(params.row.id)} />
                         </Box>
                     )
                 },
@@ -181,10 +182,7 @@ const BillingView = ({
                                                                         sx={{ color: 'action.active' }}
                                                                     />
                                                                 </IconButton>
-                                                                <IconButton
-                                                                >
-                                                                    <MoreVert sx={{ color: 'action.active' }} />
-                                                                </IconButton>
+                                                                <RowMenu row={params.row} />
                                                             </Box>
                                                         );
                                                     }
@@ -203,5 +201,45 @@ const BillingView = ({
         />
     );
 }
+
+const RowMenu = ({ row }: any) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleOpenMenu = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setAnchorEl(null);
+    };
+
+    const handleAction = (action: any) => {
+        handleCloseMenu();
+    };
+
+    return (
+        <>
+            <IconButton onClick={handleOpenMenu}>
+                <MoreVert />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleCloseMenu}
+            >
+                <MenuItem onClick={() => handleAction("edit")}>
+                    <RemoveRedEyeOutlined sx={{ color: 'action.active', fontSize: '2.3vh', marginRight: '0.3vh' }} />
+                    <Box width={8} />
+                    <span style={{ fontSize: '1.5vh', fontWeight: 'bold' }}>Imagens</span>
+                </MenuItem>
+                <MenuItem onClick={() => handleAction("delete")}>
+                    <RemoveRedEyeOutlined sx={{ color: 'action.active', fontSize: '2.3vh', marginRight: '0.3vh' }} />
+                    <Box width={8} />
+                    <span style={{ fontSize: '1.5vh', fontWeight: 'bold' }}>Laudos</span>
+                </MenuItem>
+            </Menu>
+        </>
+    );
+};
 
 export default BillingView;

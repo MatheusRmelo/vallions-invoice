@@ -99,6 +99,11 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference }: P
             handleClickSnack({ message: 'Mês é obrigatório', severity: 'error' });
             return;
         }
+        var reports = conference?.reports_finished.filter((element) => element.checked);
+        if (reports?.length == 0) {
+            handleClickSnack({ message: 'Nenhum relatório foi selecionado', severity: 'error' });
+            return;
+        }
         var monthClosing = months.filter((element) => element.number == month);
         const response = await post(`/api/billings`, {
             value_total: parseInt(quantity) * price,
@@ -108,10 +113,10 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference }: P
             branch_fk: unity?.cd_unidade,
         });
         if (response.ok) {
-            for (let i = 0; i < (conference?.reports_finished ?? []).length; i++) {
+            for (let i = 0; i < (reports ?? []).length; i++) {
                 await post(`/api/billing-confirmations`, {
                     status: 0,
-                    report_fk: conference?.reports_finished[i].id,
+                    report_fk: reports![i].id,
                     branch_fk: unity?.cd_unidade,
                 });
             }
