@@ -9,7 +9,7 @@ type Props = {
     expandedRowIds: string[],
     handleExpandClick: (id: string) => void,
     handleChangeCheckedConference: (id: string) => void,
-    handleChangeCheckedReport: (idBilling: number, idReport: number) => void,
+    handleChangeCheckedReport: (idBilling: string, idReport: number) => void,
 }
 const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handleChangeCheckedConference, handleChangeCheckedReport }: Props) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -103,7 +103,7 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                                         ?.reports_finished || []
                                                 ).map((report) => {
                                                     return {
-                                                        id: report.study_fk,
+                                                        id: report.id,
                                                         reportDate: report.date_report,
                                                         reportTitle: report.title,
                                                         reportValue: 'Não encontrado',

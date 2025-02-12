@@ -205,6 +205,9 @@ const BillingConference: React.FC = () => {
                     }
                 }
                 newArray[i].checked = !newArray[i].checked;
+                for (let x = 0; x < newArray[i].reports_finished.length; x++) {
+                    newArray[i].reports_finished[x].checked = newArray[i].checked;
+                }
             }
         }
         setConferences(newArray);
@@ -220,10 +223,10 @@ const BillingConference: React.FC = () => {
         setBillings(newArray);
     };
 
-    const handleChangeCheckedReport = (idBilling: number, idReport: number) => {
+    const handleChangeCheckedReport = (idBilling: string, idReport: number) => {
         var newArray = [...conferences];
         for (let i = 0; i < newArray.length; i++) {
-            if (newArray[i].id == idBilling) {
+            if (`${newArray[i].id}${newArray[i].price}${newArray[i].patient_name}` == idBilling) {
                 for (let x = 0; x < newArray[i].reports_finished.length; x++) {
                     if (newArray[i].reports_finished[x].id == idReport) {
                         newArray[i].reports_finished[x].checked = !newArray[i].reports_finished[x].checked;
@@ -282,6 +285,7 @@ const BillingConference: React.FC = () => {
     };
 
     const handleOpenConferenceChecked = () => {
+
         var array: Conference[] = [...conferences.filter((element) => element.checked)];
 
         setCheckedConferences(array);
@@ -626,6 +630,8 @@ const BillingConference: React.FC = () => {
                 price={Number(currentConference?.price ?? 0)}
                 unity={getUnityById(unity ?? '')}
                 conference={currentConference}
+                startAt={startDate}
+                endAt={endDate}
             />
         </>
     );

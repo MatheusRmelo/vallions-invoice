@@ -1,6 +1,6 @@
 import { Dialog, Box, DialogTitle, DialogContent, DialogContentText, Grid, FormControl, InputLabel, Select, MenuItem, TextField, DialogActions, Button, SnackbarCloseReason } from "@mui/material";
 import useAPI from "hooks/useAPI";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Conference } from "types/conference";
 import { Unity } from "types/unity";
 import SnackBarAlert from "ui-component/SnackBarAlert";
@@ -11,6 +11,8 @@ type Props = {
     price: number,
     unity?: Unity,
     conference: Conference | null,
+    startAt: string,
+    endAt: string,
 }
 
 type Month = {
@@ -18,59 +20,60 @@ type Month = {
     number: string
 }
 
+const dataMonths: Month[] = [
+    {
+        label: "Janeiro",
+        number: "01",
+    },
+    {
+        label: "Fevereiro",
+        number: "02",
+    },
+    {
+        label: "Março",
+        number: "03",
+    },
+    {
+        label: "Abril",
+        number: "04",
+    },
+    {
+        label: "Maio",
+        number: "05",
+    },
+    {
+        label: "Junho",
+        number: "06",
+    },
+    {
+        label: "Julho",
+        number: "07",
+    },
+    {
+        label: "Agosto",
+        number: "08",
+    },
+    {
+        label: "Setembro",
+        number: "09",
+    },
+    {
+        label: "Outubro",
+        number: "10",
+    },
+    {
+        label: "Novembro",
+        number: "11",
+    },
+    {
+        label: "Dezembro",
+        number: "12",
+    }
+];
 
-const CompetenceConferenceForm = ({ open, onClose, price, unity, conference }: Props) => {
+const CompetenceConferenceForm = ({ open, onClose, price, unity, conference, startAt, endAt }: Props) => {
     const [month, setMonth] = useState("");
-    const [months, setMonths] = useState<Month[]>([
-        {
-            label: "Janeiro",
-            number: "01",
-        },
-        {
-            label: "Fevereiro",
-            number: "02",
-        },
-        {
-            label: "Março",
-            number: "03",
-        },
-        {
-            label: "Abril",
-            number: "04",
-        },
-        {
-            label: "Maio",
-            number: "05",
-        },
-        {
-            label: "Junho",
-            number: "06",
-        },
-        {
-            label: "Julho",
-            number: "07",
-        },
-        {
-            label: "Agosto",
-            number: "08",
-        },
-        {
-            label: "Setembro",
-            number: "09",
-        },
-        {
-            label: "Outubro",
-            number: "10",
-        },
-        {
-            label: "Novembro",
-            number: "11",
-        },
-        {
-            label: "Dezembro",
-            number: "12",
-        }
-    ]);
+    const [months, setMonths] = useState<Month[]>([]);
     const [quantity, setQuantity] = useState("");
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
@@ -78,6 +81,16 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference }: P
 
     const { post } = useAPI();
 
+    useEffect(() => {
+        init();
+    }, [open]);
+
+    const init = () => {
+        var start = new Date(startAt);
+        var end = new Date(endAt);
+        setMonths(dataMonths.filter((element) => Number(element.number) >= start.getMonth() + 1 && Number(element.number) <= end.getMonth() + 1));
+        setMonth("");
+    }
 
     const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
         setMessageSnack(message);
@@ -113,11 +126,13 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference }: P
             branch_fk: unity?.cd_unidade,
         });
         if (response.ok) {
+            console.log(response.result);
             for (let i = 0; i < (reports ?? []).length; i++) {
                 await post(`/api/billing-confirmations`, {
                     status: 0,
                     report_fk: reports![i].id,
                     branch_fk: unity?.cd_unidade,
+                    billing_fk: response.result.id
                 });
             }
             onClose(true);
