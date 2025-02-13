@@ -30,8 +30,8 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                     return {
                         id: `${conference.id}${conference.price}${conference.patient_name}`,
                         namePatient: conference.patient_name,
-                        study_description: '',
-                        dateOfStudy: '',
+                        study_description: conference.description,
+                        dateOfStudy: conference.date_study,
                         unity: conference.branch_name,
                         quantity: conference.reports_finished_count,
                         valueUnit: Number(conference.price).toLocaleString(),

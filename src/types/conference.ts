@@ -5,6 +5,8 @@ export type Conference = {
     price: string,
     reports_finished_count: string,
     reports_finished: ReportConference[],
+    description: string,
+    date_study: string,
     checked: boolean,
 };
 
@@ -37,6 +39,8 @@ export function parseConference(data: any): Conference {
         patient_name: data.patient_name,
         branch_name: data.branch_name,
         price: data.price,
+        description: data.description,
+        date_study: data.date_study,
         reports_finished_count: data.reports_finished_count,
         reports_finished: parseReportConferenceList(data.reports_finished),
         checked: false,

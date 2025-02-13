@@ -406,7 +406,7 @@ const BillingConference: React.FC = () => {
                 <Card>
                     <CardContent sx={{ bgcolor: 'background.default' }}>
                         <Grid container spacing={4}>
-                            <Grid item xs={isMobile ? 6 : 1.5}>
+                            <Grid item xs={isMobile ? 12 : 1.5}>
                                 <TextField
                                     label="Data Início"
                                     type="date"
@@ -415,7 +415,7 @@ const BillingConference: React.FC = () => {
                                     onChange={(e) => setStartDate(e.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={isMobile ? 6 : 1.5}>
+                            <Grid item xs={isMobile ? 12 : 1.5}>
                                 <TextField
                                     label="Data Fim"
                                     type="date"
