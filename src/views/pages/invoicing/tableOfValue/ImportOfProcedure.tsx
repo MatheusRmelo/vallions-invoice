@@ -50,27 +50,39 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                 fullWidth
                 PaperProps={{
                     sx: {
-                        width: '40%',
+                        width: { xs: '95%', sm: '80%', md: '40%' },
                         height: 'auto',
-                        padding: '20px',
+                        padding: { xs: '10px', sm: '20px' },
                         margin: 0,
                         maxHeight: '100vh',
-                        borderRadius: '20px',
+                        borderRadius: { xs: '10px', sm: '20px' },
                         fontWeight: 'bold'
                     }
                 }}
             >
-                <DialogTitle>Importação de Procedimentos</DialogTitle>
+                <DialogTitle sx={{
+                    fontSize: { xs: '18px', sm: '20px' },
+                    padding: { xs: '10px', sm: '16px' }
+                }}>
+                    Importação de Procedimentos
+                </DialogTitle>
                 <Divider />
 
                 <DialogContent>
-                    <DialogContentText sx={{ fontSize: '2vh' }}>
+                    <DialogContentText sx={{
+                        fontSize: { xs: '14px', sm: '2vh' },
+                        padding: { xs: '10px 0', sm: '16px 0' }
+                    }}>
                         Você gostaria de importar os procedimentos cadastrados para a tabela de valores? Caso sim, informe abaixo a data de
                         vigência inicial e final para os procedimentos que serão importados.
                     </DialogContentText>
-                    <Box height="2vh" />
-                    <Box display="flex" justifyContent="space-between">
-                        <Box width="18%" />
+                    <Box height={{ xs: '1vh', sm: '2vh' }} />
+                    <Box
+                        display="flex"
+                        flexDirection={{ xs: 'column', sm: 'row' }}
+                        justifyContent="space-between"
+                        sx={{ px: { xs: 0, sm: '18%' } }}
+                    >
                         <TextField
                             margin="dense"
                             label="Data Início"
@@ -81,8 +93,9 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                             }}
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
+                            sx={{ mb: { xs: 2, sm: 0 } }}
                         />
-                        <Box width="3vw" />
+                        <Box width={{ xs: 0, sm: '3vw' }} height={{ xs: '1vh', sm: 0 }} />
                         <TextField
                             margin="dense"
                             label="Data Fim"
@@ -94,19 +107,31 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                         />
-                        <Box width="18%" />
                     </Box>
-                    <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
-                    <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
+                    <SnackBarAlert
+                        open={openSucessSnack}
+                        message="Sucesso!"
+                        severity="success"
+                        onClose={handleCloseSnack}
+                    />
+                    <SnackBarAlert
+                        open={openErrorSnack}
+                        message={messageSnack}
+                        severity="error"
+                        onClose={handleCloseSnack}
+                    />
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={{
+                    padding: { xs: '8px', sm: '16px' },
+                    justifyContent: 'center'
+                }}>
                     <Button
                         variant="outlined"
                         sx={{
-                            width: '10vh',
-                            height: '4vh',
+                            width: { xs: '80px', sm: '10vh' },
+                            height: { xs: '36px', sm: '4vh' },
                             fontWeight: 'bold',
-                            fontSize: '1.5vh'
+                            fontSize: { xs: '14px', sm: '1.5vh' }
                         }}
                         onClick={() => handleClose(null, null, null)}
                         color="primary"
@@ -118,9 +143,9 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                         variant="contained"
                         onClick={handleImport}
                         sx={{
-                            width: '10vh',
-                            height: '4vh',
-                            fontSize: '1.5vh',
+                            width: { xs: '80px', sm: '10vh' },
+                            height: { xs: '36px', sm: '4vh' },
+                            fontSize: { xs: '14px', sm: '1.5vh' },
                             fontWeight: 'bold',
                             color: 'white',
                             backgroundColor: 'rgba(103, 58, 183, 1)'

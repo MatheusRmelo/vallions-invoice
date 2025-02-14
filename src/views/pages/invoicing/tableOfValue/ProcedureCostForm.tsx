@@ -140,26 +140,33 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             fullWidth
             PaperProps={{
                 sx: {
-                    width: '38%',
+                    width: { xs: '95%', sm: '80%', md: '38%' },
                     height: 'auto',
-                    padding: '20px',
+                    padding: { xs: '10px', sm: '20px' },
                     margin: 0,
                     maxHeight: '100vh',
-                    borderRadius: '20px'
+                    borderRadius: { xs: '10px', sm: '20px' }
                 }
             }}
         >
-            <DialogTitle>Procedimentos Tabela de Faturamento</DialogTitle>
+            <DialogTitle sx={{
+                fontSize: { xs: '18px', sm: '20px' },
+                padding: { xs: '10px', sm: '16px' }
+            }}>
+                Procedimentos Tabela de Faturamento
+            </DialogTitle>
             <Divider />
             <DialogContent>
-                <DialogContentText>
+                <DialogContentText sx={{
+                    fontSize: { xs: '12px', sm: '14px' },
+                    padding: { xs: '5px 0', sm: '10px 0' }
+                }}>
                     <strong>Cadastro de Procedimento:</strong> Insira todas as informações necessárias para o procedimento, incluindo
-                    instituição e modalidade. Verifique se os dados estão corretos antes de salvar. Confirme se deseja cadastrar este
-                    procedimento.
+                    instituição e modalidade. Verifique se os dados estão corretos antes de salvar.
                 </DialogContentText>
-                <Box mt={'6vh'} />
-                <Grid container spacing={2}>
-                    <Grid item xs={3}>
+                <Box mt={{ xs: '2vh', sm: '4vh', md: '6vh' }} />
+                <Grid container spacing={{ xs: 1, sm: 2 }}>
+                    <Grid item xs={12} sm={6} md={3}>
                         <TextField
                             label="Data Inicio"
                             type="date"
@@ -167,9 +174,10 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                             InputLabelProps={{ shrink: true }}
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
+                            sx={{ mb: { xs: 1, sm: 0 } }}
                         />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={12} sm={6} md={3}>
                         <TextField
                             label="Data Fim"
                             type="date"
@@ -177,9 +185,10 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                             InputLabelProps={{ shrink: true }}
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
+                            sx={{ mb: { xs: 1, sm: 0 } }}
                         />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} md={6}>
                         <FormControl fullWidth>
                             <InputLabel id="institute-label">Instituição</InputLabel>
                             <Select
@@ -200,9 +209,9 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                         </FormControl>
                     </Grid>
                 </Grid>
-                <Box mt={'2vh'} />
-                <Grid container spacing={2}>
-                    <Grid item xs={6}>
+                <Box mt={{ xs: '1vh', sm: '2vh' }} />
+                <Grid container spacing={{ xs: 1, sm: 2 }}>
+                    <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
                             <InputLabel id="procedure-label">Procedimento</InputLabel>
                             <Select
@@ -222,20 +231,33 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={6}>
-                        <TextField label="Valor" fullWidth value={value} onChange={(e) => setValue(e.target.value)} />
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            label="Valor"
+                            fullWidth
+                            value={value}
+                            onChange={(e) => setValue(e.target.value)}
+                        />
                     </Grid>
                 </Grid>
-                <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={() => setOpenErrorSnack(false)} />
+                <SnackBarAlert
+                    open={openErrorSnack}
+                    message={messageSnack}
+                    severity="error"
+                    onClose={() => setOpenErrorSnack(false)}
+                />
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{
+                padding: { xs: '8px', sm: '16px' },
+                justifyContent: 'center'
+            }}>
                 <Button
                     variant="outlined"
                     sx={{
-                        width: '10vh',
-                        height: '4vh',
+                        width: { xs: '80px', sm: '10vh' },
+                        height: { xs: '36px', sm: '4vh' },
                         fontWeight: 'bold',
-                        fontSize: '1.5vh'
+                        fontSize: { xs: '14px', sm: '1.5vh' }
                     }}
                     onClick={() => onClose(null)}
                     color="primary"
@@ -248,9 +270,9 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                     type="submit"
                     onClick={handleSaveProcedureCost}
                     sx={{
-                        width: '10vh',
-                        height: '4vh',
-                        fontSize: '1.5vh',
+                        width: { xs: '80px', sm: '10vh' },
+                        height: { xs: '36px', sm: '4vh' },
+                        fontSize: { xs: '14px', sm: '1.5vh' },
                         fontWeight: 'bold',
                         color: 'white',
                         backgroundColor: 'rgba(103, 58, 183, 1)'
