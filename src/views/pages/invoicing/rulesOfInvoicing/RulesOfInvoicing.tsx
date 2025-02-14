@@ -52,6 +52,7 @@ const RulesOfInvoicing = () => {
             setDataRaw(rules);
         } else {
             setMessageSnack('Erro' + response.message);
+
             setOpenErrorSnack(true);
         }
         setLoading(false);
@@ -94,6 +95,7 @@ const RulesOfInvoicing = () => {
                 setMessageSnack('Status da Regra de faturamento atualizada com sucesso');
                 setOpenSucessSnack(true);
             } else {
+                console.log('error aqui ');
                 setMessageSnack('Erro ao atualizar situação regra de faturamento');
                 setOpenErrorSnack(true);
             }

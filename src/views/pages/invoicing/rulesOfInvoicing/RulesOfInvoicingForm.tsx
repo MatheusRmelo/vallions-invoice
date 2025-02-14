@@ -61,7 +61,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             const institutes = response.result.map((institute: any) => parseInstitute(institute));
             setInstitutes(institutes);
         } else {
-            setError(response.message);
+            setError(
+                'Não foi possível carregar as instituições. Erro:' +
+                response.message);
         }
     };
 
@@ -236,7 +238,10 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     };
 
     useEffect(() => {
-        setOpenErrorSnack(true);
+        if (error) {
+            setOpenErrorSnack(true);
+            setMessageSnack(error);
+        }
     }, [error]);
 
     useEffect(() => {
