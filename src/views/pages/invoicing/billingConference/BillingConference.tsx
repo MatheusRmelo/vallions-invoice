@@ -519,7 +519,7 @@ const BillingConference: React.FC = () => {
                         </Tabs>
                         <Box mt={'4vh'} />
 
-                        <Box display="flex" justifyContent="space-between">
+                        <Box display="flex" alignItems={"center"} justifyContent="space-between">
                             <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
                             {tabIndex == 0 ? (
                                 <IconButton onClick={() => handleOpenConferenceChecked()}>
