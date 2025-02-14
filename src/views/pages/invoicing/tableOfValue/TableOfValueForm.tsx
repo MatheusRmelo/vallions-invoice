@@ -61,7 +61,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
-
+    const [idsForDelete, setIdsForDelete] = useState<number[]>([]);
     const { get, post, put, del } = useAPI();
 
     useEffect(() => {
@@ -69,6 +69,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
     }, [tableOfValue]);
 
     useEffect(() => {
+        setIdsForDelete([]);
         getTableOfValue();
     }, [open]);
 
@@ -86,6 +87,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         const response = await get('/api/institutionsAccess');
         if (response.ok) {
             setInstitutes(response.result.map(parseInstitute));
+            console.log(response.result.map(parseInstitute));
             getTableOfValue();
         } else {
             setError(response.message);
@@ -96,6 +98,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         if (tableOfValue) {
             var institute = institutes.filter((element) => element.name == tableOfValue.nickname);
             setDescription(tableOfValue.description);
+
             setInstitute(institute[0].id_institution);
             getProceduresCosts();
         } else {
@@ -152,10 +155,18 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
 
                 }
             }
-
+            idsForDelete.forEach(async (id) => {
+                const response = await del(`/api/costs-has-procedures/${id}`);
+                if (response.ok) {
+                    getProceduresCosts();
+                } else {
+                    setError(response.message);
+                }
+            });
             if (medicalProcedureId != null) {
                 const results = proceduresCosts.map(async (procedureCost) => {
                     if (procedureCost.id != 0 && procedureCost.id != null) {
+
                         return put(`/api/costs-has-procedures/${procedureCost!.id}`, {
                             medical_procedure_cost_fk: medicalProcedureId!,
                             billing_procedures_fk: procedureCost.codProcedure,
@@ -211,12 +222,14 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             let newArray = [...proceduresCosts];
             setProceduresCosts(newArray.splice(id));
         } else {
-            const response = await del(`/api/costs-has-procedures/${proceduresCosts[id].id}`);
-            if (response.ok) {
-                getProceduresCosts();
-            } else {
-                setError(response.message);
-            }
+            // const response = await del(`/api/costs-has-procedures/${proceduresCosts[id].id}`);
+            // if (response.ok) {
+            //     getProceduresCosts();
+            // } else {
+            //     setError(response.message);
+            // }
+            setIdsForDelete([...idsForDelete, proceduresCosts[id].id!]);
+
         }
     };
 
@@ -301,7 +314,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     </DialogContentText>
                     <Box height={65} />
                     <Grid container spacing={2}>
-                        <Grid item xs={10} sm={5}>
+                        <Grid item xs={12} sm={5}>
                             <CustomTextField
                                 label="Descrição da Tabela de Valores"
                                 name="description"
@@ -334,15 +347,11 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={14} sm={4.7}></Grid>
+                        <Grid item xs={12} sm={4.7}></Grid>
                     </Grid>
                     <Box height="6vh" />
-                    <Box display={'flex'} justifyContent={'space-between'}>
-                        <Box
-                            sx={{
-                                marginLeft: '30px'
-                            }}
-                        >
+                    <Grid container spacing={2}>
+                        <Grid item xs={6} sm={5}>
                             <CustomTextFieldSearch
                                 label="Search"
                                 onChange={(e) => {
@@ -350,41 +359,39 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 }}
                                 prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />}
                             />
-                        </Box>
-                        <Box
-                            display={'flex'}
-                            alignItems={'flex-start'}
-                            sx={{
-                                marginTop: '20px'
-                            }}
-                        >
-                            <CloudUpload
-                                onClick={() => {
-                                    setImportOpen(true);
-                                }}
-                                sx={{ color: 'action.active', mr: 2, marginTop: '1px', fontSize: 24 }}
-                            />
-                            <Fab
-                                color="primary"
-                                onClick={handleClickAddProcedureCost}
-                                sx={{
-                                    width: 24,
-                                    height: 24,
-                                    minHeight: 24,
-                                    fontSize: 20,
-                                    boxShadow: 'none'
-                                }}
-                                aria-label="add"
-                            >
-                                <Add sx={{ fontSize: 20 }} />
-                            </Fab>
-                        </Box>
-                    </Box>
+                        </Grid>
+                        <Grid item xs={6} sm={5} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Box display="flex" alignItems="center">
+                                <CloudUpload
+                                    onClick={() => {
+                                        setImportOpen(true);
+                                    }}
+                                    sx={{ color: 'action.active', mr: 2, fontSize: 24, cursor: 'pointer' }}
+                                />
+                                <Fab
+                                    color="primary"
+                                    onClick={handleClickAddProcedureCost}
+                                    sx={{
+                                        width: 24,
+                                        height: 24,
+                                        minHeight: 24,
+                                        fontSize: 20,
+                                        boxShadow: 'none'
+                                    }}
+                                    aria-label="add"
+                                >
+                                    <Add sx={{ fontSize: 20 }} />
+                                </Fab>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={2}></Grid>
+                    </Grid>
                     <Box height="6vh" />
                     {proceduresCosts !== null && proceduresCosts.length > 0 && (
                         <DataGrid
                             disableRowSelectionOnClick
                             rows={proceduresCosts
+                                .filter((procedureCost) => !idsForDelete.includes(procedureCost.id!))
                                 .filter((procedureCost) => {
                                     return (
                                         filter.length === 0 ||
