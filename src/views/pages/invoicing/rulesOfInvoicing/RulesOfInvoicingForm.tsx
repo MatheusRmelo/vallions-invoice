@@ -52,6 +52,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
     const [openErrorSnack, setOpenErrorSnack] = React.useState(false);
     const [openSucessSnack, setOpenSucessSnack] = React.useState(false);
     const [messageSnack, setMessageSnack] = React.useState('');
+    const [idsForDelete, setIdsForDelete] = React.useState<number[]>([]);
+    const [idsForDeleteAddition, setIdsForDeleteAddition] = React.useState<number[]>([]);
 
     const getInstitutes = async () => {
         const response = await get('/api/institutionsAccess');
@@ -115,7 +117,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setRules([]);
             setInstitution(undefined);
             setRulesAddition([]);
-        }
+
+        } setIdsForDelete([]);
+        setIdsForDeleteAddition([]);
     }, [open]);
 
     const getDetailsRule = async (id: Number) => {
@@ -198,14 +202,15 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setRules(newArray);
             return;
         }
-        const req = await del(`/api/billing-rule-goals/${rules[index].id}`);
-        if (req.ok) {
-            let newArray = [...rules];
-            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
-            setRules(newArray);
-        } else {
-            setError('Falha ao deletar a regra de faturamento.');
-        }
+        // const req = await del(`/api/billing-rule-goals/${rules[index].id}`);
+        // if (req.ok) {
+        // let newArray = [...rules];
+        // newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+        // setRules(newArray);
+        setIdsForDelete([...idsForDelete, rules[index].id]);
+        // } else {
+        //     setError('Falha ao deletar a regra de faturamento.');
+        // }
     };
 
     const deleteRuleAddition = async (index: number) => {
@@ -215,14 +220,19 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setRulesAddition(newArray);
             return;
         }
-        const req = await del(`/api/priority-billing-rules/${rulesAddition[index].id}`);
-        if (req.ok) {
-            let newArray = [...rulesAddition];
-            newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
-            setRulesAddition(newArray);
-        } else {
-            setError('Falha ao deletar a regra de faturamento.');
-        }
+        // const req = await del(`/api/priority-billing-rules/${rulesAddition[index].id}`);
+        // let newArray = [...rulesAddition];
+        // newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+        // setRulesAddition(newArray);
+        setIdsForDeleteAddition([...idsForDeleteAddition, rulesAddition[index].id]);
+
+        // if (req.ok) {
+        //     let newArray = [...rulesAddition];
+        //     newArray = newArray.filter((element, checkIndex) => checkIndex !== index);
+        //     setRulesAddition(newArray);
+        // } else {
+        //     setError('Falha ao deletar a regra de faturamento.');
+        // }
     };
 
     useEffect(() => {
@@ -293,7 +303,32 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             console.log(reqsRulesBillingsRaw);
             const reqsRulesBillings = await Promise.all(reqsRulesBillingsRaw);
             const reqsRulesPriority = await Promise.all(reqsRulesPriorityRaw);
+            if (ruleEdit) {
+                const futureReqsDelRulesBillings = idsForDelete.map((id) => del(`/api/billing-rule-goals/${id}`));
+                const futureReqsDelRulesPriority = idsForDeleteAddition.map((id) => del(`/api/priority-billing-rules/${id}`));
+                const reqsDelRulesBillings = await Promise.all(futureReqsDelRulesBillings);
+                const reqsDelRulesPriority = await Promise.all(futureReqsDelRulesPriority);
+                if (reqsDelRulesBillings.every((e) => e.ok) && reqsDelRulesPriority.every((e) => e.ok)) {
+                    const updatedRulesAddition = rulesAddition.filter(rule =>
+                        !idsForDeleteAddition.includes(rule.id!)
+                    );
+                    setRulesAddition(updatedRulesAddition);
 
+                    const updatedRules = rules.filter(rule =>
+                        !idsForDelete.includes(rule.id!)
+                    );
+                    setRules(updatedRules);
+
+                    setIdsForDelete([]);
+                    setIdsForDeleteAddition([]);
+                } else {
+                    const error: string[] = reqsDelRulesBillings
+                        .concat(reqsDelRulesPriority)
+                        .filter((e) => !e.ok)
+                        .map((e) => e.message);
+                    setError('Falha ao deletar algumas regras de faturamento: ' + error.join(', '));
+                }
+            }
             if (reqsRulesBillings.every((e) => e.ok) && reqsRulesPriority.every((e) => e.ok)) {
                 onClose(true);
                 setOpenSucessSnack(true);
@@ -464,7 +499,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                 <Box display={'flex'} flexDirection={'column'} marginRight={{ md: '16px' }} mb={{ xs: '16px', md: 0 }}>
                                     <span style={{ fontWeight: 'bold', fontSize: '1.5vh' }}>DEFINA AS REGRAS</span>
                                     <Box height={'0.8vh'} />
-                                    <span style={{ fontSize: '1.2vh'}}>
+                                    <span style={{ fontSize: '1.2vh' }}>
                                         <strong>Definição da Regra Principal:</strong> Estabeleça a regra principal que guiará o processo de
                                         faturamento. Esta regra será a base para todas as condições e execuções do faturamento.
                                     </span>
@@ -487,21 +522,23 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                 </Button>
                             </Box>
                             <Box mt={'6vh'} />
-                            {rules.map((element, index) => (
-                                <RuleRow
-                                    rule={element}
-                                    tableOfValues={tableOfValues}
-                                    tags={tags}
-                                    setRule={(value) => {
-                                        let newArray = [...rules];
-                                        newArray[index] = value;
-                                        setRules(newArray);
-                                    }}
-                                    onDelete={() => {
-                                        deleteRule(index);
-                                    }}
-                                />
-                            ))}
+                            {rules
+                                .filter(rule => !idsForDelete.includes(rule.id!))
+                                .map((element, index) => (
+                                    <RuleRow
+                                        rule={element}
+                                        tableOfValues={tableOfValues}
+                                        tags={tags}
+                                        setRule={(value) => {
+                                            let newArray = [...rules];
+                                            newArray[index] = value;
+                                            setRules(newArray);
+                                        }}
+                                        onDelete={() => {
+                                            deleteRule(index);
+                                        }}
+                                    />
+                                ))}
 
                             {/* Mocado remove dps */}
                             <Box mt={'6vh'} />
@@ -532,20 +569,22 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                 </Button>
                             </Box>
                             <Box mt={'6vh'} />
-                            {rulesAddition.map((element, index) => (
-                                <AddRuleRow
-                                    rule={element}
-                                    tableOfValues={tableOfValues}
-                                    setRule={(value) => {
-                                        let newArray = [...rulesAddition];
-                                        newArray[index] = value;
-                                        setRulesAddition(newArray);
-                                    }}
-                                    onDelete={() => {
-                                        deleteRuleAddition(index);
-                                    }}
-                                />
-                            ))}
+                            {rulesAddition
+                                .filter(rule => !idsForDeleteAddition.includes(rule.id!))
+                                .map((element, index) => (
+                                    <AddRuleRow
+                                        rule={element}
+                                        tableOfValues={tableOfValues}
+                                        setRule={(value) => {
+                                            let newArray = [...rulesAddition];
+                                            newArray[index] = value;
+                                            setRulesAddition(newArray);
+                                        }}
+                                        onDelete={() => {
+                                            deleteRuleAddition(index);
+                                        }}
+                                    />
+                                ))}
                             {/* <AddRuleRow mockInstitutes={mockInstitutes} /> */}
                             {/* Mocado remove dps */}
                             {/* <AddRuleRow mockInstitutes={mockInstitutes} /> */}
