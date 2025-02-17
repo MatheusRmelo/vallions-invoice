@@ -34,6 +34,9 @@ import '@fontsource/poppins/700.css';
 
 ///Toastfy import
 import { ToastContainer } from 'react-toastify';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { ptBR } from 'date-fns/locale/pt-BR';
 
 // ==============================|| REACT DOM RENDER ||============================== //
 
@@ -42,7 +45,9 @@ const root = createRoot(container!);
 root.render(
     <Provider store={store}>
         <ConfigProvider>
-            <App />
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+                <App />
+            </LocalizationProvider>
         </ConfigProvider>
         <ToastContainer autoClose={3000} hideProgressBar={false} closeOnClick rtl={false} draggable />
     </Provider>

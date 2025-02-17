@@ -26,6 +26,7 @@ import {
     SnackbarCloseReason,
     CircularProgress
 } from '@mui/material';
+
 import { DataGrid, GridRow } from '@mui/x-data-grid';
 import CustomTextField from 'ui-component/inputs/customSearchTextField';
 import MainCard from 'ui-component/cards/MainCard';
@@ -44,10 +45,10 @@ import ReceiptView from './ReceiptView';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 import { Doctor, parseDoctor } from 'types/doctor';
 import CompetenceConferenceForm from './CompetenceConferenceForm';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
 
 const BillingConference: React.FC = () => {
-    const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
-    const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
     const [tabIndex, setTabIndex] = useState(0);
     const [expandedRowIds, setExpandedRowIds] = useState<string[]>([]);
     const [conferences, setConferences] = useState<Conference[]>([]);
@@ -58,6 +59,8 @@ const BillingConference: React.FC = () => {
     const [openBillingReversal, setOpenBillingReversal] = useState(false);
     const [openBillingConfirm, setOpenBillingConfirm] = useState(false);
     const [openCompetenceConference, setOpenCompetenceConference] = useState(false);
+    const [startDate, setStartDate] = useState<Date>(new Date());
+    const [endDate, setEndDate] = useState<Date>(new Date());
 
     const [institutes, setInstitutes] = useState<Institute[]>([]);
     const [institute, setInstitute] = useState<string>();
@@ -169,7 +172,7 @@ const BillingConference: React.FC = () => {
     const getConferences = async () => {
         setLoading(true);
         const response = await get(
-            `/api/conference?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branch=${unity}${doctor ? `&physician=${doctor}` : ''}${filter ? `&type_date=${filter == 'Data Laudo' ? 1 : 2}` : ''}`
+            `/api/conference?date_init=${startDate.toISOString().slice(0, 10)}&date_end=${endDate.toISOString().slice(0, 10)}&institution=${institute}&branch=${unity}${doctor ? `&physician=${doctor}` : ''}${filter ? `&type_date=${filter == 'Data Laudo' ? 1 : 2}` : ''}`
         );
         if (response.ok) {
             setConferences(parseConferenceList(response.result));
@@ -182,7 +185,7 @@ const BillingConference: React.FC = () => {
     const getBillings = async () => {
         setLoading(true);
         const response = await get(
-            `/api/billings?date_init=${startDate}&date_end=${endDate}&institution=${institute}&branches=${unity}${doctor ? `&physician=${doctor}` : ''}${filter ? `&type_date=${filter == 'Data Laudo' ? 1 : 2}` : ''}`
+            `/api/billings?date_init=${startDate.toISOString().slice(0, 10)}&date_end=${endDate.toISOString().slice(0, 10)}&institution=${institute}&branches=${unity}${doctor ? `&physician=${doctor}` : ''}${filter ? `&type_date=${filter == 'Data Laudo' ? 1 : 2}` : ''}`
         );
         if (response.ok) {
             const billings = parseBillingList(response.result);
@@ -407,21 +410,20 @@ const BillingConference: React.FC = () => {
                     <CardContent sx={{ bgcolor: 'background.default' }}>
                         <Grid container spacing={4}>
                             <Grid item xs={isMobile ? 12 : 1.5}>
-                                <TextField
+                                <DatePicker
+                                    sx={{ width: '100%' }}
                                     label="Data Início"
-                                    type="date"
-                                    fullWidth
+
                                     value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
+                                    onChange={(newValue) => setStartDate(newValue ?? new Date())}
                                 />
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 1.5}>
-                                <TextField
+                                <DatePicker
+                                    sx={{ width: '100%' }}
                                     label="Data Fim"
-                                    type="date"
-                                    fullWidth
                                     value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
+                                    onChange={(newValue) => setEndDate(newValue ?? new Date())}
                                 />
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 1.5}>

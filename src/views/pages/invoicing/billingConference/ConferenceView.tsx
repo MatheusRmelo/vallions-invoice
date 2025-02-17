@@ -23,7 +23,12 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
     };
 
     return (
-        <>
+        <Box sx={{
+            '& .MuiDataGrid-root': { border: 'none' },
+            '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '12px' },
+            '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '12px', fontWeight: 'bold' },
+            '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
+        }}>
 
             <DataGrid
                 rows={conferences.map((conference) => {
@@ -181,7 +186,7 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                         );
                     }
                 }}
-            /></>
+            /></Box>
     );
 }
 

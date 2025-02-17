@@ -11,8 +11,8 @@ type Props = {
     price: number,
     unity?: Unity,
     conference: Conference | null,
-    startAt: string,
-    endAt: string,
+    startAt: Date,
+    endAt: Date,
 }
 
 type Month = {
@@ -86,8 +86,8 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference, sta
     }, [open]);
 
     const init = () => {
-        var start = new Date(startAt);
-        var end = new Date(endAt);
+        var start = startAt;
+        var end = endAt;
         setMonths(dataMonths.filter((element) => Number(element.number) >= start.getMonth() + 1 && Number(element.number) <= end.getMonth() + 1));
         setMonth("");
     }
