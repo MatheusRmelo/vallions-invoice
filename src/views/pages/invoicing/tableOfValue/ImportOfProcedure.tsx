@@ -3,6 +3,7 @@ import { Dialog, Divider, DialogTitle, DialogContent, DialogContentText, DialogA
 import useAPI from 'hooks/useAPI';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 import { parseProcedureCost, ProcedureCost } from 'types/procedures_costs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 interface ImportOfProcedureProps {
     open: boolean;
@@ -12,8 +13,8 @@ interface ImportOfProcedureProps {
 }
 
 const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProcedureId, institutionId, handleClose }) => {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
@@ -21,9 +22,9 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
     const { get } = useAPI();
 
     const handleImport = async () => {
-        const response = await get(`/api/procedures-by-date?institution=1&initial_effective_date=${startDate}&final_effective_date=${endDate}`);
+        const response = await get(`/api/procedures-by-date?institution=1&initial_effective_date=${startDate.toISOString().slice(0, 10)}&final_effective_date=${endDate.toISOString().slice(0, 10)}`);
         if (response.ok) {
-            handleClose(response.result.map(parseProcedureCost), startDate, endDate);
+            handleClose(response.result.map(parseProcedureCost), startDate.toISOString().slice(0, 10), endDate.toISOString().slice(0, 10));
         } else {
             handleClickSnack({ message: response.message ?? 'Error importar', severity: 'error' });
         }
@@ -83,29 +84,18 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                         justifyContent="space-between"
                         sx={{ px: { xs: 0, sm: '18%' } }}
                     >
-                        <TextField
-                            margin="dense"
+                        <DatePicker
                             label="Data Início"
-                            type="date"
-                            fullWidth
-                            InputLabelProps={{
-                                shrink: true
-                            }}
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            sx={{ mb: { xs: 2, sm: 0 } }}
+                            onChange={(value) => setStartDate(value ?? new Date())}
+                            sx={{ mb: { xs: 2, sm: 0 }, width: '100%' }}
                         />
                         <Box width={{ xs: 0, sm: '3vw' }} height={{ xs: '1vh', sm: 0 }} />
-                        <TextField
-                            margin="dense"
+                        <DatePicker
                             label="Data Fim"
-                            type="date"
-                            fullWidth
-                            InputLabelProps={{
-                                shrink: true
-                            }}
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
+                            sx={{ width: '100%' }}
+                            onChange={(value) => setEndDate(value ?? new Date())}
                         />
                     </Box>
                     <SnackBarAlert

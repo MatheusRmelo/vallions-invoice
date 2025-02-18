@@ -22,6 +22,7 @@ import { Institute } from 'types/institute';
 import useAPI from 'hooks/useAPI';
 import { parseProcedure, Procedure } from 'types/procedure';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 type Props = {
     open: boolean;
@@ -41,8 +42,8 @@ const procedureCostSchema = z.object({
 });
 
 const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, institutes, tableOfValueId }) => {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
     const [procedure, setProcedure] = useState<string>('');
     const [value, setValue] = useState('');
     const [institute, setInstitute] = useState<string>('');
@@ -64,16 +65,16 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
     const getProcedureCost = () => {
         if (procedureCost) {
             setValue(procedureCost.valueProcedure.toString());
-            setStartDate(procedureCost.validatyStart ? new Date(procedureCost.validatyStart!).toISOString().split('T')[0] : '');
-            setEndDate(procedureCost.validatyEnd ? new Date(procedureCost.validatyEnd!).toISOString().split('T')[0] : '');
+            setStartDate(procedureCost.validatyStart ? new Date(procedureCost.validatyStart!) : new Date());
+            setEndDate(procedureCost.validatyEnd ? new Date(procedureCost.validatyEnd!) : new Date());
             if (institutes.length > 0) {
                 setInstitute(institutes[0].id_institution);
             }
             setProcedure(procedureCost.codProcedure);
         } else {
             setValue('');
-            setStartDate('');
-            setEndDate('');
+            setStartDate(new Date());
+            setEndDate(new Date());
             setProcedure('');
         }
     };
@@ -114,8 +115,8 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 ...procedureCost,
                 codProcedure: procedure,
                 descriptionProcedure: getProcedureById(procedure)?.name ?? null,
-                validatyStart: startDate,
-                validatyEnd: endDate,
+                validatyStart: startDate.toISOString().split('T')[0],
+                validatyEnd: endDate.toISOString().split('T')[0],
                 valueProcedure: parseFloat(value)
             });
             return;
@@ -124,8 +125,8 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 codProcedure: procedure,
                 descriptionProcedure: getProcedureById(procedure)?.name ?? null,
                 id: 0,
-                validatyStart: startDate,
-                validatyEnd: endDate,
+                validatyStart: startDate.toISOString().split('T')[0],
+                validatyEnd: endDate.toISOString().split('T')[0],
                 valueProcedure: parseFloat(value)
             });
             return;
@@ -140,7 +141,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             fullWidth
             PaperProps={{
                 sx: {
-                    width: { xs: '95%', sm: '80%', md: '38%' },
+                    width: { xs: '95%', sm: '80%', md: '40%' },
                     height: 'auto',
                     padding: { xs: '10px', sm: '20px' },
                     margin: 0,
@@ -167,25 +168,19 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 <Box mt={{ xs: '2vh', sm: '4vh', md: '6vh' }} />
                 <Grid container spacing={{ xs: 1, sm: 2 }}>
                     <Grid item xs={12} sm={6} md={3}>
-                        <TextField
+                        <DatePicker
                             label="Data Inicio"
-                            type="date"
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            sx={{ mb: { xs: 1, sm: 0 } }}
+                            onChange={(value) => setStartDate(value ?? new Date())}
+                            sx={{ mb: { xs: 1, sm: 0 }, width: '100%' }}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
-                        <TextField
+                        <DatePicker
                             label="Data Fim"
-                            type="date"
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            sx={{ mb: { xs: 1, sm: 0 } }}
+                            onChange={(value) => setEndDate(value ?? new Date())}
+                            sx={{ mb: { xs: 1, sm: 0 }, width: '100%' }}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
