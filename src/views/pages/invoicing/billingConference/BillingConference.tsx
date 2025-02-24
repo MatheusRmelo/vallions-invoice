@@ -409,7 +409,7 @@ const BillingConference: React.FC = () => {
                 <Card>
                     <CardContent sx={{ bgcolor: 'background.default' }}>
                         <Grid container spacing={4}>
-                            <Grid item xs={isMobile ? 12 : 1.5}>
+                            <Grid item xs={isMobile ? 12 : 1.5} minWidth={'190px'}>
                                 <DatePicker
                                     sx={{ width: '100%' }}
                                     label="Data Início"
@@ -418,7 +418,7 @@ const BillingConference: React.FC = () => {
                                     onChange={(newValue) => setStartDate(newValue ?? new Date())}
                                 />
                             </Grid>
-                            <Grid item xs={isMobile ? 12 : 1.5}>
+                            <Grid item xs={isMobile ? 12 : 1.5} minWidth={'190px'}>
                                 <DatePicker
                                     sx={{ width: '100%' }}
                                     label="Data Fim"
@@ -426,7 +426,7 @@ const BillingConference: React.FC = () => {
                                     onChange={(newValue) => setEndDate(newValue ?? new Date())}
                                 />
                             </Grid>
-                            <Grid item xs={isMobile ? 12 : 1.5}>
+                            <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
                                 <FormControl fullWidth>
                                     <InputLabel id="filter">Filtro</InputLabel>
                                     <Select
@@ -445,7 +445,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={isMobile ? 12 : 1.5}>
+                            <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
                                 <FormControl fullWidth>
                                     <InputLabel id="institute">Instituição</InputLabel>
                                     <Select
@@ -464,7 +464,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={isMobile ? 12 : 1.5}>
+                            <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
                                 <FormControl fullWidth>
                                     <InputLabel id="unity">Unidade</InputLabel>
                                     <Select
@@ -482,7 +482,7 @@ const BillingConference: React.FC = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={isMobile ? 12 : 1.5}>
+                            <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
                                 <FormControl fullWidth>
                                     <InputLabel id="doctor">Médico</InputLabel>
                                     <Select
@@ -500,7 +500,7 @@ const BillingConference: React.FC = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={isMobile ? 12 : 2}>
+                            <Grid item xs={isMobile ? 12 : 2} >
                                 <Button
                                     variant="contained"
                                     color="primary"

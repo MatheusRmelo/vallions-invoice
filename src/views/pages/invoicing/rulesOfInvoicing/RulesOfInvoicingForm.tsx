@@ -422,9 +422,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                     </Box>
                 ) : (
                     <>
-                        <DialogTitle>Regras de Faturamento</DialogTitle>
+                        <DialogTitle sx={{ fontSize: '20px' }}>Regras de Faturamento</DialogTitle>
                         <DialogContent>
-                            <DialogContentText>
+                            <DialogContentText sx={{ fontSize: '12px' }}>
                                 <strong>Cadastro de Regras de Faturamento:</strong> Defina as regras de faturamento, incluindo condições e
                                 exceções que serão aplicadas. Verifique se todas as configurações estão corretas e de acordo com a
                                 instituição antes de salvar. Confirme se deseja cadastrar estas regras de faturamento.
@@ -502,9 +502,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             <Box mt={'6vh'} />
                             <Box display={'flex'} justifyContent={'space-between'} flexDirection={{ xs: 'column', md: 'row' }}>
                                 <Box display={'flex'} flexDirection={'column'} marginRight={{ md: '16px' }} mb={{ xs: '16px', md: 0 }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '1.5vh' }}>DEFINA AS REGRAS</span>
+                                    <span style={{ fontWeight: 'bold', fontSize: '12px' }}>DEFINA AS REGRAS</span>
                                     <Box height={'0.8vh'} />
-                                    <span style={{ fontSize: '1.2vh' }}>
+                                    <span style={{ fontSize: '12px' }}>
                                         <strong>Definição da Regra Principal:</strong> Estabeleça a regra principal que guiará o processo de
                                         faturamento. Esta regra será a base para todas as condições e execuções do faturamento.
                                     </span>
@@ -517,7 +517,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         fontWeight: 'bold',
                                         margin: '0',
                                         padding: '0',
-                                        fontSize: '1.5vh',
+                                        fontSize: '12px',
                                         backgroundColor: 'rgba(103, 58, 183, 1)',
                                         minWidth: '10vh'
                                     }}
@@ -549,9 +549,9 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             <Box mt={'6vh'} />
                             <Box display={'flex'} justifyContent={'space-between'} flexDirection={{ xs: 'column', md: 'row' }}>
                                 <Box display={'flex'} flexDirection={'column'} marginRight={{ md: '16px' }} mb={{ xs: '16px', md: 0 }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '1.5vh' }}>REGRAS ADICIONAIS</span>
+                                    <span style={{ fontWeight: 'bold', fontSize: '12px' }}>REGRAS ADICIONAIS</span>
                                     <Box height={'0.8vh'} />
-                                    <span style={{ fontSize: '1.2vh' }}>
+                                    <span style={{ fontSize: '12px' }}>
                                         <strong>Regras Adicionais:</strong> Estabeleça as regras principais e inclua as regras adicionais,
                                         como as prioridades dos estudos, que determinarão o e faturamento
                                     </span>
@@ -564,7 +564,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         fontWeight: 'bold',
                                         margin: '0',
                                         padding: '0',
-                                        fontSize: '1.5vh',
+                                        fontSize: '12px',
                                         backgroundColor: 'rgba(103, 58, 183, 1)',
                                         minWidth: '10vh'
                                     }}
