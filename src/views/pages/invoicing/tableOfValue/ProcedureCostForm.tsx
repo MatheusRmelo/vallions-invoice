@@ -43,9 +43,9 @@ const procedureCostSchema = z.object({
 });
 
 const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, institutes, tableOfValueId }) => {
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
-    const [procedure, setProcedure] = useState<string>('');
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [procedure, setProcedure] = useState<Procedure | null>(null);
     const [value, setValue] = useState('');
     const [institute, setInstitute] = useState<string>('');
     const [procedures, setProcedures] = useState<Procedure[]>([]);
@@ -65,8 +65,8 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
     const getProcedureCost = () => {
         if (procedureCost) {
             setValue(procedureCost.valueProcedure.toString());
-            setStartDate(procedureCost.validatyStart ? new Date(procedureCost.validatyStart!) : new Date());
-            setEndDate(procedureCost.validatyEnd ? new Date(procedureCost.validatyEnd!) : new Date());
+            setStartDate(procedureCost.validatyStart ? new Date(procedureCost.validatyStart) : null);
+            setEndDate(procedureCost.validatyEnd ? new Date(procedureCost.validatyEnd) : null);
             if (institutes.length > 0) {
                 setInstitute(institutes[0].id_institution);
             }
@@ -79,9 +79,9 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             }, 1000);
         } else {
             setValue('');
-            setStartDate(new Date());
-            setEndDate(new Date());
-            setProcedure('');
+            setStartDate(null);
+            setEndDate(null);
+            setProcedure(null);
         }
     };
 
@@ -122,10 +122,10 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
         if (procedureCost != null) {
             onClose({
                 ...procedureCost,
-                codProcedure: procedure,
-                descriptionProcedure: getProcedureById(procedure)?.name ?? null,
-                validatyStart: startDate.toISOString().split('T')[0],
-                validatyEnd: endDate.toISOString().split('T')[0],
+                codProcedure: procedure?.id.toString() ?? null,
+                descriptionProcedure: getProcedureById(procedure?.id.toString() ?? null)?.name ?? null,
+                validatyStart: formattedStartDate,
+                validatyEnd: formattedEndDate,
                 valueProcedure: parseFloat(value)
             });
             return;
@@ -134,8 +134,8 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 codProcedure: procedure?.id.toString() ?? null,
                 descriptionProcedure: getProcedureById(procedure?.id.toString() ?? null)?.name ?? null,
                 id: 0,
-                validatyStart: startDate.toISOString().split('T')[0],
-                validatyEnd: endDate.toISOString().split('T')[0],
+                validatyStart: formattedStartDate,
+                validatyEnd: formattedEndDate,
                 valueProcedure: parseFloat(value)
             });
             return;
@@ -150,7 +150,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             fullWidth
             PaperProps={{
                 sx: {
-                    width: { xs: '95%', sm: '80%', md: '40%' },
+                    width: { xs: '95%', sm: '80%', md: '38%' },
                     height: 'auto',
                     padding: { xs: '10px', sm: '20px' },
                     margin: 0,
@@ -182,18 +182,24 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 <Grid container spacing={{ xs: 1, sm: 2 }}>
                     <Grid item xs={12} sm={6} md={3}>
                         <DatePicker
-                            label="Data Inicio"
+                            label="Data Início"
                             value={startDate}
-                            onChange={(value) => setStartDate(value ?? new Date())}
-                            sx={{ mb: { xs: 1, sm: 0 }, width: '100%' }}
+                            onChange={(newValue) => setStartDate(newValue)}
+                            sx={{
+                                width: '100%',
+                                mb: { xs: 1, sm: 0 }
+                            }}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                         <DatePicker
                             label="Data Fim"
                             value={endDate}
-                            onChange={(value) => setEndDate(value ?? new Date())}
-                            sx={{ mb: { xs: 1, sm: 0 }, width: '100%' }}
+                            onChange={(newValue) => setEndDate(newValue)}
+                            sx={{
+                                width: '100%',
+                                mb: { xs: 1, sm: 0 }
+                            }}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>

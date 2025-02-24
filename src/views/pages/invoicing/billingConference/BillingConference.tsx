@@ -288,7 +288,6 @@ const BillingConference: React.FC = () => {
     };
 
     const handleOpenConferenceChecked = () => {
-
         var array: Conference[] = [...conferences.filter((element) => element.checked)];
 
         setCheckedConferences(array);
@@ -413,7 +412,6 @@ const BillingConference: React.FC = () => {
                                 <DatePicker
                                     sx={{ width: '100%' }}
                                     label="Data Início"
-
                                     value={startDate}
                                     onChange={(newValue) => setStartDate(newValue ?? new Date())}
                                 />
@@ -500,7 +498,7 @@ const BillingConference: React.FC = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={isMobile ? 12 : 2} >
+                            <Grid item xs={isMobile ? 12 : 2}>
                                 <Button
                                     variant="contained"
                                     color="primary"
@@ -521,13 +519,13 @@ const BillingConference: React.FC = () => {
                         </Tabs>
                         <Box mt={'4vh'} />
 
-                        <Box display="flex" alignItems={"center"} justifyContent="space-between">
+                        <Box display="flex" alignItems={'center'} justifyContent="space-between">
                             <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
-                            {tabIndex == 0 ? (
+                            {tabIndex === 0 ? (
                                 <IconButton onClick={() => handleOpenConferenceChecked()}>
                                     <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
                                 </IconButton>
-                            ) : tabIndex == 1 ? (
+                            ) : tabIndex === 1 ? (
                                 <Box display="flex">
                                     <RefreshOutlined onClick={() => handleOpenRefundBilling()} sx={{ color: 'action.active', mr: 2 }} />
                                     <MonetizationOn onClick={() => handleOpenConfirmBilling()} sx={{ color: 'action.active', mr: 1 }} />
@@ -585,7 +583,7 @@ const BillingConference: React.FC = () => {
                         <Box
                             display="flex"
                             alignItems={'center'}
-                            onClick={() => { }}
+                            onClick={() => {}}
                             sx={{
                                 '&:hover': {
                                     cursor: 'pointer',
@@ -601,7 +599,7 @@ const BillingConference: React.FC = () => {
                         <Box
                             display="flex"
                             alignItems={'center'}
-                            onClick={() => { }}
+                            onClick={() => {}}
                             sx={{
                                 '&:hover': {
                                     cursor: 'pointer',

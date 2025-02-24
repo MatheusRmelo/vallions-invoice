@@ -1,17 +1,23 @@
-import { ExpandLess, ExpandMore, MoreVert, RemoveRedEyeOutlined } from "@mui/icons-material";
-import { Box, IconButton, Checkbox, Typography, Chip, Menu, MenuItem, Button } from "@mui/material";
-import { DataGrid, GridRow } from "@mui/x-data-grid";
-import { useState } from "react";
-import { Conference } from "types/conference";
+import { ExpandLess, ExpandMore, MoreVert, RemoveRedEyeOutlined } from '@mui/icons-material';
+import { Box, IconButton, Checkbox, Typography, Chip, Menu, MenuItem, Button } from '@mui/material';
+import { DataGrid, GridRow } from '@mui/x-data-grid';
+import { useState } from 'react';
+import { Conference } from 'types/conference';
 
 type Props = {
-    conferences: Conference[],
-    expandedRowIds: string[],
-    handleExpandClick: (id: string) => void,
-    handleChangeCheckedConference: (id: string) => void,
-    handleChangeCheckedReport: (idBilling: string, idReport: number) => void,
-}
-const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handleChangeCheckedConference, handleChangeCheckedReport }: Props) => {
+    conferences: Conference[];
+    expandedRowIds: string[];
+    handleExpandClick: (id: string) => void;
+    handleChangeCheckedConference: (id: string) => void;
+    handleChangeCheckedReport: (idBilling: string, idReport: number) => void;
+};
+const ConferenceView = ({
+    conferences,
+    expandedRowIds,
+    handleExpandClick,
+    handleChangeCheckedConference,
+    handleChangeCheckedReport
+}: Props) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -23,13 +29,31 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
     };
 
     return (
-        <Box sx={{
-            '& .MuiDataGrid-root': { border: 'none' },
-            '& .MuiDataGrid-cell': { borderBottom: 'none', fontSize: '12px' },
-            '& .MuiDataGrid-columnHeaders': { borderBottom: 'none', fontSize: '12px', fontWeight: 'bold' },
-            '& .MuiDataGrid-footerContainer': { borderTop: 'none' }
-        }}>
-
+        <Box
+            sx={{
+                height: '100%',
+                width: '100%',
+                '& .MuiDataGrid-root': {
+                    border: 'none',
+                    maxHeight: '65vh'
+                },
+                '& .MuiDataGrid-cell': {
+                    borderBottom: 'none',
+                    fontSize: '12px'
+                },
+                '& .MuiDataGrid-columnHeaders': {
+                    borderBottom: 'none',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                },
+                '& .MuiDataGrid-footerContainer': {
+                    borderTop: 'none'
+                },
+                '& .MuiDataGrid-virtualScroller': {
+                    overflow: 'auto'
+                }
+            }}
+        >
             <DataGrid
                 rows={conferences.map((conference) => {
                     return {
@@ -41,7 +65,7 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                         quantity: conference.reports_finished_count,
                         valueUnit: Number(conference.price).toLocaleString(),
                         valueTotal: (Number(conference.reports_finished_count) * Number(conference.price)).toLocaleString(),
-                        checked: conference.checked,
+                        checked: conference.checked
                     };
                 })}
                 columns={[
@@ -59,32 +83,52 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                         )
                     },
                     {
-                        field: 'namePatient', headerName: 'Nome do Paciente', flex: 2, minWidth: 150
-                        , renderHeader: () => <strong style={{ fontSize: '12px' }}>Nome do Paciente</strong>,
-
+                        field: 'namePatient',
+                        headerName: 'Nome do Paciente',
+                        flex: 2,
+                        minWidth: 150,
+                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Nome do Paciente</strong>
                     },
                     {
-                        field: 'study_description', minWidth: 150, headerName: 'Descrição do Estudo', flex: 2,
-                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Estudo</strong>,
+                        field: 'study_description',
+                        minWidth: 150,
+                        headerName: 'Descrição do Estudo',
+                        flex: 2,
+                        renderHeader: () => <strong style={{ fontSize: '12px' }}>Descrição do Estudo</strong>
                     },
                     {
-                        field: 'dateOfStudy', minWidth: 150, headerName: 'Data do Estudo', flex: 1,
+                        field: 'dateOfStudy',
+                        minWidth: 150,
+                        headerName: 'Data do Estudo',
+                        flex: 1,
                         renderHeader: () => <strong style={{ fontSize: '12px' }}>Data do Estudo</strong>
                     },
                     {
-                        field: 'unity', minWidth: 150, headerName: 'Unidade', flex: 1,
+                        field: 'unity',
+                        minWidth: 150,
+                        headerName: 'Unidade',
+                        flex: 1,
                         renderHeader: () => <strong style={{ fontSize: '12px' }}>Unidade</strong>
                     },
                     {
-                        field: 'quantity', minWidth: 150, headerName: 'Qtn', flex: 1,
+                        field: 'quantity',
+                        minWidth: 150,
+                        headerName: 'Qtn',
+                        flex: 1,
                         renderHeader: () => <strong style={{ fontSize: '12px' }}>Qtn</strong>
                     },
                     {
-                        field: 'valueUnit', minWidth: 150, headerName: '$ Valor Laudo', flex: 1,
+                        field: 'valueUnit',
+                        minWidth: 150,
+                        headerName: '$ Valor Laudo',
+                        flex: 1,
                         renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Valor Laudo</strong>
                     },
                     {
-                        field: 'valueTotal', minWidth: 150, headerName: '$ Total', flex: 1,
+                        field: 'valueTotal',
+                        minWidth: 150,
+                        headerName: '$ Total',
+                        flex: 1,
                         renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Total</strong>
                     }
                 ]}
@@ -97,15 +141,28 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                             <>
                                 <GridRow {...props} />
                                 {expandedRowIds.includes(row.id) && (
-                                    <div style={{ gridColumn: '1 / -1', padding: '16px' }}>
+                                    <div
+                                        style={{
+                                            gridColumn: '1 / -1',
+                                            padding: '16px',
+                                            overflow: 'hidden'
+                                        }}
+                                    >
                                         <Box height={20} />
                                         <Typography variant="h3">Laudos</Typography>
                                         <Box height={20} />
-                                        <div style={{ height: 200, width: '100%' }}>
+                                        <div
+                                            style={{
+                                                height: '250px',
+                                                width: '100%'
+                                            }}
+                                        >
                                             <DataGrid
                                                 rows={(
-                                                    conferences.find((conference) => `${conference.id}${conference.price}${conference.patient_name}` === row.id)
-                                                        ?.reports_finished || []
+                                                    conferences.find(
+                                                        (conference) =>
+                                                            `${conference.id}${conference.price}${conference.patient_name}` === row.id
+                                                    )?.reports_finished || []
                                                 ).map((report) => {
                                                     return {
                                                         id: report.id,
@@ -113,7 +170,7 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                                         reportTitle: report.title,
                                                         reportValue: 'Não encontrado',
                                                         status: report.status,
-                                                        checked: report.checked,
+                                                        checked: report.checked
                                                     };
                                                 })}
                                                 columns={[
@@ -125,7 +182,12 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                                         renderHeader: () => <strong style={{ fontSize: '12px' }}>#</strong>,
                                                         renderCell: (params) => (
                                                             <Box>
-                                                                <Checkbox checked={params.row.checked} onChange={(v) => handleChangeCheckedReport(row.id, Number(params.row.id))} />
+                                                                <Checkbox
+                                                                    checked={params.row.checked}
+                                                                    onChange={(v) =>
+                                                                        handleChangeCheckedReport(row.id, Number(params.row.id))
+                                                                    }
+                                                                />
                                                                 {params.value}
                                                             </Box>
                                                         )
@@ -158,10 +220,19 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
 
                                                         flex: 2,
                                                         renderCell(params) {
-                                                            return <Chip
-                                                                variant='outlined'
-                                                                color={params.value == 0 ? 'error' : 'success'}
-                                                                label={params.value == 0 ? 'Em aberto' : params.value == '1' ? 'Faturado' : ''} />;
+                                                            return (
+                                                                <Chip
+                                                                    variant="outlined"
+                                                                    color={params.value == 0 ? 'error' : 'success'}
+                                                                    label={
+                                                                        params.value == 0
+                                                                            ? 'Em aberto'
+                                                                            : params.value == '1'
+                                                                              ? 'Faturado'
+                                                                              : ''
+                                                                    }
+                                                                />
+                                                            );
                                                         }
                                                     },
 
@@ -178,6 +249,15 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                                                 ]}
                                                 hideFooter
                                                 getRowId={(row) => row.id}
+                                                sx={{
+                                                    '& .MuiDataGrid-root': {
+                                                        border: 'none',
+                                                        overflow: 'auto'
+                                                    },
+                                                    '& .MuiDataGrid-virtualScroller': {
+                                                        overflow: 'auto'
+                                                    }
+                                                }}
                                             />
                                         </div>
                                     </div>
@@ -186,9 +266,10 @@ const ConferenceView = ({ conferences, expandedRowIds, handleExpandClick, handle
                         );
                     }
                 }}
-            /></Box>
+            />
+        </Box>
     );
-}
+};
 
 const RowMenu = ({ row }: any) => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -210,17 +291,13 @@ const RowMenu = ({ row }: any) => {
             <IconButton onClick={handleOpenMenu}>
                 <MoreVert />
             </IconButton>
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleCloseMenu}
-            >
-                <MenuItem onClick={() => handleAction("edit")}>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                <MenuItem onClick={() => handleAction('edit')}>
                     <RemoveRedEyeOutlined sx={{ color: 'action.active', fontSize: '2.3vh', marginRight: '0.3vh' }} />
                     <Box width={8} />
                     <span style={{ fontSize: '1.5vh', fontWeight: 'bold' }}>Imagens</span>
                 </MenuItem>
-                <MenuItem onClick={() => handleAction("delete")}>
+                <MenuItem onClick={() => handleAction('delete')}>
                     <RemoveRedEyeOutlined sx={{ color: 'action.active', fontSize: '2.3vh', marginRight: '0.3vh' }} />
                     <Box width={8} />
                     <span style={{ fontSize: '1.5vh', fontWeight: 'bold' }}>Laudos</span>

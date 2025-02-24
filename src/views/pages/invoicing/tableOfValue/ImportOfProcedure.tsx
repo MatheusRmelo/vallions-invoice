@@ -14,7 +14,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import useAPI from 'hooks/useAPI';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 import { parseProcedureCost, ProcedureCost } from 'types/procedures_costs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 interface ImportOfProcedureProps {
     open: boolean;
