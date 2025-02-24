@@ -22,11 +22,11 @@ export type ReportConference = {
 
 export function parseReportConference(data: any): ReportConference {
     return {
-        id: data.id || 0,
+        id: parseInt(data.report_id || '0'),
         study_fk: data.study_fk || '',
         title: data.title || '',
         status: data.status || '',
-        date_report: data.date_report || '',
+        date_report: data.report_date || '',
         report_price: data.report_price || '0',
         checked: false
     };
@@ -48,7 +48,7 @@ export function parseConference(data: any): Conference {
         description: data.description || '',
         date_study: data.date_study || '',
         reports_finished_count: data.reports_finished_count || '0',
-        reports_finished: parseReportConferenceList(data.reports_finished || []),
+        reports_finished: parseReportConferenceList(data.reportsFinished || []),
         checked: false
     };
 }

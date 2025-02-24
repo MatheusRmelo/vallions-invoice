@@ -2,7 +2,7 @@ import { ExpandLess, ExpandMore, MoreVert, RemoveRedEyeOutlined } from '@mui/ico
 import { Box, IconButton, Checkbox, Typography, Chip, Menu, MenuItem, Button } from '@mui/material';
 import { DataGrid, GridRow } from '@mui/x-data-grid';
 import { useState } from 'react';
-import { Conference } from 'types/conference';
+import { Conference, ReportConference } from 'types/conference';
 
 type Props = {
     conferences: Conference[];
@@ -57,12 +57,13 @@ const ConferenceView = ({
             <DataGrid
                 rows={conferences.map((conference) => {
                     return {
-                        id: `${conference.id}${conference.price}${conference.patient_name}`,
+                        id: `${conference.id}${conference.patient_name}`,
                         namePatient: conference.patient_name,
                         study_description: conference.description,
                         dateOfStudy: conference.date_study,
                         unity: conference.branch_name,
                         quantity: conference.reports_finished_count,
+                        reports: conference.reports_finished,
                         valueUnit: Number(
                             conference.reports_finished.map((e) => Number(e.report_price)).reduce((a, b) => a + b, 0)
                         ).toLocaleString(),
@@ -164,16 +165,13 @@ const ConferenceView = ({
                                         >
                                             <DataGrid
                                                 rows={(
-                                                    conferences.find(
-                                                        (conference) =>
-                                                            `${conference.id}${conference.price}${conference.patient_name}` === row.id
-                                                    )?.reports_finished || []
-                                                ).map((report) => {
+                                                    row.reports || []
+                                                ).map((report: ReportConference) => {
                                                     return {
                                                         id: report.id,
                                                         reportDate: report.date_report,
                                                         reportTitle: report.title,
-                                                        reportValue: 'Não encontrado',
+                                                        reportValue: report.report_price ?? 'Nulo',
                                                         status: report.status,
                                                         checked: report.checked
                                                     };

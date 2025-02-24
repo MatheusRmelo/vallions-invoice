@@ -200,7 +200,7 @@ const BillingConference: React.FC = () => {
     const handleChangeCheckedConference = (idBilling: string) => {
         var newArray = [...conferences];
         for (let i = 0; i < newArray.length; i++) {
-            if (`${newArray[i].id}${newArray[i].price}${newArray[i].patient_name}` == idBilling) {
+            if (`${newArray[i].id}${newArray[i].patient_name}` == idBilling) {
                 if (!newArray[i].checked) {
                     if (newArray[i].reports_finished.length == 0) {
                         handleClickSnack({ message: 'Não é possível faturar, pois não foi encontrado o ReportID', severity: 'error' });
@@ -229,7 +229,7 @@ const BillingConference: React.FC = () => {
     const handleChangeCheckedReport = (idBilling: string, idReport: number) => {
         var newArray = [...conferences];
         for (let i = 0; i < newArray.length; i++) {
-            if (`${newArray[i].id}${newArray[i].price}${newArray[i].patient_name}` == idBilling) {
+            if (`${newArray[i].id}${newArray[i].patient_name}` == idBilling) {
                 for (let x = 0; x < newArray[i].reports_finished.length; x++) {
                     if (newArray[i].reports_finished[x].id == idReport) {
                         newArray[i].reports_finished[x].checked = !newArray[i].reports_finished[x].checked;
