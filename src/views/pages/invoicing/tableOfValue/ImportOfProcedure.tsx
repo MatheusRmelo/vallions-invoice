@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Dialog, Divider, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Box, SnackbarCloseReason } from '@mui/material';
+import { Dialog, Divider, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Box, SnackbarCloseReason } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import useAPI from 'hooks/useAPI';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
 import { parseProcedureCost, ProcedureCost } from 'types/procedures_costs';
@@ -12,8 +13,8 @@ interface ImportOfProcedureProps {
 }
 
 const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProcedureId, institutionId, handleClose }) => {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
@@ -21,9 +22,17 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
     const { get } = useAPI();
 
     const handleImport = async () => {
-        const response = await get(`/api/procedures-by-date?institution=1&initial_effective_date=${startDate}&final_effective_date=${endDate}`);
+        if (!startDate || !endDate) {
+            handleClickSnack({ message: 'Selecione as datas de início e fim', severity: 'error' });
+            return;
+        }
+
+        const formattedStartDate = startDate.toISOString().split('T')[0];
+        const formattedEndDate = endDate.toISOString().split('T')[0];
+
+        const response = await get(`/api/procedures-by-date?institution=1&initial_effective_date=${formattedStartDate}&final_effective_date=${formattedEndDate}`);
         if (response.ok) {
-            handleClose(response.result.map(parseProcedureCost), startDate, endDate);
+            handleClose(response.result.map(parseProcedureCost), formattedStartDate, formattedEndDate);
         } else {
             handleClickSnack({ message: response.message ?? 'Error importar', severity: 'error' });
         }
@@ -39,7 +48,6 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
         setOpenSucessSnack(false);
         setOpenErrorSnack(false);
     };
-
 
     return (
         <div>
@@ -83,29 +91,21 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                         justifyContent="space-between"
                         sx={{ px: { xs: 0, sm: '18%' } }}
                     >
-                        <TextField
-                            margin="dense"
+                        <DatePicker
                             label="Data Início"
-                            type="date"
-                            fullWidth
-                            InputLabelProps={{
-                                shrink: true
-                            }}
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            sx={{ mb: { xs: 2, sm: 0 } }}
+                            onChange={(newValue) => setStartDate(newValue)}
+                            sx={{
+                                width: '100%',
+                                mb: { xs: 2, sm: 0 }
+                            }}
                         />
                         <Box width={{ xs: 0, sm: '3vw' }} height={{ xs: '1vh', sm: 0 }} />
-                        <TextField
-                            margin="dense"
+                        <DatePicker
                             label="Data Fim"
-                            type="date"
-                            fullWidth
-                            InputLabelProps={{
-                                shrink: true
-                            }}
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
+                            onChange={(newValue) => setEndDate(newValue)}
+                            sx={{ width: '100%' }}
                         />
                     </Box>
                     <SnackBarAlert

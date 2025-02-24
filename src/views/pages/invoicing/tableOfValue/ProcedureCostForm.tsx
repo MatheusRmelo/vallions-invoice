@@ -22,6 +22,7 @@ import { Institute } from 'types/institute';
 import useAPI from 'hooks/useAPI';
 import { parseProcedure, Procedure } from 'types/procedure';
 import SnackBarAlert from 'ui-component/SnackBarAlert';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 type Props = {
     open: boolean;
@@ -34,6 +35,7 @@ type Props = {
 const procedureCostSchema = z.object({
     id: z.number(),
     codProcedure: z.string(),
+
     descriptionProcedure: z.string(),
     validatyStart: z.string(),
     validatyEnd: z.string(),
@@ -41,13 +43,12 @@ const procedureCostSchema = z.object({
 });
 
 const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, institutes, tableOfValueId }) => {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [procedure, setProcedure] = useState<string>('');
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [procedure, setProcedure] = useState<Procedure | null>(null);
     const [value, setValue] = useState('');
     const [institute, setInstitute] = useState<string>('');
     const [procedures, setProcedures] = useState<Procedure[]>([]);
-
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
 
@@ -64,17 +65,23 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
     const getProcedureCost = () => {
         if (procedureCost) {
             setValue(procedureCost.valueProcedure.toString());
-            setStartDate(procedureCost.validatyStart ? new Date(procedureCost.validatyStart!).toISOString().split('T')[0] : '');
-            setEndDate(procedureCost.validatyEnd ? new Date(procedureCost.validatyEnd!).toISOString().split('T')[0] : '');
+            setStartDate(procedureCost.validatyStart ? new Date(procedureCost.validatyStart) : null);
+            setEndDate(procedureCost.validatyEnd ? new Date(procedureCost.validatyEnd) : null);
             if (institutes.length > 0) {
                 setInstitute(institutes[0].id_institution);
             }
-            setProcedure(procedureCost.codProcedure);
+
+            const procedure = getProcedureById(procedureCost.codProcedure);
+            console.log('procedure: ' + procedure?.name);
+            console.log('procedureId: ' + procedure?.id);
+            setTimeout(() => {
+                setProcedure(procedure);
+            }, 1000);
         } else {
             setValue('');
-            setStartDate('');
-            setEndDate('');
-            setProcedure('');
+            setStartDate(null);
+            setEndDate(null);
+            setProcedure(null);
         }
     };
 
@@ -109,23 +116,26 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             return;
         }
 
+        const formattedStartDate = startDate.toISOString().split('T')[0];
+        const formattedEndDate = endDate.toISOString().split('T')[0];
+
         if (procedureCost != null) {
             onClose({
                 ...procedureCost,
-                codProcedure: procedure,
-                descriptionProcedure: getProcedureById(procedure)?.name ?? null,
-                validatyStart: startDate,
-                validatyEnd: endDate,
+                codProcedure: procedure?.id.toString() ?? null,
+                descriptionProcedure: getProcedureById(procedure?.id.toString() ?? null)?.name ?? null,
+                validatyStart: formattedStartDate,
+                validatyEnd: formattedEndDate,
                 valueProcedure: parseFloat(value)
             });
             return;
         } else {
             onClose({
-                codProcedure: procedure,
-                descriptionProcedure: getProcedureById(procedure)?.name ?? null,
+                codProcedure: procedure?.id.toString() ?? null,
+                descriptionProcedure: getProcedureById(procedure?.id.toString() ?? null)?.name ?? null,
                 id: 0,
-                validatyStart: startDate,
-                validatyEnd: endDate,
+                validatyStart: formattedStartDate,
+                validatyEnd: formattedEndDate,
                 valueProcedure: parseFloat(value)
             });
             return;
@@ -167,25 +177,25 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 <Box mt={{ xs: '2vh', sm: '4vh', md: '6vh' }} />
                 <Grid container spacing={{ xs: 1, sm: 2 }}>
                     <Grid item xs={12} sm={6} md={3}>
-                        <TextField
-                            label="Data Inicio"
-                            type="date"
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
+                        <DatePicker
+                            label="Data Início"
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            sx={{ mb: { xs: 1, sm: 0 } }}
+                            onChange={(newValue) => setStartDate(newValue)}
+                            sx={{
+                                width: '100%',
+                                mb: { xs: 1, sm: 0 }
+                            }}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
-                        <TextField
+                        <DatePicker
                             label="Data Fim"
-                            type="date"
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            sx={{ mb: { xs: 1, sm: 0 } }}
+                            onChange={(newValue) => setEndDate(newValue)}
+                            sx={{
+                                width: '100%',
+                                mb: { xs: 1, sm: 0 }
+                            }}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -219,7 +229,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                                 id="procedure-select"
                                 value={procedure}
                                 label="Procedimento"
-                                onChange={(e) => setProcedure(e.target.value as string)}
+                                onChange={(e) => setProcedure(e.target.value as Procedure)}
                                 fullWidth
                                 IconComponent={ArrowDropDownIcon}
                             >
