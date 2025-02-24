@@ -63,8 +63,13 @@ const ConferenceView = ({
                         dateOfStudy: conference.date_study,
                         unity: conference.branch_name,
                         quantity: conference.reports_finished_count,
-                        valueUnit: Number(conference.price).toLocaleString(),
-                        valueTotal: (Number(conference.reports_finished_count) * Number(conference.price)).toLocaleString(),
+                        valueUnit: Number(
+                            conference.reports_finished.map((e) => Number(e.report_price)).reduce((a, b) => a + b, 0)
+                        ).toLocaleString(),
+                        valueTotal: (
+                            Number(conference.reports_finished_count) *
+                            Number(conference.reports_finished.map((e) => Number(e.report_price)).reduce((a, b) => a + b, 0))
+                        ).toLocaleString(),
                         checked: conference.checked
                     };
                 })}

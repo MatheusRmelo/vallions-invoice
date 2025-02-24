@@ -118,7 +118,7 @@ const BillingConference: React.FC = () => {
             const reports = parseReportBillingList(response.result);
             var newArray = [...receipts];
             for (let i = 0; i < newArray.length; i++) {
-                if (newArray[i].id == id) {
+                if (newArray[i].id === id) {
                     newArray[i].reportsBilling = reports.map((element) => ({ ...element, status: '1' }));
                 }
             }
@@ -627,7 +627,7 @@ const BillingConference: React.FC = () => {
             <CompetenceConferenceForm
                 open={openCompetenceConference}
                 onClose={(value) => handleCloseCompetenceConference(value)}
-                price={Number(currentConference?.price ?? 0)}
+                price={currentConference?.reports_finished?.map((e) => Number(e.report_price)).reduce((a, b) => a + b, 0) ?? 0}
                 unity={getUnityById(unity ?? '')}
                 conference={currentConference}
                 startAt={startDate}
