@@ -7,6 +7,7 @@ import { Conference } from 'types/conference';
 type Props = {
     conferences: Conference[];
     expandedRowIds: string[];
+    keySearch: string;
     handleExpandClick: (id: string) => void;
     handleChangeCheckedConference: (id: string) => void;
     handleChangeCheckedReport: (idBilling: string, idReport: number) => void;
@@ -16,7 +17,8 @@ const ConferenceView = ({
     expandedRowIds,
     handleExpandClick,
     handleChangeCheckedConference,
-    handleChangeCheckedReport
+    handleChangeCheckedReport,
+    keySearch
 }: Props) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -55,24 +57,32 @@ const ConferenceView = ({
             }}
         >
             <DataGrid
-                rows={conferences.map((conference) => {
-                    return {
-                        id: `${conference.id}${conference.price}${conference.patient_name}`,
-                        namePatient: conference.patient_name,
-                        study_description: conference.description,
-                        dateOfStudy: conference.date_study,
-                        unity: conference.branch_name,
-                        quantity: conference.reports_finished_count,
-                        valueUnit: Number(
-                            conference.reports_finished.map((e) => Number(e.report_price)).reduce((a, b) => a + b, 0)
-                        ).toLocaleString(),
-                        valueTotal: (
-                            Number(conference.reports_finished_count) *
-                            Number(conference.reports_finished.map((e) => Number(e.report_price)).reduce((a, b) => a + b, 0))
-                        ).toLocaleString(),
-                        checked: conference.checked
-                    };
-                })}
+                rows={conferences
+                    .filter((conference) => {
+                        if (conference.patient_name.toLowerCase().includes(keySearch.toLowerCase())) {
+                            return conference;
+                        } else {
+                            return null;
+                        }
+                    })
+                    .map((conference) => {
+                        return {
+                            id: `${conference.id}${conference.price}${conference.patient_name}`,
+                            namePatient: conference.patient_name,
+                            study_description: conference.description,
+                            dateOfStudy: conference.date_study,
+                            unity: conference.branch_name,
+                            quantity: conference.reports_finished_count,
+                            valueUnit: Number(
+                                conference.reports_finished.map((e) => Number(e.report_price)).reduce((a, b) => a + b, 0)
+                            ).toLocaleString(),
+                            valueTotal: (
+                                Number(conference.reports_finished_count) *
+                                Number(conference.reports_finished.map((e) => Number(e.report_price)).reduce((a, b) => a + b, 0))
+                            ).toLocaleString(),
+                            checked: conference.checked
+                        };
+                    })}
                 columns={[
                     {
                         field: 'expand',

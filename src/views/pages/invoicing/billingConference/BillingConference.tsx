@@ -75,7 +75,7 @@ const BillingConference: React.FC = () => {
     const [checkedBillings, setCheckedBillings] = useState<ReportBilling[]>([]);
     const [currentConference, setCurrentConference] = useState<Conference | null>(null);
     const [checkedConferences, setCheckedConferences] = useState<Conference[]>([]);
-
+    const [keySearch, setKeySearch] = useState<string>('');
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
@@ -520,7 +520,11 @@ const BillingConference: React.FC = () => {
                         <Box mt={'4vh'} />
 
                         <Box display="flex" alignItems={'center'} justifyContent="space-between">
-                            <CustomTextField label="Search" prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />} />
+                            <CustomTextField
+                                label="Search"
+                                onChange={(e) => setKeySearch(e.target.value)}
+                                prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />}
+                            />
                             {tabIndex === 0 ? (
                                 <IconButton onClick={() => handleOpenConferenceChecked()}>
                                     <SendOutlined sx={{ color: 'action.active', mr: 1 }} />
@@ -542,6 +546,7 @@ const BillingConference: React.FC = () => {
                                 {tabIndex === 0 && (
                                     <ConferenceView
                                         conferences={conferences}
+                                        keySearch={keySearch}
                                         expandedRowIds={expandedRowIds}
                                         handleChangeCheckedConference={(id) => handleChangeCheckedConference(id)}
                                         handleChangeCheckedReport={(idBilling, idReport) => handleChangeCheckedReport(idBilling, idReport)}
