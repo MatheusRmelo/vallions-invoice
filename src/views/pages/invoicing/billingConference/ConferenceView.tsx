@@ -57,7 +57,7 @@ const ConferenceView = ({
             <DataGrid
                 rows={conferences.map((conference) => {
                     return {
-                        id: `${conference.id}${conference.price}${conference.patient_name}`,
+                        id: `${conference.id}${conference.patient_name}`,
                         namePatient: conference.patient_name,
                         study_description: conference.description,
                         dateOfStudy: conference.date_study,
@@ -167,7 +167,7 @@ const ConferenceView = ({
                                                 rows={(
                                                     conferences.find(
                                                         (conference) =>
-                                                            `${conference.id}${conference.price}${conference.patient_name}` === row.id
+                                                            `${conference.id}${conference.patient_name}` === row.id
                                                     )?.reports_finished || []
                                                 ).map((report) => {
                                                     return {
