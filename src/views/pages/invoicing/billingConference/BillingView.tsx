@@ -119,7 +119,7 @@ const BillingView = ({ billings, expandedRowIds, handleExpandClick, handleChange
                         renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Total</strong>
                     }
                 ]}
-                hideFooter
+                hideFooter={false}
                 getRowId={(row) => row.id}
                 slots={{
                     row: (props) => {

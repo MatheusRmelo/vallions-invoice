@@ -105,7 +105,7 @@ const ReceiptView = ({ billings, expandedRowIds, handleExpandClick }: Props) => 
                         renderHeader: () => <strong style={{ fontSize: '12px' }}>$ Total</strong>
                     }
                 ]}
-                hideFooter
+                hideFooter={false}
                 getRowId={(row) => row.id}
                 slots={{
                     row: (props) => {
