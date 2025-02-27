@@ -9,7 +9,7 @@ type Props = {
     expandedRowIds: string[];
     handleExpandClick: (id: string) => void;
 };
-const ReceiptView = ({ billings, expandedRowIds, handleExpandClick, keySearch }: Props) => {
+const ReceiptView = ({ billings, expandedRowIds, handleExpandClick }: Props) => {
     return (
         <Box
             sx={{
