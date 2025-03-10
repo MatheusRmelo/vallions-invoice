@@ -238,13 +238,15 @@ const ConferenceView = ({
                                                             return (
                                                                 <Chip
                                                                     variant="outlined"
-                                                                    color={params.value == 0 ? 'error' : 'success'}
+                                                                    color={params.value === 0 ? 'error' : 'success'}
                                                                     label={
-                                                                        params.value == 0
-                                                                            ? 'Em aberto'
-                                                                            : params.value == '1'
-                                                                              ? 'Faturado'
-                                                                              : ''
+                                                                        /// Solicitado ao cliente para ficar fixo "Em Aberto"
+                                                                        'Em Aberto'
+                                                                        // params.value == 0
+                                                                        //     ? 'Em aberto'
+                                                                        //     : params.value == '1'
+                                                                        //       ? 'Faturado'
+                                                                        //       : ''
                                                                     }
                                                                 />
                                                             );
