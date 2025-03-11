@@ -513,13 +513,13 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                     variant="contained"
                                     sx={{
                                         width: '18vh',
-                                        height: '3.5vh',
+                                        height: '32px',
                                         fontWeight: 'bold',
                                         margin: '0',
                                         padding: '0',
                                         fontSize: '12px',
                                         backgroundColor: 'rgba(103, 58, 183, 1)',
-                                        minWidth: '10vh'
+                                        minWidth: '18vh'
                                     }}
                                     onClick={handleClickAddRule}
                                 >
@@ -560,13 +560,13 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                     variant="contained"
                                     sx={{
                                         width: '18vh',
-                                        height: '3.5vh',
+                                        height: '32px',
                                         fontWeight: 'bold',
                                         margin: '0',
                                         padding: '0',
                                         fontSize: '12px',
                                         backgroundColor: 'rgba(103, 58, 183, 1)',
-                                        minWidth: '10vh'
+                                        minWidth: '18vh'
                                     }}
                                     onClick={handleClickAddRulesAditional}
                                 >

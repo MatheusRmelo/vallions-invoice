@@ -45,7 +45,7 @@ const procedureCostSchema = z.object({
 const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, institutes, tableOfValueId }) => {
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const [procedure, setProcedure] = useState<Procedure | null>(null);
+    const [procedure, setProcedure] = useState<string | null>(null);
     const [value, setValue] = useState('');
     const [institute, setInstitute] = useState<string>('');
     const [procedures, setProcedures] = useState<Procedure[]>([]);
@@ -71,12 +71,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 setInstitute(institutes[0].id_institution);
             }
 
-            const procedure = getProcedureById(procedureCost.codProcedure);
-            console.log('procedure: ' + procedure?.name);
-            console.log('procedureId: ' + procedure?.id);
-            setTimeout(() => {
-                setProcedure(procedure);
-            }, 1000);
+            setProcedure(procedureCost.codProcedure);
         } else {
             setValue('');
             setStartDate(null);
@@ -122,8 +117,8 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
         if (procedureCost != null) {
             onClose({
                 ...procedureCost,
-                codProcedure: procedure?.id.toString() ?? null,
-                descriptionProcedure: getProcedureById(procedure?.id.toString() ?? null)?.name ?? null,
+                codProcedure: procedure ?? null,
+                descriptionProcedure: getProcedureById(procedure ?? null)?.name ?? null,
                 validatyStart: formattedStartDate,
                 validatyEnd: formattedEndDate,
                 valueProcedure: parseFloat(value)
@@ -131,8 +126,8 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             return;
         } else {
             onClose({
-                codProcedure: procedure?.id.toString() ?? null,
-                descriptionProcedure: getProcedureById(procedure?.id.toString() ?? null)?.name ?? null,
+                codProcedure: procedure ?? null,
+                descriptionProcedure: getProcedureById(procedure ?? null)?.name ?? null,
                 id: 0,
                 validatyStart: formattedStartDate,
                 validatyEnd: formattedEndDate,
@@ -180,29 +175,50 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 </DialogContentText>
                 <Box mt={{ xs: '2vh', sm: '4vh', md: '6vh' }} />
                 <Grid container spacing={{ xs: 1, sm: 2 }}>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid item xs={12} sm={6} md={6}>
                         <DatePicker
                             label="Data Início"
                             value={startDate}
                             onChange={(newValue) => setStartDate(newValue)}
                             sx={{
                                 width: '100%',
+                                minWidth: '100px',
                                 mb: { xs: 1, sm: 0 }
                             }}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid item xs={12} sm={6} md={6}>
                         <DatePicker
                             label="Data Fim"
                             value={endDate}
                             onChange={(newValue) => setEndDate(newValue)}
                             sx={{
-                                width: '100%',
+                                width: '100%', minWidth: '180px',
                                 mb: { xs: 1, sm: 0 }
                             }}
                         />
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} sm={6}>
+                        <FormControl fullWidth>
+                            <InputLabel id="procedure-label">Procedimento</InputLabel>
+                            <Select
+                                labelId="procedure-label"
+                                id="procedure-select"
+                                value={procedure}
+                                label="Procedimento"
+                                onChange={(e) => setProcedure(e.target.value as string)}
+                                fullWidth
+                                IconComponent={ArrowDropDownIcon}
+                            >
+                                {procedures.map((procedure) => (
+                                    <MenuItem key={procedure.id.toString()} value={procedure.id.toString()}>
+                                        {procedure.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6}>
                         <FormControl fullWidth>
                             <InputLabel id="institute-label">Instituição</InputLabel>
                             <Select
@@ -225,26 +241,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 </Grid>
                 <Box mt={{ xs: '1vh', sm: '2vh' }} />
                 <Grid container spacing={{ xs: 1, sm: 2 }}>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
-                            <InputLabel id="procedure-label">Procedimento</InputLabel>
-                            <Select
-                                labelId="procedure-label"
-                                id="procedure-select"
-                                value={procedure}
-                                label="Procedimento"
-                                onChange={(e) => setProcedure(e.target.value as Procedure)}
-                                fullWidth
-                                IconComponent={ArrowDropDownIcon}
-                            >
-                                {procedures.map((procedure) => (
-                                    <MenuItem key={procedure.id} value={procedure.id}>
-                                        {procedure.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
+
                     <Grid item xs={12} sm={6}>
                         <TextField label="Valor" fullWidth value={value} onChange={(e) => setValue(e.target.value)} />
                     </Grid>
@@ -254,17 +251,15 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
             <DialogActions
                 sx={{
                     padding: { xs: '8px', sm: '16px' },
-                    justifyContent: 'center'
+                    justifyContent: 'end'
                 }}
             >
                 <Button
                     variant="outlined"
                     sx={{
-                        width: { xs: '80px', sm: '10vh' },
-                        height: { xs: '36px', sm: '4vh' },
                         fontWeight: 'bold',
-                        fontSize: { xs: '14px', sm: '1.5vh' }
                     }}
+                    size="large"
                     onClick={() => onClose(null)}
                     color="primary"
                 >
@@ -275,10 +270,8 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                     variant="contained"
                     type="submit"
                     onClick={handleSaveProcedureCost}
+                    size="large"
                     sx={{
-                        width: { xs: '80px', sm: '10vh' },
-                        height: { xs: '36px', sm: '4vh' },
-                        fontSize: { xs: '14px', sm: '1.5vh' },
                         fontWeight: 'bold',
                         color: 'white',
                         backgroundColor: 'rgba(103, 58, 183, 1)'

@@ -72,10 +72,22 @@ const TableOfValues = () => {
         }
         if (found != -1) {
             setTableOfValues(newArray);
-            await put(`/api/medical-procedure-costs/${id.valueOf()}`, {
+            var response = await put(`/api/medical-procedure-costs/${id.valueOf()}`, {
                 ...newArray[found],
                 status: newArray[found].status ? 1 : 0
             });
+            if (response.ok) {
+                setOpenSucessSnack(true);
+                setMessageSnack(
+                    newArray[found].status ? 'A tabela de valores foi ativada com sucesso' : 'A tabela de valores foi desativada com sucesso'
+                );
+            } else {
+                setOpenErrorSnack(true);
+                setMessageSnack('Não foi possível alterar o status da tabela de valores. ');
+                newArray[found].status = !newArray[found].status;
+            }
+
+
         }
     };
 
@@ -117,7 +129,7 @@ const TableOfValues = () => {
     return (
         <>
             <MainCard title="Tabela de Valores" sx={{ bgcolor: 'background.default' }}>
-                <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
+                <SnackBarAlert open={openSucessSnack} message={messageSnack ?? 'Sucesso!'} severity="success" onClose={handleCloseSnack} />
                 <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 <Box display="flex" justifyContent="space-between">
                     <CustomTextField

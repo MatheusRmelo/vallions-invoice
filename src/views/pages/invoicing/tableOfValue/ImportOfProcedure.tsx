@@ -96,20 +96,19 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                     <Box
                         display="flex"
                         flexDirection={{ xs: 'column', sm: 'row' }}
-                        justifyContent="space-between"
-                        sx={{ px: { xs: 0, sm: '18%' } }}
+                        justifyContent="center"
                     >
                         <DatePicker
                             label="Data Início"
                             value={startDate}
                             onChange={(value) => setStartDate(value ?? new Date())}
-                            sx={{ mb: { xs: 2, sm: 0 }, width: '100%' }}
+                            sx={{ minWidth: '200px', maxWidth: '200px' }}
                         />
-                        <Box width={{ xs: 0, sm: '3vw' }} height={{ xs: '1vh', sm: 0 }} />
+                        <Box width={32} />
                         <DatePicker
                             label="Data Fim"
                             value={endDate}
-                            sx={{ width: '100%' }}
+                            sx={{ minWidth: '200px', maxWidth: '200px' }}
                             onChange={(value) => setEndDate(value ?? new Date())}
                         />
                     </Box>
@@ -119,17 +118,15 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                 <DialogActions
                     sx={{
                         padding: { xs: '8px', sm: '16px' },
-                        justifyContent: 'center'
+                        justifyContent: 'end'
                     }}
                 >
                     <Button
                         variant="outlined"
                         sx={{
-                            width: { xs: '80px', sm: '10vh' },
-                            height: { xs: '36px', sm: '4vh' },
                             fontWeight: 'bold',
-                            fontSize: { xs: '14px', sm: '1.5vh' }
                         }}
+                        size="large"
                         onClick={() => handleClose(null, null, null)}
                         color="primary"
                     >
@@ -139,10 +136,8 @@ const ImportOfProcedure: React.FC<ImportOfProcedureProps> = ({ open, billingProc
                     <Button
                         variant="contained"
                         onClick={handleImport}
+                        size="large"
                         sx={{
-                            width: { xs: '80px', sm: '10vh' },
-                            height: { xs: '36px', sm: '4vh' },
-                            fontSize: { xs: '14px', sm: '1.5vh' },
                             fontWeight: 'bold',
                             color: 'white',
                             backgroundColor: 'rgba(103, 58, 183, 1)'
