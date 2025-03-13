@@ -121,10 +121,6 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference, sta
     };
 
     const handleSave = async () => {
-        if (quantity == '') {
-            handleClickSnack({ message: 'Quantidade é obrigatório', severity: 'error' });
-            return;
-        }
         if (month == '') {
             handleClickSnack({ message: 'Mês é obrigatório', severity: 'error' });
             return;
@@ -136,9 +132,9 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference, sta
         }
         var monthClosing = months.filter((element) => element.number == month);
         const response = await post(`/api/billings`, {
-            value_total: parseInt(quantity) * price,
+            value_total: parseInt(conference?.reports_finished_count ?? '0') * price,
             month_closing: `${new Date().getFullYear()}-${monthClosing[0].number}-01`,
-            quantity: parseInt(quantity),
+            quantity: parseInt(conference?.reports_finished_count ?? '0'),
             status: 0,
             branch_fk: unity?.cd_unidade
         });
