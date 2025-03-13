@@ -193,7 +193,8 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                             value={endDate}
                             onChange={(newValue) => setEndDate(newValue)}
                             sx={{
-                                width: '100%', minWidth: '180px',
+                                width: '100%',
+                                minWidth: '180px',
                                 mb: { xs: 1, sm: 0 }
                             }}
                         />
@@ -241,7 +242,6 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 </Grid>
                 <Box mt={{ xs: '1vh', sm: '2vh' }} />
                 <Grid container spacing={{ xs: 1, sm: 2 }}>
-
                     <Grid item xs={12} sm={6}>
                         <TextField label="Valor" fullWidth value={value} onChange={(e) => setValue(e.target.value)} />
                     </Grid>
@@ -257,7 +257,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 <Button
                     variant="outlined"
                     sx={{
-                        fontWeight: 'bold',
+                        fontWeight: 'bold'
                     }}
                     size="large"
                     onClick={() => onClose(null)}
