@@ -267,12 +267,12 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                     <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={handleCloseSnack} />
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" onClick={() => handleClose(false)} color="primary" size="large">
+                    <Button variant="outlined" onClick={() => handleClose(false)} color="primary" size="medium">
                         Fechar
                     </Button>
                     <Box width={5} />
                     <Button
-                        size="large"
+                        size="medium"
                         variant="contained"
                         type="submit"
                         sx={{ color: 'white', backgroundColor: 'rgba(103, 58, 183, 1)' }}

@@ -282,6 +282,11 @@ const BillingConference: React.FC = () => {
     }, []);
 
     const handleSearch = () => {
+        if (institute == undefined || unity == undefined) {
+            handleClickSnack({ message: 'E necessário informar a instituição e a Unidade para pesquisar ', severity: 'error' });
+            return;
+        }
+
         getBillings();
         getConferences();
         setExpandedRowIds([]);
@@ -410,7 +415,7 @@ const BillingConference: React.FC = () => {
                         <Grid container spacing={4}>
                             <Grid item xs={isMobile ? 12 : 1.5} minWidth={'190px'}>
                                 <DatePicker
-                                    sx={{ width: '100%' }}
+                                    sx={{ width: '100%', height: '80%' }}
                                     label="Data Início"
                                     value={startDate}
                                     onChange={(newValue) => setStartDate(newValue ?? new Date())}
@@ -418,14 +423,14 @@ const BillingConference: React.FC = () => {
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 1.5} minWidth={'190px'}>
                                 <DatePicker
-                                    sx={{ width: '100%' }}
+                                    sx={{ width: '100%', height: '80%' }}
                                     label="Data Fim"
                                     value={endDate}
                                     onChange={(newValue) => setEndDate(newValue ?? new Date())}
                                 />
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
-                                <FormControl fullWidth>
+                                <FormControl fullWidth sx={{ height: '80%' }}>
                                     <InputLabel id="filter">Filtro</InputLabel>
                                     <Select
                                         fullWidth
@@ -433,6 +438,7 @@ const BillingConference: React.FC = () => {
                                         variant="outlined"
                                         value={filter}
                                         onChange={(e) => setFilter(e.target.value)}
+                                        sx={{ height: '100%' }}
                                     >
                                         {['Data Laudo', 'Data Estudo'].map((value) => (
                                             <MenuItem key={value} value={value}>
@@ -444,7 +450,7 @@ const BillingConference: React.FC = () => {
                             </Grid>
 
                             <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
-                                <FormControl fullWidth>
+                                <FormControl fullWidth sx={{ height: '80%' }}>
                                     <InputLabel id="institute">Instituição</InputLabel>
                                     <Select
                                         fullWidth
@@ -452,6 +458,7 @@ const BillingConference: React.FC = () => {
                                         variant="outlined"
                                         value={institute}
                                         onChange={(e) => setInstitute(e.target.value as string)}
+                                        sx={{ height: '100%' }}
                                     >
                                         {institutes.map((institution) => (
                                             <MenuItem key={institution.id_institution} value={institution.id_institution}>
@@ -463,7 +470,7 @@ const BillingConference: React.FC = () => {
                             </Grid>
 
                             <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
-                                <FormControl fullWidth>
+                                <FormControl fullWidth sx={{ height: '80%' }}>
                                     <InputLabel id="unity">Unidade</InputLabel>
                                     <Select
                                         fullWidth
@@ -471,6 +478,7 @@ const BillingConference: React.FC = () => {
                                         variant="outlined"
                                         value={unity}
                                         onChange={(e) => setUnity(e.target.value as string)}
+                                        sx={{ height: '100%' }}
                                     >
                                         {unities.map((unity) => (
                                             <MenuItem key={unity.cd_unidade} value={unity.cd_unidade}>
@@ -481,7 +489,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
-                                <FormControl fullWidth>
+                                <FormControl fullWidth sx={{ height: '80%' }}>
                                     <InputLabel id="doctor">Médico</InputLabel>
                                     <Select
                                         fullWidth
@@ -489,6 +497,7 @@ const BillingConference: React.FC = () => {
                                         variant="outlined"
                                         value={doctor}
                                         onChange={(e) => setDoctor(e.target.value as string)}
+                                        sx={{ height: '100%' }}
                                     >
                                         {doctors.map((doctor) => (
                                             <MenuItem key={doctor.id_physician} value={doctor.id_physician}>
@@ -503,7 +512,7 @@ const BillingConference: React.FC = () => {
                                     variant="contained"
                                     color="primary"
                                     fullWidth
-                                    style={{ height: '90%' }}
+                                    style={{ height: '80%', width: 'auto' }}
                                     onClick={handleSearch}
                                     disabled={!(startDate && endDate)}
                                 >
