@@ -415,18 +415,30 @@ const BillingConference: React.FC = () => {
                         <Grid container spacing={4}>
                             <Grid item xs={isMobile ? 12 : 1.5} minWidth={'190px'}>
                                 <DatePicker
-                                    sx={{ width: '100%', height: '80%' }}
+                                    sx={{ width: '100%' }}
                                     label="Data Início"
                                     value={startDate}
                                     onChange={(newValue) => setStartDate(newValue ?? new Date())}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            size: 'small'
+                                        }
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 1.5} minWidth={'190px'}>
                                 <DatePicker
-                                    sx={{ width: '100%', height: '80%' }}
+                                    sx={{ width: '100%' }}
                                     label="Data Fim"
                                     value={endDate}
                                     onChange={(newValue) => setEndDate(newValue ?? new Date())}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            size: 'small'
+                                        }
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
