@@ -441,8 +441,8 @@ const BillingConference: React.FC = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
-                                <FormControl fullWidth sx={{ height: '80%' }}>
+                            <Grid item xs={isMobile ? 12 : 1.3} minWidth={'150px'}>
+                                <FormControl fullWidth size='small'>
                                     <InputLabel id="filter">Filtro</InputLabel>
                                     <Select
                                         fullWidth
@@ -462,7 +462,7 @@ const BillingConference: React.FC = () => {
                             </Grid>
 
                             <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
-                                <FormControl fullWidth sx={{ height: '80%' }}>
+                                <FormControl fullWidth size='small'>
                                     <InputLabel id="institute">Instituição</InputLabel>
                                     <Select
                                         fullWidth
@@ -482,7 +482,7 @@ const BillingConference: React.FC = () => {
                             </Grid>
 
                             <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
-                                <FormControl fullWidth sx={{ height: '80%' }}>
+                                <FormControl fullWidth size='small'>
                                     <InputLabel id="unity">Unidade</InputLabel>
                                     <Select
                                         fullWidth
@@ -501,7 +501,7 @@ const BillingConference: React.FC = () => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={isMobile ? 12 : 1.2} minWidth={'150px'}>
-                                <FormControl fullWidth sx={{ height: '80%' }}>
+                                <FormControl fullWidth size='small'>
                                     <InputLabel id="doctor">Médico</InputLabel>
                                     <Select
                                         fullWidth
@@ -524,7 +524,7 @@ const BillingConference: React.FC = () => {
                                     variant="contained"
                                     color="primary"
                                     fullWidth
-                                    style={{ height: '80%', width: 'auto' }}
+                                    style={{ height: '100%', width: 'auto' }}
                                     onClick={handleSearch}
                                     disabled={!(startDate && endDate)}
                                 >
@@ -609,7 +609,7 @@ const BillingConference: React.FC = () => {
                         <Box
                             display="flex"
                             alignItems={'center'}
-                            onClick={() => {}}
+                            onClick={() => { }}
                             sx={{
                                 '&:hover': {
                                     cursor: 'pointer',
@@ -625,7 +625,7 @@ const BillingConference: React.FC = () => {
                         <Box
                             display="flex"
                             alignItems={'center'}
-                            onClick={() => {}}
+                            onClick={() => { }}
                             sx={{
                                 '&:hover': {
                                     cursor: 'pointer',
