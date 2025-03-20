@@ -17,7 +17,7 @@ const AddRule: React.FC<AddRuleProps> = ({ rule, tableOfValues, setRule, onDelet
     return (
         <Grid container spacing={1} alignItems="center">
             <Grid item xs={12} sm={2}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                     <InputLabel id="level-label">Nivel de Prioridade</InputLabel>
                     <Select
                         fullWidth
@@ -40,7 +40,7 @@ const AddRule: React.FC<AddRuleProps> = ({ rule, tableOfValues, setRule, onDelet
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={3}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                     <InputLabel id="tableValue-label">Selecione Tabela de Valores</InputLabel>
                     <Select
                         fullWidth
@@ -63,7 +63,7 @@ const AddRule: React.FC<AddRuleProps> = ({ rule, tableOfValues, setRule, onDelet
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={3}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                     <InputLabel id="typeCharge-label">Selecione Tipo de Cobrança</InputLabel>
                     <Select
                         fullWidth

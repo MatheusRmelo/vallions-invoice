@@ -48,7 +48,7 @@ const FormControlSelect = ({
     };
 
     return (
-        <FormControl fullWidth error={errorState}>
+        <FormControl fullWidth size="small" error={errorState}>
             <TextField
                 id="outlined-select-currency"
                 select

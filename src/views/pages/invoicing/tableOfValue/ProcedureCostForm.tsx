@@ -200,7 +200,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
+                        <FormControl fullWidth size="small">
                             <InputLabel id="procedure-label">Procedimento</InputLabel>
                             <Select
                                 labelId="procedure-label"
@@ -220,7 +220,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
-                        <FormControl fullWidth>
+                        <FormControl fullWidth size="small">
                             <InputLabel id="institute-label">Instituição</InputLabel>
                             <Select
                                 labelId="institute-label"

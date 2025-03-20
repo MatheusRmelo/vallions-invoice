@@ -29,7 +29,6 @@ import useScriptRef from 'hooks/useScriptRef';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-
 // ===============================|| JWT LOGIN ||=============================== //
 
 const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
@@ -93,7 +92,12 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
         >
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
-                    <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
+                    <FormControl
+                        fullWidth
+                        size="small"
+                        error={Boolean(touched.email && errors.email)}
+                        sx={{ ...theme.typography.customInput }}
+                    >
                         <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-email-login"
@@ -111,7 +115,12 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         )}
                     </FormControl>
 
-                    <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
+                    <FormControl
+                        fullWidth
+                        size="small"
+                        error={Boolean(touched.password && errors.password)}
+                        sx={{ ...theme.typography.customInput }}
+                    >
                         <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password-login"

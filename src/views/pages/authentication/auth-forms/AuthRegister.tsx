@@ -151,7 +151,12 @@ const JWTRegister = ({ ...others }) => {
                                 />
                             </Grid>
                         </Grid>
-                        <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
+                        <FormControl
+                            fullWidth
+                            size="small"
+                            error={Boolean(touched.email && errors.email)}
+                            sx={{ ...theme.typography.customInput }}
+                        >
                             <InputLabel htmlFor="outlined-adornment-email-register">Email Address / Username</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-email-register"
@@ -209,7 +214,7 @@ const JWTRegister = ({ ...others }) => {
                         </FormControl>
 
                         {strength !== 0 && (
-                            <FormControl fullWidth>
+                            <FormControl fullWidth size="small">
                                 <Box sx={{ mb: 2 }}>
                                     <Grid container spacing={2} alignItems="center">
                                         <Grid item>

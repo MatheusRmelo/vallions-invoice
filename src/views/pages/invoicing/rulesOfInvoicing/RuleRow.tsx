@@ -23,7 +23,7 @@ const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, o
     return (
         <Grid container spacing={1} alignItems="center">
             <Grid item xs={12} sm={3}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                     <InputLabel id="tableValue-label">Selecione Tabela de Valores</InputLabel>
                     <Select
                         fullWidth
@@ -46,7 +46,7 @@ const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, o
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={3}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                     <InputLabel id="typeCharge-label">Selecione Tipo de Cobrança</InputLabel>
                     <Select
                         fullWidth
@@ -82,7 +82,7 @@ const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, o
                 />
             </Grid>
             <Grid item xs={12} sm={2}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                     <InputLabel id="tag-label">Selecione a TAG</InputLabel>
                     <Select
                         fullWidth

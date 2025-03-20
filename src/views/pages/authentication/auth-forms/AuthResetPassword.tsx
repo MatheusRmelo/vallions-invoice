@@ -114,7 +114,12 @@ const AuthResetPassword = ({ ...others }) => {
         >
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
-                    <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
+                    <FormControl
+                        fullWidth
+                        size="small"
+                        error={Boolean(touched.password && errors.password)}
+                        sx={{ ...theme.typography.customInput }}
+                    >
                         <InputLabel htmlFor="outlined-adornment-password-reset">Password</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password-reset"
@@ -143,14 +148,14 @@ const AuthResetPassword = ({ ...others }) => {
                         />
                     </FormControl>
                     {touched.password && errors.password && (
-                        <FormControl fullWidth>
+                        <FormControl fullWidth size="small">
                             <FormHelperText error id="standard-weight-helper-text-reset">
                                 {errors.password}
                             </FormHelperText>
                         </FormControl>
                     )}
                     {strength !== 0 && (
-                        <FormControl fullWidth>
+                        <FormControl fullWidth size="small">
                             <Box sx={{ mb: 2 }}>
                                 <Grid container spacing={2} alignItems="center">
                                     <Grid item>
@@ -192,7 +197,7 @@ const AuthResetPassword = ({ ...others }) => {
                     </FormControl>
 
                     {touched.confirmPassword && errors.confirmPassword && (
-                        <FormControl fullWidth>
+                        <FormControl fullWidth size="small">
                             <FormHelperText error id="standard-weight-helper-text-confirm-password">
                                 {' '}
                                 {errors.confirmPassword}{' '}

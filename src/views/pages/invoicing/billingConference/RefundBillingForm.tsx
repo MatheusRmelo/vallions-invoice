@@ -1,26 +1,39 @@
-import { Dialog, Box, DialogTitle, DialogContent, DialogContentText, Grid, FormControl, InputLabel, Select, MenuItem, TextField, DialogActions, Button, SnackbarCloseReason } from "@mui/material";
-import useAPI from "hooks/useAPI";
-import { useState } from "react";
-import { Billing, ReportBilling } from "types/billing";
-import { Unity } from "types/unity";
-import SnackBarAlert from "ui-component/SnackBarAlert";
+import {
+    Dialog,
+    Box,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    Grid,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    TextField,
+    DialogActions,
+    Button,
+    SnackbarCloseReason
+} from '@mui/material';
+import useAPI from 'hooks/useAPI';
+import { useState } from 'react';
+import { Billing, ReportBilling } from 'types/billing';
+import { Unity } from 'types/unity';
+import SnackBarAlert from 'ui-component/SnackBarAlert';
 
 type Props = {
-    open: boolean,
-    onClose: (success: boolean) => void,
-    billing: ReportBilling | null,
-    unity?: Unity,
-}
-
+    open: boolean;
+    onClose: (success: boolean) => void;
+    billing: ReportBilling | null;
+    unity?: Unity;
+};
 
 const RefundBillingForm = ({ open, onClose, billing, unity }: Props) => {
-    const [reason, setReason] = useState("");
+    const [reason, setReason] = useState('');
     const [openSucessSnack, setOpenSucessSnack] = useState(false);
     const [openErrorSnack, setOpenErrorSnack] = useState(false);
     const [messageSnack, setMessageSnack] = useState('');
 
     const { post } = useAPI();
-
 
     const handleClickSnack = ({ message, severity }: { message: string; severity: 'success' | 'error' | 'warning' | 'info' }) => {
         setMessageSnack(message);
@@ -42,11 +55,13 @@ const RefundBillingForm = ({ open, onClose, billing, unity }: Props) => {
         } else {
             handleClickSnack({ message: response.message ?? 'Error ao confirmar faturamento', severity: 'error' });
         }
-    }
+    };
 
     return (
         <Dialog fullWidth maxWidth={'lg'} open={open} onClose={() => onClose(false)}>
-            {billing == null ? <div></div> :
+            {billing == null ? (
+                <div></div>
+            ) : (
                 <div>
                     <Box margin={'10px'}>
                         <DialogTitle>
@@ -62,7 +77,7 @@ const RefundBillingForm = ({ open, onClose, billing, unity }: Props) => {
                             <Box height={40} />
                             <Grid container spacing={2}>
                                 <Grid item xs={8}>
-                                    <FormControl fullWidth>
+                                    <FormControl fullWidth size="small">
                                         <InputLabel id="select-label">Unidade</InputLabel>
                                         <Select labelId="select-label" label="Select" value={unity?.cd_unidade} disabled>
                                             <MenuItem value={unity?.cd_unidade}>{unity?.name}</MenuItem>
@@ -73,7 +88,12 @@ const RefundBillingForm = ({ open, onClose, billing, unity }: Props) => {
                                     <TextField label="R$ Valor" fullWidth value={billing?.valueReport} disabled />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <TextField label="Motivo do Estorno" fullWidth value={reason} onChange={(e) => setReason(e.target.value)} />
+                                    <TextField
+                                        label="Motivo do Estorno"
+                                        fullWidth
+                                        value={reason}
+                                        onChange={(e) => setReason(e.target.value)}
+                                    />
                                 </Grid>
                             </Grid>
                             <SnackBarAlert open={openSucessSnack} message="Sucesso!" severity="success" onClose={handleCloseSnack} />
@@ -96,9 +116,9 @@ const RefundBillingForm = ({ open, onClose, billing, unity }: Props) => {
                         </Button>
                     </DialogActions>
                 </div>
-            }
+            )}
         </Dialog>
     );
-}
+};
 
 export default RefundBillingForm;

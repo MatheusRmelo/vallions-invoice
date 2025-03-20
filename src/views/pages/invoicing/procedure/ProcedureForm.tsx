@@ -217,7 +217,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth error={Boolean(errors.institute)} sx={formControlStyles}>
+                            <FormControl fullWidth size="small" error={Boolean(errors.institute)} sx={formControlStyles}>
                                 <InputLabel id="institute-label">Instituição</InputLabel>
                                 <Select
                                     labelId="institute-label"
@@ -240,7 +240,7 @@ const ProcedureForm: React.FC<ProcedureFormProps> = ({ open, handleClose, proced
                         </Grid>
                         <Box width={10} />
                         <Grid item xs={12} sm={5.8}>
-                            <FormControl fullWidth error={Boolean(errors.modality)} sx={formControlStyles}>
+                            <FormControl fullWidth size="small" error={Boolean(errors.modality)} sx={formControlStyles}>
                                 <InputLabel id="modality-label">Modalidade</InputLabel>
                                 <Select
                                     labelId="modality-label"

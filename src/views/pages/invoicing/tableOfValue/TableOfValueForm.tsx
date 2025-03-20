@@ -152,7 +152,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     medicalProcedureId = response.result.id;
                 } else {
                     handleClickSnack({ message: response.message ?? 'Error ao salvar as tabela de valores', severity: 'error' });
-
                 }
             }
             idsForDelete.forEach(async (id) => {
@@ -166,7 +165,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             if (medicalProcedureId != null) {
                 const results = proceduresCosts.map(async (procedureCost) => {
                     if (procedureCost.id != 0 && procedureCost.id != null) {
-
                         return put(`/api/costs-has-procedures/${procedureCost!.id}`, {
                             medical_procedure_cost_fk: medicalProcedureId!,
                             billing_procedures_fk: procedureCost.codProcedure,
@@ -192,8 +190,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                     handleClickSnack({ message: 'Erro ao salvar os procedimentos', severity: 'error' });
                 }
             }
-
-
         }
     };
 
@@ -229,7 +225,6 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             //     setError(response.message);
             // }
             setIdsForDelete([...idsForDelete, proceduresCosts[id].id!]);
-
         }
     };
 
@@ -249,7 +244,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
             setProceduresCosts(newArray);
         }
         setImportOpen(false);
-    }
+    };
 
     const formatDate = (date: Date) => {
         const day = String(date.getDate()).padStart(2, '0'); // Adiciona zero se necessário
@@ -257,8 +252,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
         const year = date.getFullYear();
         const formattedDate = `${day}/${month}/${year}`;
         return formattedDate;
-    }
-
+    };
 
     const validate = () => {
         const newErrors = { ...errors };
@@ -326,7 +320,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                         </Grid>
                         <Box width={50} />
                         <Grid item xs={12} sm={5}>
-                            <FormControl fullWidth error={Boolean(errors.institute)} sx={formControlStyles}>
+                            <FormControl fullWidth size="small" error={Boolean(errors.institute)} sx={formControlStyles}>
                                 <InputLabel id="institute-label">Instituição</InputLabel>
                                 <Select
                                     labelId="institute-label"
@@ -402,11 +396,15 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 .map((procedureCost, index) => {
                                     return {
                                         id: index,
-                                        initDate: procedureCost.validatyStart == null ? '' : formatDate(new Date(procedureCost.validatyStart!)),
+                                        initDate:
+                                            procedureCost.validatyStart == null ? '' : formatDate(new Date(procedureCost.validatyStart!)),
                                         endDate: procedureCost.validatyEnd == null ? '' : formatDate(new Date(procedureCost.validatyEnd!)),
                                         procedureCode: procedureCost.codProcedure,
                                         procedureDescription: procedureCost.descriptionProcedure,
-                                        value: procedureCost.valueProcedure == null ? '' : formatNumberToBrazilian(parseFloat(procedureCost.valueProcedure.toString()))
+                                        value:
+                                            procedureCost.valueProcedure == null
+                                                ? ''
+                                                : formatNumberToBrazilian(parseFloat(procedureCost.valueProcedure.toString()))
                                     };
                                 })}
                             columns={[
@@ -482,7 +480,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                         color="primary"
                         size="large"
                         onClick={() => handleClose(false)}
-                    // color="primary"
+                        // color="primary"
                     >
                         Fechar
                     </Button>
@@ -499,7 +497,9 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                 <ImportOfProcedure
                     billingProcedureId={tableOfValue?.id ?? 0}
                     institutionId={tableOfValue?.institution_fk ?? institute}
-                    open={importOpen} handleClose={handleCloseImportOpen} />
+                    open={importOpen}
+                    handleClose={handleCloseImportOpen}
+                />
                 <ProcedureCostForm
                     procedureCost={procedureCost}
                     institutes={institutes}

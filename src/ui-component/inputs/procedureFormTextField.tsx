@@ -8,6 +8,7 @@ interface ProcedureFormFieldProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     error: boolean;
     helperText: string;
+    size?: string;
 }
 
 const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, value, onChange, error, helperText, ...props }) => {
@@ -40,7 +41,16 @@ const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, va
                 '& .MuiInputLabel-root': {
                     '&.Mui-focused': {
                         color: 'rgba(198, 40, 40, 1)'
-                    }
+                    },
+                    left: 0,
+                    right: 0
+                    // textAlign: 'center'
+                    // transformOrigin: 'center'
+                },
+
+                /// Definir Height
+                '& .MuiInputBase-root': {
+                    height: '43px'
                 }
             }}
             {...props}

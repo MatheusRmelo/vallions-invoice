@@ -81,7 +81,12 @@ const AuthForgotPassword = ({ ...others }) => {
         >
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
-                    <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
+                    <FormControl
+                        fullWidth
+                        size="small"
+                        error={Boolean(touched.email && errors.email)}
+                        sx={{ ...theme.typography.customInput }}
+                    >
                         <InputLabel htmlFor="outlined-adornment-email-forgot">Email Address / Username</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-email-forgot"

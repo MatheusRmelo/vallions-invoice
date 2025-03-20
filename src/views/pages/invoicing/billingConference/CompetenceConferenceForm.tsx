@@ -165,7 +165,7 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference, sta
                     <Box height={40} />
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
-                            <FormControl fullWidth>
+                            <FormControl fullWidth size="small">
                                 <InputLabel id="select-label">Competência</InputLabel>
                                 <Select labelId="select-label" label="Select" value={month} onChange={(e) => setMonth(e.target.value)}>
                                     {months.map((element) => (
@@ -175,7 +175,7 @@ const CompetenceConferenceForm = ({ open, onClose, price, unity, conference, sta
                             </FormControl>
                         </Grid>
                         <Grid item xs={6}>
-                            <FormControl fullWidth>
+                            <FormControl fullWidth size="small">
                                 <InputLabel id="select-label">Unidade</InputLabel>
                                 <Select labelId="select-label" label="Select" value={unity?.cd_unidade} disabled>
                                     <MenuItem value={unity?.cd_unidade}>{unity?.name}</MenuItem>
