@@ -61,9 +61,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             const institutes = response.result.map((institute: any) => parseInstitute(institute));
             setInstitutes(institutes);
         } else {
-            setError(
-                'Não foi possível carregar as instituições. Erro:' +
-                response.message);
+            setError('Não foi possível carregar as instituições. Erro:' + response.message);
         }
     };
 
@@ -119,8 +117,8 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             setRules([]);
             setInstitution(undefined);
             setRulesAddition([]);
-
-        } setIdsForDelete([]);
+        }
+        setIdsForDelete([]);
         setIdsForDeleteAddition([]);
     }, [open]);
 
@@ -274,36 +272,36 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
             const reqsRulesBillingsRaw = rules.map((e) =>
                 ruleEdit && e.id
                     ? put(`/api/billing-rule-goals/${e.id}`, {
-                        type: e.type,
-                        value: e.value,
-                        medical_procedure_cost_fk: e.tableOfValues?.id,
-                        billing_rule_fk: reqId,
-                        tag_fk: e.tag?.id
-                    })
+                          type: e.type,
+                          value: e.value,
+                          medical_procedure_cost_fk: e.tableOfValues?.id,
+                          billing_rule_fk: reqId,
+                          tag_fk: e.tag?.id
+                      })
                     : post('/api/billing-rule-goals', {
-                        type: e.type,
-                        value: e.value,
-                        medical_procedure_cost_fk: e.tableOfValues?.id,
-                        billing_rule_fk: reqId,
-                        tag_fk: e.tag?.id
-                    })
+                          type: e.type,
+                          value: e.value,
+                          medical_procedure_cost_fk: e.tableOfValues?.id,
+                          billing_rule_fk: reqId,
+                          tag_fk: e.tag?.id
+                      })
             );
             const reqsRulesPriorityRaw = rulesAddition.map((e) =>
                 ruleEdit && e.id
                     ? put(`/api/priority-billing-rules/${e.id}`, {
-                        priority: e.levelPriority,
-                        type: e.type,
-                        value: e.value,
-                        medical_procedure_cost_fk: e.tableOfValues?.id,
-                        billing_rule_fk: reqId
-                    })
+                          priority: e.levelPriority,
+                          type: e.type,
+                          value: e.value,
+                          medical_procedure_cost_fk: e.tableOfValues?.id,
+                          billing_rule_fk: reqId
+                      })
                     : post('/api/priority-billing-rules', {
-                        priority: e.levelPriority,
-                        type: e.type,
-                        value: e.value,
-                        medical_procedure_cost_fk: e.tableOfValues?.id,
-                        billing_rule_fk: reqId
-                    })
+                          priority: e.levelPriority,
+                          type: e.type,
+                          value: e.value,
+                          medical_procedure_cost_fk: e.tableOfValues?.id,
+                          billing_rule_fk: reqId
+                      })
             );
             console.log(reqsRulesBillingsRaw);
             const reqsRulesBillings = await Promise.all(reqsRulesBillingsRaw);
@@ -314,14 +312,10 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                 const reqsDelRulesBillings = await Promise.all(futureReqsDelRulesBillings);
                 const reqsDelRulesPriority = await Promise.all(futureReqsDelRulesPriority);
                 if (reqsDelRulesBillings.every((e) => e.ok) && reqsDelRulesPriority.every((e) => e.ok)) {
-                    const updatedRulesAddition = rulesAddition.filter(rule =>
-                        !idsForDeleteAddition.includes(rule.id!)
-                    );
+                    const updatedRulesAddition = rulesAddition.filter((rule) => !idsForDeleteAddition.includes(rule.id!));
                     setRulesAddition(updatedRulesAddition);
 
-                    const updatedRules = rules.filter(rule =>
-                        !idsForDelete.includes(rule.id!)
-                    );
+                    const updatedRules = rules.filter((rule) => !idsForDelete.includes(rule.id!));
                     setRules(updatedRules);
 
                     setIdsForDelete([]);
@@ -431,12 +425,21 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             </DialogContentText>
                             <Box mt={'6vh'} />
                             <Grid container spacing={2}>
-                                {
-                                    ruleEdit != null ?
-                                        <Grid item xs={12} md={2}>
-                                            <TextField value={idRules} fullWidth id="idRules" label="ID Regra" variant="outlined" sx={{ mb: 2 }} />
-                                        </Grid> : <></>
-                                }
+                                {ruleEdit != null ? (
+                                    <Grid item xs={12} md={2}>
+                                        <TextField
+                                            value={idRules}
+                                            fullWidth
+                                            id="idRules"
+                                            label="ID Regra"
+                                            variant="outlined"
+                                            sx={{ mb: 2 }}
+                                            size="small"
+                                        />
+                                    </Grid>
+                                ) : (
+                                    <></>
+                                )}
 
                                 <Grid item xs={12} md={4}>
                                     <TextField
@@ -447,17 +450,18 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                         value={description}
                                         onChange={(event) => setDescription(event.target.value)}
                                         sx={{ mb: 2 }}
+                                        size="small"
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={3}>
-                                    <FormControl fullWidth>
+                                    <FormControl fullWidth size="small">
                                         <InputLabel id="institute-label">Instituição</InputLabel>
                                         <Select
                                             fullWidth
                                             id="institution"
                                             label="Instituição"
                                             variant="outlined"
-                                            sx={{ mb: 2 }}
+                                            sx={{ height: '100%' }}
                                             value={institution?.id_institution || ''}
                                             onChange={(event) => {
                                                 const institute = institutes.find(
@@ -476,14 +480,14 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} md={3}>
-                                    <FormControl fullWidth>
+                                    <FormControl fullWidth size="small">
                                         <InputLabel id="unity-label">Unidade</InputLabel>
                                         <Select
                                             fullWidth
                                             id="unidade"
                                             label="Unidade"
                                             variant="outlined"
-                                            sx={{ mb: 2 }}
+                                            sx={{ height: '100%' }}
                                             value={unit?.name || ''}
                                             onChange={(event) => {
                                                 const unit: Unity | undefined = unities.find((unit) => unit.name === event.target.value);
@@ -528,7 +532,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             </Box>
                             <Box mt={'6vh'} />
                             {rules
-                                .filter(rule => !idsForDelete.includes(rule.id!))
+                                .filter((rule) => !idsForDelete.includes(rule.id!))
                                 .map((element, index) => (
                                     <RuleRow
                                         rule={element}
@@ -575,7 +579,7 @@ const RulesOfInvoicingForm: React.FC<Props> = ({ open, onClose, ruleEdit }) => {
                             </Box>
                             <Box mt={'6vh'} />
                             {rulesAddition
-                                .filter(rule => !idsForDeleteAddition.includes(rule.id!))
+                                .filter((rule) => !idsForDeleteAddition.includes(rule.id!))
                                 .map((element, index) => (
                                     <AddRuleRow
                                         rule={element}
