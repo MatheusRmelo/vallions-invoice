@@ -8,7 +8,6 @@ interface ProcedureFormFieldProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     error: boolean;
     helperText: string;
-    size?: string;
 }
 
 const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, value, onChange, error, helperText, ...props }) => {
@@ -21,6 +20,7 @@ const ProcedureFormField: React.FC<ProcedureFormFieldProps> = ({ label, name, va
             value={value}
             onChange={onChange}
             error={error}
+            size='small'
             /// Removido pela incerteza se é necessário
             // helperText={helperText}
             sx={{
