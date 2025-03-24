@@ -95,6 +95,7 @@ const AddRule: React.FC<AddRuleProps> = ({ rule, tableOfValues, setRule, onDelet
                     }}
                     label="Valor/Percentual"
                     variant="outlined"
+                    size="small"
                     sx={{ mb: 2 }}
                 />
             </Grid>

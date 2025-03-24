@@ -78,7 +78,7 @@ const RuleRow: React.FC<RuleRowProps> = ({ rule, tags, tableOfValues, setRule, o
                     }}
                     label="Valor/Percentual"
                     variant="outlined"
-                    size='small'
+                    size="small"
                     sx={{ mb: 2 }}
                 />
             </Grid>
