@@ -344,7 +344,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                         <Grid item xs={12} sm={4.7}></Grid>
                     </Grid>
                     <Box height="6vh" />
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Grid item xs={6} sm={5}>
                             <CustomTextFieldSearch
                                 label="Search"
@@ -354,7 +354,7 @@ const TableOfValueForm: React.FC<TableOfValueFormProps> = ({ open, handleClose, 
                                 prefixIcon={<Search sx={{ color: 'action.active', mr: 1 }} />}
                             />
                         </Grid>
-                        <Grid item xs={6} sm={5} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Grid item xs={6} sm={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <Box display="flex" alignItems="center">
                                 <CloudUpload
                                     onClick={() => {
