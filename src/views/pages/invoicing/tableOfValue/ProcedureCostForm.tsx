@@ -177,25 +177,29 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 <Grid container spacing={{ xs: 1, sm: 2 }}>
                     <Grid item xs={12} sm={6} md={6}>
                         <DatePicker
+                            sx={{ width: '100%' }}
                             label="Data Início"
                             value={startDate}
-                            onChange={(newValue) => setStartDate(newValue)}
-                            sx={{
-                                width: '100%',
-                                minWidth: '100px',
-                                mb: { xs: 1, sm: 0 }
+                            onChange={(newValue) => setStartDate(newValue ?? new Date())}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                    size: 'small'
+                                }
                             }}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
                         <DatePicker
+                            sx={{ width: '100%' }}
                             label="Data Fim"
                             value={endDate}
-                            onChange={(newValue) => setEndDate(newValue)}
-                            sx={{
-                                width: '100%',
-                                minWidth: '180px',
-                                mb: { xs: 1, sm: 0 }
+                            onChange={(newValue) => setEndDate(newValue ?? new Date())}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                    size: 'small'
+                                }
                             }}
                         />
                     </Grid>
@@ -243,7 +247,7 @@ const ProcedureCostForm: React.FC<Props> = ({ open, onClose, procedureCost, inst
                 <Box mt={{ xs: '1vh', sm: '2vh' }} />
                 <Grid container spacing={{ xs: 1, sm: 2 }}>
                     <Grid item xs={12} sm={6}>
-                        <TextField label="Valor" fullWidth value={value} onChange={(e) => setValue(e.target.value)} />
+                        <TextField label="Valor" fullWidth value={value} onChange={(e) => setValue(e.target.value)} size="small" />
                     </Grid>
                 </Grid>
                 <SnackBarAlert open={openErrorSnack} message={messageSnack} severity="error" onClose={() => setOpenErrorSnack(false)} />
